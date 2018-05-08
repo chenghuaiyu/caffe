@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="decryption">
+      <UniqueIdentifier>{57070e6c-f7ca-495d-ae60-acbc504407ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="output">
+      <UniqueIdentifier>{0bf2081b-35c2-40d2-837a-b30a941bedf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="postprocess">
+      <UniqueIdentifier>{fb8ec8bd-ca73-4365-90d2-88460cfa24e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="runcaffe">
+      <UniqueIdentifier>{c2ef292d-5833-4924-9763-f2778350ba4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{fab8d47f-eea6-4718-8a5d-a1894baa8864}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{d434d5c1-3bba-4409-ac61-4c84731ad15e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{2e0bcb64-8192-434d-9c08-b86bc7ba9a66}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\wisdom\decryption\decryption.cpp">
+      <Filter>decryption</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\decryption\rc4.cpp">
+      <Filter>decryption</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\util\util.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\tools\encrypt.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe.cpp">
+      <Filter>runcaffe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case1.cpp">
+      <Filter>runcaffe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_normal.cpp">
+      <Filter>runcaffe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess.cpp">
+      <Filter>postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess_case1.cpp">
+      <Filter>postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess_classify.cpp">
+      <Filter>postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess_normal.cpp">
+      <Filter>postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\output\cjson.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\output\output.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\output\outputcjson.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\output\outputxml.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\detection.cpp" />
+    <ClCompile Include="..\..\wisdom\preprocess.cpp" />
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess_classify_uniform.cpp">
+      <Filter>postprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\config\get_config.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\output\tinyxml2.cpp">
+      <Filter>output</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\config\get_config_normal.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\config\get_config_xml.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case2.cpp">
+      <Filter>runcaffe</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\wisdom\decryption\decryption.h">
+      <Filter>decryption</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\decryption\rc4.hpp">
+      <Filter>decryption</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\util\util.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\tools\encrypt.hpp">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe.hpp">
+      <Filter>runcaffe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case1.hpp">
+      <Filter>runcaffe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_normal.hpp">
+      <Filter>runcaffe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess.h">
+      <Filter>postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess_case1.h">
+      <Filter>postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess_classify.h">
+      <Filter>postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess_normal.h">
+      <Filter>postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\output\cjson.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\output\output.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\output\outputcjson.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\output\outputxml.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\common.h" />
+    <ClInclude Include="..\..\wisdom\detection.hpp" />
+    <ClInclude Include="..\..\wisdom\preprocess.hpp" />
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess_classify_uniform.h">
+      <Filter>postprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\config\get_config.h">
+      <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\output\tinyxml2.h">
+      <Filter>output</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\config\get_config_normal.h">
+      <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\config\get_config_xml.h">
+      <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case2.hpp">
+      <Filter>runcaffe</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

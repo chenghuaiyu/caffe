@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="tools">
+      <UniqueIdentifier>{9bc6964a-9e29-432d-a391-caef337ec30b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="decryption">
+      <UniqueIdentifier>{ee726a83-34f4-4db1-9fd3-899a9dc184ff}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\wisdom\tools\encrypt.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\decryption\rc4.cpp">
+      <Filter>decryption</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\test\testrc4encode.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\wisdom\tools\encrypt.hpp">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\decryption\rc4.hpp">
+      <Filter>decryption</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
