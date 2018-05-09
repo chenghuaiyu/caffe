@@ -22,6 +22,9 @@
     <Filter Include="config">
       <UniqueIdentifier>{2e0bcb64-8192-434d-9c08-b86bc7ba9a66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dongle">
+      <UniqueIdentifier>{11b44a6e-5349-472c-974b-e214884df374}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\wisdom\decryption\decryption.cpp">
@@ -88,6 +91,48 @@
     </ClCompile>
     <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case2.cpp">
       <Filter>runcaffe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\tendyron.cpp">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\aes.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\bignum.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\des.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md_wrap.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md2.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md4.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md5.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\padlock.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\rsa.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha1.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha2.c">
+      <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha4.c">
+      <Filter>dongle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +201,57 @@
     </ClInclude>
     <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case2.hpp">
       <Filter>runcaffe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\tendyron.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\aes.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\base.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\bignum.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\bn_mul.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\config.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\des.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md_wrap.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md2.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md4.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md5.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\padlock.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\rsa.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha1.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha2.h">
+      <Filter>dongle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha4.h">
+      <Filter>dongle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

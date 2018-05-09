@@ -257,7 +257,7 @@ void Test_Detection(string srcdir, string dstdir, int missErrorRatio)
 	//初始化OS环境
 	if (OsInitEnv())
 	{
-			std::cout << "OsInitEnv Error" << endl;
+		std::cout << "OsInitEnv Error" << endl;
 	    return;
 	}
 

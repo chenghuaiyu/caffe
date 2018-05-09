@@ -41,7 +41,7 @@
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>libcaffe.lib;$(CudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcaffe.lib;Winscard.lib;$(CudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -53,7 +53,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-      <AdditionalDependencies>libcaffe.lib;$(CudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcaffe.lib;Winscard.lib;$(CudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -80,6 +80,20 @@
     <ClCompile Include="..\..\wisdom\decryption\decryption.cpp" />
     <ClCompile Include="..\..\wisdom\decryption\rc4.cpp" />
     <ClCompile Include="..\..\wisdom\detection.cpp" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\aes.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\bignum.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\des.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md2.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md4.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md5.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md_wrap.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\padlock.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\rsa.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha1.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha2.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha4.c" />
+    <ClCompile Include="..\..\wisdom\dongle\tendyron.cpp" />
     <ClCompile Include="..\..\wisdom\output\cjson.cpp" />
     <ClCompile Include="..\..\wisdom\output\output.cpp" />
     <ClCompile Include="..\..\wisdom\output\outputcjson.cpp" />
@@ -106,6 +120,23 @@
     <ClInclude Include="..\..\wisdom\decryption\decryption.h" />
     <ClInclude Include="..\..\wisdom\decryption\rc4.hpp" />
     <ClInclude Include="..\..\wisdom\detection.hpp" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\aes.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\base.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\bignum.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\bn_mul.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\config.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\des.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md2.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md4.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md5.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md_wrap.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\padlock.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\rsa.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha1.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha2.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha4.h" />
+    <ClInclude Include="..\..\wisdom\dongle\tendyron.h" />
     <ClInclude Include="..\..\wisdom\output\cjson.h" />
     <ClInclude Include="..\..\wisdom\output\output.h" />
     <ClInclude Include="..\..\wisdom\output\outputcjson.h" />
