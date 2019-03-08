@@ -1,0 +1,25 @@
+////////////////////////////////////////////////////////////////////
+// Copyright (C) 2011, SafeNet, Inc. All rights reserved.
+//
+// HASP(R) is a registered trademark of SafeNet, Inc. 
+//
+//
+// 
+////////////////////////////////////////////////////////////////////
+#if defined(WIN32) && defined(_USRDLL)
+
+#include "hasp_api_cpp_.h"
+
+
+////////////////////////////////////////////////////////////////////
+// DLL entry point
+////////////////////////////////////////////////////////////////////
+
+BOOL APIENTRY DllMain(HANDLE /* hModule */, 
+                      DWORD  /* dwReason */, 
+                      LPVOID /* lpReserved */)
+{
+    return TRUE;
+}
+
+#endif // WIN32 && _USRDLL

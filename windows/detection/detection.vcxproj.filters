@@ -25,6 +25,9 @@
     <Filter Include="dongle">
       <UniqueIdentifier>{11b44a6e-5349-472c-974b-e214884df374}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dongle_sentinel">
+      <UniqueIdentifier>{ecfce97e-fb11-42ea-99c2-61ef09167513}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\wisdom\decryption\decryption.cpp">
@@ -133,6 +136,54 @@
     </ClCompile>
     <ClCompile Include="..\..\wisdom\dongle\polarssl\sha4.c">
       <Filter>dongle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\errorprinter.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspbase.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspdiag.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspenc64.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspfeature.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspfile.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\hasphandle.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\hasphasp.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspimpl.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspinfo.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\hasplegacy.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\hasplock.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspmain.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspmap.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\hasptime.cpp">
+      <Filter>dongle_sentinel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\wisdom\sentinel\haspversion.cpp">
+      <Filter>dongle_sentinel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -253,5 +304,40 @@
     <ClInclude Include="..\..\wisdom\dongle\polarssl\sha4.h">
       <Filter>dongle</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\wisdom\sentinel\errorprinter.h">
+      <Filter>dongle_sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\sentinel\hasp_api.h">
+      <Filter>dongle_sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\sentinel\hasp_api_cpp.h">
+      <Filter>dongle_sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\sentinel\hasp_api_cpp_.h">
+      <Filter>dongle_sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\sentinel\haspdiag.h">
+      <Filter>dongle_sentinel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\wisdom\sentinel\vendor_code.h">
+      <Filter>dongle_sentinel</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\wisdom\sentinel\DECXO.hvc">
+      <Filter>dongle_sentinel</Filter>
+    </None>
+    <None Include="..\..\wisdom\runcaffe\run_caffe_case3.cpp">
+      <Filter>runcaffe</Filter>
+    </None>
+    <None Include="..\..\wisdom\runcaffe\run_caffe_case3.hpp">
+      <Filter>runcaffe</Filter>
+    </None>
+    <None Include="..\..\wisdom\runcaffe\run_caffe_case4.cpp">
+      <Filter>runcaffe</Filter>
+    </None>
+    <None Include="..\..\wisdom\runcaffe\run_caffe_case4.hpp">
+      <Filter>runcaffe</Filter>
+    </None>
   </ItemGroup>
 </Project>

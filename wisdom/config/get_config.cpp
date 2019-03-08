@@ -13,15 +13,16 @@ using namespace std;
 int GetModelInfo(string configfile, MODEL_INFO_S *pstInfo, string strpath)
 {
     int ret;
-    std::cout << "strpath:" << strpath <<endl;
-    std::cout << "configfile:" << configfile <<endl;
-    if (IsFileExist(configfile+".cfg"))
+    std::cout << "dll directory: " << strpath <<endl;
+    if (IsFileExist(configfile + ".cfg"))
     {
-        ret = GetModelInfoNormal(configfile+".cfg", pstInfo, strpath);
+		ret = GetModelInfoNormal(configfile + ".cfg", pstInfo, strpath);
+		std::cout << "GetModelInfoNormal(" << configfile + ".cfg): " << ret << endl;
     }
-    else if(IsFileExist(configfile+".xml"))
+    else if(IsFileExist(configfile + ".xml"))
     {
-        ret = GetModelInfoXml(configfile+".xml", pstInfo, strpath);
+		ret = GetModelInfoXml(configfile + ".xml", pstInfo, strpath);
+		std::cout << "GetModelInfoNormal(" << configfile + ".xml): " << ret << endl;
     }
     else
     {

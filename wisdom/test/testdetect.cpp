@@ -45,7 +45,7 @@ int OsInitEnv(void)
 	hmod = ::LoadLibrary(_TEXT("detection.dll"));
 	if (NULL == hmod)
 	{
-	    std::cout << "Load DLL fail"  << endl;
+	    std::cout << "fail to LoadLibrary"  << endl;
 	    return -1;
 	}
 	
@@ -239,15 +239,11 @@ void Test_Detection_image(string srcdir, string dstDir, string srcFilename, int 
 	}
 }
 
-void Test_Detection(string srcdir, string dstdir, int missErrorRatio)
-{
+void Test_Detection(string srcdir, string dstdir, int missErrorRatio, char* objectName = "test", char* DeviceName = "gpu0") {
 	int i;
-	char* objectName = "test";
-	char* DeviceName = "gpu0";
 	vector<string> files;
 
-	if (!IsDirExist(srcdir))
-	{
+	if (!IsDirExist(srcdir)){
 		std::cout << "srcdir file is not exist" << endl;
 		return;
 	}
@@ -255,28 +251,22 @@ void Test_Detection(string srcdir, string dstdir, int missErrorRatio)
 	MkDstDir((const char *)dstdir.c_str());
 
 	//初始化OS环境
-	if (OsInitEnv())
-	{
+	if (OsInitEnv()){
 		std::cout << "OsInitEnv Error" << endl;
 	    return;
 	}
 
 	//初始化AI
-	if (OsDetectionInit(objectName, DeviceName) == 0)
-	{
+	if (OsDetectionInit(objectName, DeviceName) == 0) {
 		GetFiles(srcdir, files);
 		
-		for (i = 0; i < files.size(); i++)
-		{
+		for (i = 0; i < files.size(); i++) {
 			printf("%s\n", files[i].c_str());
 			string suffixStr = files[i].substr(files[i].find_last_of('.') + 1);
-			if ((suffixStr == "mp4") || (suffixStr == "avi"))
-			{
+			if ((suffixStr == "mp4") || (suffixStr == "avi")) {
 				//解码video，AI处理，绘制框，显示，写文件
 				Test_Detection_video(dstdir, files[i], missErrorRatio);
-			}
-			else
-			{
+			} else {
 				//解码image文件，AI处理，绘制框，写文件
 				Test_Detection_image(srcdir, dstdir, files[i], missErrorRatio);
 			}
@@ -293,7 +283,7 @@ int main(int argc, char** argv)
 	string srcdir, dstdir;
 	if (argc < 3)
 	{
-		std::cout << "parameter is not enough:" << endl;
+		std::cout << "parameter format: directory_of_image_files directory_to_save_result" << endl;
 	}
 	else
 	{
@@ -304,8 +294,6 @@ int main(int argc, char** argv)
 		std::cout << "dstdir:" << dstdir << endl;
 	
 		Test_Detection(srcdir, dstdir, 0);
+		std::cout << "job finished." << endl;
 	}
 }
-
-
-

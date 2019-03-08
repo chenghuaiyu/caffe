@@ -18,6 +18,7 @@
     <ProjectGuid>{00BBA8C0-707D-42A7-82FF-D5211185ED7F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
+    <PlatformToolset>v120</PlatformToolset>
     <RootNamespace>test_all</RootNamespace>
     <NuGetPackageImportStamp>1df3590e</NuGetPackageImportStamp>
   </PropertyGroup>

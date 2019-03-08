@@ -47,7 +47,7 @@ bool IsFileExist(string strFileName)
 {
     if (access(strFileName.c_str(), 0 ) == -1)
     {
-        cout << "file isn't exist" << endl;
+        cout << "file doesn't exist: " << strFileName << endl;
         return false;
     }
     return true;

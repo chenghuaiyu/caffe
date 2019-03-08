@@ -1,4 +1,6 @@
-
+#ifndef _LINUX_
+#include <io.h>
+#endif
 #include "boost/algorithm/string.hpp"
 #include "caffe/caffe.hpp"
 #include "caffe/util/signal_handler.h"
@@ -21,15 +23,10 @@
 #include <iostream>  
 #include <stdio.h> 
 #include <stdlib.h>  
-#ifndef _LINUX_
-#include <io.h>
-#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
 #include "opencv2/opencv.hpp"
-
 #include "common.h"
 #include "runcaffe/run_caffe.hpp"
 #include "detection.hpp"
@@ -38,8 +35,33 @@
 #include "decryption/decryption.h"
 #include "postprocess/postprocess.h"
 #include "output/output.h"
+enum {
+	RSA_NONE = 0,
+	RSA_SENTINEL = 1,
+	RSA_TENDYRON = 2
+};
+//#define RSA		RSA_NONE
+#define RSA		RSA_SENTINEL
 
+#if		RSA == RSA_SENTINEL
+#include "sentinel\hasp_api_cpp.h"
+#include "sentinel\vendor_code.h"
+#include "sentinel\errorprinter.h"
+#elif	RSA == RSA_TENDYRON
+#include "dongle/tendyron.h"
 
+char * pszReaders = NULL;
+wchar_t * pwszReaders = NULL;
+//command 1: 00A4000002DF20
+const unsigned char ucBuf1[] = { 0x00, 0xA4, 0x00, 0x00, 0x02, 0xDF, 0x20 };
+//command 2: E02241B613010000 <message>
+const unsigned char ucBuf2[] = { 0xE0, 0x22, 0x41, 0xB6, 0x13, 0x01, 0x00, 0x00 };
+//command 3: E02A9E9A00
+const unsigned char ucBuf3[] = { 0xE0, 0x2A, 0x9E, 0x9A, 0x00 };
+const unsigned char ucBuf[] = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f };
+
+#else
+#endif
 
 using caffe::Blob;
 using caffe::Caffe;
@@ -53,7 +75,6 @@ using caffe::vector;
 using std::ostringstream;
 using ::google::protobuf::Message;
 using caffe::LabelMap;
-
 
 using namespace std;
 using namespace cv;
@@ -126,8 +147,8 @@ int GetConfig(DETECT_INFO_S *pstInfo)
 	strConfigFilePath = strDLLPath;
 	strSubConfigFilePath = strDLLPath;
 #endif
-	std::cout << "DLL Path = " << strConfigFilePath.c_str() << endl;
 	strConfigFilePath.append(CONFIG_FILENAME);
+	std::cout << "DLL Path: " << strConfigFilePath.c_str() << endl;
 
 	ret = GetModelInfo(strConfigFilePath, &pstInfo->stMainModel, strDLLPath);
 
@@ -140,7 +161,55 @@ int GetConfig(DETECT_INFO_S *pstInfo)
 	return ret;
 }
 
+#if	RSA == RSA_SENTINEL
 
+#elif	RSA == RSA_TENDYRON
+int tendyron(const unsigned char * pucBuf, unsigned long usBufLen, unsigned char ** ppucBufOut)
+{
+	if (NULL == pucBuf || 0 >= usBufLen || NULL == ppucBufOut)
+	{
+		return FAIL;
+	}
+
+	if (NULL == pszReaders)
+	{
+		if (!TDR_GetFirstReaderName(&pszReaders))
+		{
+			return FAIL;
+		}
+	}
+
+	unsigned long ulLenOut = 0;
+	unsigned char * pucBufOut = NULL;
+	BOOL bRet = TDR_SendCommand(pszReaders, SCARD_PROTOCOL_T1, ucBuf1, sizeof(ucBuf1), &pucBufOut, &ulLenOut);
+	if (!bRet)
+	{
+		return FAIL;
+	}
+	TDR_FreeMemory((void **)&pucBufOut);
+
+	unsigned char ucBufIn[LEN_APDU] = { 0 };//buffer containing the data to write
+	memcpy(ucBufIn, ucBuf2, sizeof(ucBuf2));
+	memcpy(ucBufIn + sizeof(ucBuf2), pucBuf, usBufLen);
+	//bRet = TDR_SendCommand(pszReaders, SCARD_PROTOCOL_T1, ucBufIn, sizeof(ucBuf2) + usBufLen, &pucBufOut, &ulLenOut);
+	bRet = TDR_SendCommand(pszReaders, SCARD_PROTOCOL_T1, ucBufIn, sizeof(ucBuf2) + 16, &pucBufOut, &ulLenOut);
+	if (!bRet)
+	{
+		return FAIL;
+	}
+	TDR_FreeMemory((void **)&pucBufOut);
+
+	bRet = TDR_SendCommand(pszReaders, SCARD_PROTOCOL_T1, ucBuf3, sizeof(ucBuf3), &pucBufOut, &ulLenOut);
+	if (!bRet)
+	{
+		return FAIL;
+	}
+	//TDR_FreeMemory((void **)&pucBufOut);
+	*ppucBufOut = pucBufOut;
+	return SUCCESS;
+}
+#else
+#endif
 
 // Parse GPU ids or use all available devices
 static void get_gpus(vector<int>* gpus, string strgpus)
@@ -252,10 +321,73 @@ int InitModel(MODEL_INFO_S *pstInfo)
 
 int InitDetector(DETECT_INFO_S *pstInfo)
 {
-    int ret;
-    
-    ret = InitModel(&pstInfo->stMainModel);
+	LOG(INFO) << "RSA: " << RSA;
+#if		RSA == RSA_SENTINEL
+	hasp_u32_t FeatureID = 1123u;
+	ErrorPrinter errorPrinter;
+	haspStatus status;
 
+	//Demonstrates the login to the default feature of a key
+	//Searches both locally and remotely for it
+	cout << "login to default feature         : " << FeatureID;
+	Chasp hasp1(ChaspFeature::ChaspFeature(FeatureID));
+	status = hasp1.login(vendorCode);
+	errorPrinter.printError(status);
+	if (!HASP_SUCCEEDED(status)) {
+		LOG(ERROR) << "login error: " << status;
+		return FAIL;
+	}
+
+	SYSTEMTIME	curr_tm = {};
+	GetLocalTime(&curr_tm);
+	char szBuf[_MAX_PATH] = {};
+	sprintf_s(szBuf, _MAX_PATH, "%03d%02d%03d%02d%02d%04d", curr_tm.wMilliseconds, curr_tm.wHour, rand(), curr_tm.wSecond, curr_tm.wMinute, clock());
+	string str = string(szBuf);
+	status = hasp1.encrypt(str);
+	if (!HASP_SUCCEEDED(status)) {
+		LOG(ERROR) << "hasp  encrypt: " << status;
+		return FAIL;
+	}
+	status = hasp1.decrypt(str);
+	if (!HASP_SUCCEEDED(status)) {
+		LOG(ERROR) << "hasp decrypt: " << status;
+		return FAIL;
+	}
+	if (str != string(szBuf)) {
+		LOG(ERROR) << "hasp : " << status;
+		return FAIL;
+	}
+
+	hasp1.logout();
+
+#elif	RSA == RSA_TENDYRON
+	BOOL bRet = TDR_GetFirstReaderName(&pszReaders);
+	if (!bRet) {
+		return FAIL;
+	}
+
+	SYSTEMTIME	curr_tm = {};
+	GetLocalTime(&curr_tm);
+	char szBuf[_MAX_PATH] = {};
+	sprintf_s(szBuf, _MAX_PATH, "%03d%02d%03d%02d%02d%04d", curr_tm.wMilliseconds, curr_tm.wHour, rand(), curr_tm.wSecond, curr_tm.wMinute, clock());
+
+	unsigned char * pucBufOut = NULL;
+	//if (FAIL == tendyron(ucBuf, sizeof(ucBuf), &pucBufOut)) {
+	if (FAIL == tendyron((unsigned char *)szBuf, strlen(szBuf), &pucBufOut)) {
+		return FAIL;
+	}
+	unsigned char * pucBufOut2 = NULL;
+	tendyronRsa(pucBufOut, &pucBufOut2);
+	TDR_FreeMemory((void **)&pucBufOut);
+	//int n = memcmp(szBuf, pucBufOut2 + 128 - strlen(szBuf), strlen(szBuf));
+	int n = memcmp(szBuf, pucBufOut2 + 112, 16);
+	TDR_FreeMemory((void **)&pucBufOut2);
+	if (0 != n) {
+		return FAIL;
+	}
+#endif
+
+    int ret = InitModel(&pstInfo->stMainModel);
     if (pstInfo->stMainModel.postmode.find("classify") != string::npos)
     {
         ret = InitModel(&pstInfo->stSubModel);
@@ -281,9 +413,6 @@ int DetectionInit(char *objectName, char *DeviceName)
     }
 	return SUCCESS;
 } 
-
-
-
 
 char* DetectionMat(cv::Mat& org_img, int missErrorRatio)
 {
@@ -481,7 +610,66 @@ char* Detection(char *imagesPath, int missErrorRatio)
             totalfiles.push_back(tmpfile);
             continue;
         }
-        tmpfile.width = org_img.cols;
+
+#if		RSA == RSA_SENTINEL
+		hasp_u32_t FeatureID = 1123u;
+		ErrorPrinter errorPrinter;
+		haspStatus status;
+
+		//Demonstrates the login to the default feature of a key
+		//Searches both locally and remotely for it
+		cout << "login to default feature         : " << FeatureID;
+		Chasp hasp1(ChaspFeature::ChaspFeature(FeatureID));
+		status = hasp1.login(vendorCode);
+		errorPrinter.printError(status);
+		if (!HASP_SUCCEEDED(status)) {
+			LOG(ERROR) << "login error: " << status;
+			return "";
+		}
+
+		SYSTEMTIME	curr_tm = {};
+		GetLocalTime(&curr_tm);
+		char szBuf[_MAX_PATH] = {};
+		sprintf_s(szBuf, _MAX_PATH, "%03d%02d%03d%02d%02d%04d", curr_tm.wMilliseconds, curr_tm.wHour, rand(), curr_tm.wSecond, curr_tm.wMinute, clock());
+		string str = string(szBuf);
+		status = hasp1.encrypt(str);
+		if (!HASP_SUCCEEDED(status)) {
+			LOG(ERROR) << "hasp  encrypt: " << status;
+			return "";
+		}
+		status = hasp1.decrypt(str);
+		if (!HASP_SUCCEEDED(status)) {
+			LOG(ERROR) << "hasp decrypt: " << status;
+			return "";
+		}
+		if (str != string(szBuf)) {
+			LOG(ERROR) << "hasp : " << status;
+			return "";
+		}
+
+		hasp1.logout();
+
+#elif	RSA == RSA_TENDYRON
+		SYSTEMTIME	curr_tm = {};
+		GetLocalTime(&curr_tm);
+		char szBuf[_MAX_PATH] = {};
+		sprintf_s(szBuf, _MAX_PATH, "%03d%02d%03d%02d%02d%04d", curr_tm.wMilliseconds, curr_tm.wHour, rand(), curr_tm.wSecond, curr_tm.wMinute, clock());
+
+		unsigned char * pucBufOut = NULL;
+		if (FAIL == tendyron((unsigned char *)szBuf, strlen(szBuf), &pucBufOut)) {
+			return "";
+		}
+		unsigned char * pucBufOut2 = NULL;
+		tendyronRsa(pucBufOut, &pucBufOut2);
+		TDR_FreeMemory((void **)&pucBufOut);
+		int n = memcmp(szBuf, pucBufOut2 + 112, 16);
+		TDR_FreeMemory((void **)&pucBufOut2);
+		if (0 != n) {
+			return "";
+		}
+#endif
+
+		tmpfile.width = org_img.cols;
         tmpfile.height = org_img.rows;
 
         vector<DETECT_BOX_S> retbox;
@@ -512,5 +700,14 @@ void DetectionUnInit(void)
     {
         delete pstSubInfo->caffe_net;
     }
+#if		RSA == RSA_SENTINEL
+
+#elif	RSA == RSA_TENDYRON
+	if (pszReaders) {
+		TDR_FreeMemory((void **)&pszReaders);
+	}
+#else
+#endif
+
 }
 

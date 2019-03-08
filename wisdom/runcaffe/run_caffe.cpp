@@ -9,6 +9,8 @@
 #include "run_caffe_normal.hpp"
 #include "run_caffe_case1.hpp"
 #include "run_caffe_case2.hpp"
+#include "run_caffe_case3.hpp"
+#include "run_caffe_case4.hpp"
 
 using namespace std;
 using namespace cv;
@@ -27,6 +29,14 @@ vector<DETECT_BOX_S> run_caffe(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
     else if (pstInfo->runmode == "case2")
     {
         retbox = run_caffe_case2(org_img, pstInfo);
+    }
+    else if (pstInfo->runmode == "case3")
+    {
+        retbox = run_caffe_case3(org_img, pstInfo);
+    }
+    else if (pstInfo->runmode == "case4")
+    {
+        retbox = run_caffe_case4(org_img, pstInfo);
     }
     else
     {

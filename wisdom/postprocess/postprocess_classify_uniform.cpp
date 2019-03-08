@@ -56,7 +56,7 @@ using namespace std;
 using namespace cv;
 
 //#define DEBUG
-#define SMOOTH
+//#define SMOOTH
 
 //之后会使用配置值
 int crop_minW = 30;//30;

@@ -110,6 +110,11 @@ vector<DETECT_BOX_S> run_caffe_pad_case2(cv::Mat& org_img, MODEL_INFO_S *pstInfo
     int h = height;
     int w_off = (w - srcw) / 2;
     int h_off = (h - srch) / 2;
+    //if (w_off >= 8)
+    //  w_off  -= 8;
+    //if (h_off >= 8)
+    //  h_off -= 8;
+    
     std::cout << "w_off:" << w_off << endl;
     std::cout << "w:" << w << endl;
     std::cout << "h_off:" << h_off << endl;
