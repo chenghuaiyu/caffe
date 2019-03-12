@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ImportGroup Label="PropertySheets" />
     <PropertyGroup Label="UserMacros">
-        <BuildDir>$(SolutionDir)..\Build</BuildDir>
+        <BuildDir>$(SolutionDir)Build</BuildDir>
         <!--NOTE: CpuOnlyBuild and UseCuDNN flags can't be set at the same time.-->
         <CpuOnlyBuild>false</CpuOnlyBuild>
         <UseCuDNN>true</UseCuDNN>
-        <CudaVersion>10.0</CudaVersion>
+        <CudaVersion>10.1</CudaVersion>
         <!-- NOTE: If Python support is enabled, PythonDir (below) needs to be
          set to the root of your Python installation. If your Python installation
          does not contain debug libraries, debug build will not work. -->
@@ -18,12 +18,47 @@
 
         <!-- Set CUDA architecture suitable for your GPU.
          Setting proper architecture is important to mimize your run and compile time. -->
-        <CudaArchitecture>compute_35,sm_35;compute_52,sm_52;compute_61,sm_61</CudaArchitecture>
+		<!-- 
+		Change to generate CUDA code for one of the following GPU architectures
+		[Fermi  Kepler  Maxwell  Pascal  Volta  Turing  All]
+		
+		https://en.wikipedia.org/wiki/CUDA
+		GeForce GTX 960: Maxwell, 5.2
+		GTX 1060: Pascal, 6.1
+		RTX 2060: Turing, 7.5
+		
+		GeForce GTX Titan: Kepler, 3.5
+		GeForce GTX 750: Maxwell, 5.0
+		Tegra X1: Maxwell, 5.3
+		Quadro GP100, Tesla P100: Pascal, 6.0
+		Tegra X2: Pascal, 6.2
+		TNVIDIA TITAN V: Volta, 7.0
+		Tegra Xavier: Volta, 7.2
+		
+		sm_30 and sm_32		Basic features
+							+ Kepler support
+							+ Unified memory programming
+		sm_35			+ Dynamic parallelism support
+		sm_50, sm_52, and sm_53	+ Maxwell support
+		sm_60, sm_61, and sm_62	+ Pascal support
+		sm_70 and sm_72			+ Volta support
+		sm_75				+ Turing support
+		
+		Supported CUDA level of GPU and card. See also at Nvidia:
+		CUDA SDK 6.0 support for compute capability 1.0-3.5. (Tesla, Fermi, Kepler)
+		CUDA SDK 6.5 support for compute capability 1.1-5.x (Tesla, Fermi, Kepler, Maxwell). Last version with support for compute capability 1.x (Tesla)
+		CUDA SDK 7.5 support for compute capability 2.0-5.x (Fermi, Kepler, Maxwell)
+		CUDA SDK 8.0 support for compute capability 2.0-6.x (Fermi, Kepler, Maxwell, Pascal). Last version with support for compute capability 2.x (Fermi)
+		CUDA SDK 9.0/9.1/9.2 support for compute capability 3.0 - 7.2 (Kepler, Maxwell, Pascal, Volta)
+		CUDA SDK 10.0/10.1 support for compute capability 3.0-7.5 (Kepler, Maxwell, Pascal, Volta, Turing)
+		-->
+        <!-- <CudaArchitecture>compute_35,sm_35;compute_52,sm_52;compute_61,sm_61</CudaArchitecture> -->
+        <CudaArchitecture>compute_35,sm_35;compute_50,sm_50;compute_52,sm_52;compute_53,sm_53;compute_60,sm_60;compute_61,sm_61;compute_62,sm_62;compute_70,sm_70;compute_72,sm_72;compute_75,sm_75</CudaArchitecture>
 
-        <!-- CuDNN 4 and 5 are supported -->
-        <CuDnnPath>$(CUDA_PATH)\</CuDnnPath>
-        <ScriptsDir>$(SolutionDir)\scripts</ScriptsDir>
-		<Nuget_Repo>D:\NugetPackages</Nuget_Repo>
+        <!-- CuDNN 4 to 7 are supported -->
+        <CuDnnPath>$(CUDA_PATH)</CuDnnPath>
+        <ScriptsDir>$(SolutionDir)scripts</ScriptsDir>
+		<!-- <NUGET_PACKAGES>D:\NugetPackages</NUGET_PACKAGES> -->
     </PropertyGroup>
     <PropertyGroup Condition="'$(CpuOnlyBuild)'=='false'">
         <CudaDependencies>cublas.lib;cuda.lib;curand.lib;cudart.lib</CudaDependencies>
@@ -33,8 +68,8 @@
         <CudaDependencies>cudnn.lib;$(CudaDependencies)</CudaDependencies>
     </PropertyGroup>
     <PropertyGroup Condition="'$(UseCuDNN)'=='true' And $(CuDnnPath)!=''">
-        <LibraryPath>$(CuDnnPath)\cuda\lib\x64;$(LibraryPath)</LibraryPath>
-        <IncludePath>$(CuDnnPath)\cuda\include;$(IncludePath)</IncludePath>
+        <LibraryPath>$(CuDnnPath)\lib\$(Platform);$(LibraryPath)</LibraryPath>
+        <IncludePath>$(CuDnnPath)\include;$(IncludePath)</IncludePath>
     </PropertyGroup>
 
     <PropertyGroup>

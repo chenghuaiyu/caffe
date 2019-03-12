@@ -185,6 +185,8 @@
     <ClCompile Include="..\..\wisdom\sentinel\haspversion.cpp">
       <Filter>dongle_sentinel</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case3.cpp" />
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\wisdom\decryption\decryption.h">
@@ -322,22 +324,12 @@
     <ClInclude Include="..\..\wisdom\sentinel\vendor_code.h">
       <Filter>dongle_sentinel</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case3.hpp" />
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case4.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\wisdom\sentinel\DECXO.hvc">
       <Filter>dongle_sentinel</Filter>
-    </None>
-    <None Include="..\..\wisdom\runcaffe\run_caffe_case3.cpp">
-      <Filter>runcaffe</Filter>
-    </None>
-    <None Include="..\..\wisdom\runcaffe\run_caffe_case3.hpp">
-      <Filter>runcaffe</Filter>
-    </None>
-    <None Include="..\..\wisdom\runcaffe\run_caffe_case4.cpp">
-      <Filter>runcaffe</Filter>
-    </None>
-    <None Include="..\..\wisdom\runcaffe\run_caffe_case4.hpp">
-      <Filter>runcaffe</Filter>
     </None>
   </ItemGroup>
 </Project>
