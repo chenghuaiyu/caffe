@@ -475,13 +475,11 @@ void DataTransformer<Dtype>::TransformInv(const Dtype* data, cv::Mat* cv_img,
 				int idx = (c * height + h) * width + w;
 				if (has_mean_file) {
 					ptr[img_idx++] = static_cast<uchar>(data[idx] / scale + mean[idx]);
-				}
-				else {
+				} else {
 					if (has_mean_values) {
 						ptr[img_idx++] =
 							static_cast<uchar>(data[idx] / scale + mean_values_[c]);
-					}
-					else {
+					} else {
 						ptr[img_idx++] = static_cast<uchar>(data[idx] / scale);
 					}
 				}
@@ -491,8 +489,7 @@ void DataTransformer<Dtype>::TransformInv(const Dtype* data, cv::Mat* cv_img,
 
 	if (param_.has_resize_param()) {
 		*cv_img = ApplyResize(orig_img, param_.resize_param());
-	}
-	else {
+	} else {
 		*cv_img = orig_img;
 	}
 }

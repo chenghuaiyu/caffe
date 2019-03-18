@@ -39,12 +39,10 @@ const size_t ChaspBase64::m_ulMaxLineLength = 76;
 // Construction/Destruction
 ////////////////////////////////////////////////////////////////////
 
-ChaspBase64::ChaspBase64()
-{
+ChaspBase64::ChaspBase64() {
 }
 
-ChaspBase64::~ChaspBase64()
-{
+ChaspBase64::~ChaspBase64() {
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -58,27 +56,23 @@ ChaspBase64::~ChaspBase64()
 // are skipped
 ////////////////////////////////////////////////////////////////////
 void ChaspBase64::decode(const std::string& source,
-                         std::vector<unsigned char>& dest) throw()
-{
+                         std::vector<unsigned char>& dest) throw() {
     dest.resize(0);
     dest.reserve(( source.length() * 4) / 3);
 
     std::string::const_iterator srcIt = source.begin(); 
     
-    while (source.end() != srcIt)
-    {
+    while (source.end() != srcIt) {
         hasp_u32_t ulCurr = 0;
         int nBits = 0;
 
         int i;
-        for (i = 0; 4 > i; i++)
-        {
+        for (i = 0; 4 > i; i++) {
             if (source.end() <= srcIt)
                 break;
 
             int nChar = ChaspBase64().decodeChar(*(srcIt++));
-            if (0 > nChar)
-            {
+            if (0 > nChar) {
                 i--;
                 continue;
             }
@@ -122,8 +116,7 @@ int ChaspBase64::decodeChar(const int nChar) const
 //
 ////////////////////////////////////////////////////////////////////
 void ChaspBase64::encode(const std::vector<unsigned char>& source,
-                         std::string& dest) throw()
-{
+                         std::string& dest) throw() {
     dest.resize(0);
     
     std::vector<unsigned char>::const_iterator srcIt = source.begin();
@@ -133,19 +126,16 @@ void ChaspBase64::encode(const std::vector<unsigned char>& source,
 
     dest.reserve(nLen1 + 2 * nLen2);
 
-    for (size_t i = 0; nLen2 >= i; i++)
-    {
+    for (size_t i = 0; nLen2 >= i; i++) {
         if (nLen2 == i)
             nLen3 = (nLen1 % m_ulMaxLineLength) / 4;
 
-        for (size_t j = 0; nLen3 > j; j++)
-        {
+        for (size_t j = 0; nLen3 > j; j++) {
             hasp_u32_t ulCurr = 0;
             for (int n = 0; 3 > n; n++, ulCurr <<= 8)
                 ulCurr |= *(srcIt++);
 
-            for (int k = 0; 4 > k; k++, ulCurr <<= 6)
-            {
+            for (int k = 0; 4 > k; k++, ulCurr <<= 6) {
                 hasp_u8_t nIndex = static_cast<hasp_u8_t>(ulCurr >> 26);
                 dest+= m_rAlphabet[nIndex];
             }
@@ -158,17 +148,14 @@ void ChaspBase64::encode(const std::vector<unsigned char>& source,
         dest.resize(dest.size() - 2);
 
     nLen2 = (source.size() % 3) ? (source.size() % 3 + 1) : 0;
-    if (nLen2)
-    {
+    if (nLen2) {
         hasp_u32_t ulCurr = 0;
-        for (size_t n = 0; 3 > n; n++, ulCurr <<= 8)
-        {
+        for (size_t n = 0; 3 > n; n++, ulCurr <<= 8) {
             if ((source.size() % 3) > n)
                 ulCurr |= *(srcIt++);
         }
 
-        for (size_t k = 0; nLen2 > k; k++, ulCurr <<= 6)
-        {
+        for (size_t k = 0; nLen2 > k; k++, ulCurr <<= 6) {
             hasp_u8_t nIndex = static_cast<hasp_u8_t>(ulCurr>>26);
             dest += m_rAlphabet[nIndex];
         }

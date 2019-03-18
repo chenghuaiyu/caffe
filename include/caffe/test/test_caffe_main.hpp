@@ -3,6 +3,7 @@
 #ifndef CAFFE_TEST_TEST_CAFFE_MAIN_HPP_
 #define CAFFE_TEST_TEST_CAFFE_MAIN_HPP_
 
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <gtest/gtest.h>
 

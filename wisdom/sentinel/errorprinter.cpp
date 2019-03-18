@@ -6,8 +6,7 @@
 
 using namespace std;
 
-ErrorPrinter::ErrorPrinter()
-{
+ErrorPrinter::ErrorPrinter() {
     errorMap.insert(StatusMap::value_type(HASP_STATUS_OK, "Operation completed successfully"));
     errorMap.insert(StatusMap::value_type(HASP_MEM_RANGE, "Invalid memory address"));
     errorMap.insert(StatusMap::value_type(HASP_INV_PROGNUM_OPT, "Unknown/invalid Feature ID option"));
@@ -112,8 +111,7 @@ ErrorPrinter::ErrorPrinter()
     errorMap.insert(StatusMap::value_type(HASP_FIRST_HASP_ACT, "Reserved for Sentinel Activation API" ));
 }
 
-void ErrorPrinter::printError(haspStatus status)
-{
+void ErrorPrinter::printError(haspStatus status) {
     StatusMap::const_iterator error = errorMap.find(status);
     if(error == errorMap.end())
         cout<<"unknown error: "<<status<<endl;
@@ -121,8 +119,7 @@ void ErrorPrinter::printError(haspStatus status)
         cout<<error->second<<endl;
 }
 
-const char* ErrorPrinter::getError(haspStatus status)
-{
+const char* ErrorPrinter::getError(haspStatus status) {
     StatusMap::const_iterator error = errorMap.find(status);
     if(error == errorMap.end())
         return "Unknown error";

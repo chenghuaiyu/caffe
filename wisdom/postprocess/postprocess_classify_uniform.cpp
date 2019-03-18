@@ -12,6 +12,7 @@
 #include "google/protobuf/text_format.h"
 #include <google/protobuf/io/coded_stream.h>
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -97,8 +98,7 @@ static std::vector<int> Argmax(const std::vector<float>& v, int N) {
 }
 
 void IntersectBBox(const BBox& bbox1, const BBox& bbox2,
-	BBox* intersect_bbox) 
-{
+	BBox* intersect_bbox) {
 	if (bbox2.xmin > bbox1.xmax || bbox2.xmax < bbox1.xmin ||
 		bbox2.ymin > bbox1.ymax || bbox2.ymax < bbox1.ymin) {
 		// Return [0, 0, 0, 0] if there is no intersection.
@@ -106,8 +106,7 @@ void IntersectBBox(const BBox& bbox1, const BBox& bbox2,
 		intersect_bbox->ymin = 0;
 		intersect_bbox->xmax = 0;
 		intersect_bbox->ymax = 0;
-	}
-	else {
+	} else {
 		intersect_bbox->xmin = std::max(bbox1.xmin, bbox2.xmin);
 		intersect_bbox->ymin = std::max(bbox1.ymin, bbox2.ymin);
 		intersect_bbox->xmax = std::min(bbox1.xmax, bbox2.xmax);
@@ -116,13 +115,10 @@ void IntersectBBox(const BBox& bbox1, const BBox& bbox2,
 }
 
 float BBoxSize(const BBox& bbox) {
-	if (bbox.xmax < bbox.xmin || bbox.ymax < bbox.ymin)
-	{
+	if (bbox.xmax < bbox.xmin || bbox.ymax < bbox.ymin) {
 		// If bbox is invalid (e.g. xmax < xmin or ymax < ymin), return 0.
 		return 0;
-	}
-	else 
-	{
+	} else {
 		float width = bbox.xmax - bbox.xmin;
 		float height = bbox.ymax - bbox.ymin;
 
@@ -131,8 +127,7 @@ float BBoxSize(const BBox& bbox) {
 	}
 }
 
-static float jaccardOverlap(const BBox& bbox1, const BBox& bbox2)
-{
+static float jaccardOverlap(const BBox& bbox1, const BBox& bbox2) {
 	BBox intersect_bbox;
 	IntersectBBox(bbox1, bbox2, &intersect_bbox);
 	float intersect_width, intersect_height;
@@ -145,35 +140,27 @@ static float jaccardOverlap(const BBox& bbox1, const BBox& bbox2)
 		float bbox1_size = BBoxSize(bbox1);
 		float bbox2_size = BBoxSize(bbox2);
 		return intersect_size / (bbox1_size + bbox2_size - intersect_size);
-	}
-	else {
+	} else {
 		return 0.;
 	}
 }
 
-static vector<bool>checkjaccardOverlap(const float& excludeIou, const vector<BBox>& bboxes1, const vector<BBox>& bboxes2)
-{
+static vector<bool>checkjaccardOverlap(const float& excludeIou, const vector<BBox>& bboxes1, const vector<BBox>& bboxes2) {
 	float iou = 0;
 	bool exclude = false;
 	vector<bool> iou_result;
-	for (int i = 0; i < bboxes1.size(); i++)
-	{
+	for (int i = 0; i < bboxes1.size(); i++) {
 		exclude = false;
-		for (int j = 0; j < bboxes2.size(); j++)
-		{
+		for (int j = 0; j < bboxes2.size(); j++) {
 			iou = jaccardOverlap(bboxes1[i], bboxes2[j]);
-			if ((iou > excludeIou) && (iou != 1))
-			{
+			if ((iou > excludeIou) && (iou != 1)) {
 				exclude = 1;
 				continue;
 			}
 		}
-		if (!exclude)
-		{
+		if (!exclude) {
 			iou_result.push_back(false);
-		}
-		else
-		{
+		} else {
 			iou_result.push_back(true);
 		}
 	}
@@ -181,36 +168,31 @@ static vector<bool>checkjaccardOverlap(const float& excludeIou, const vector<BBo
 }
 
 
-static vector<BBox>excludeClosePerson(const float& excludeIou, const vector<BBox>& bboxes1, const vector<BBox>& bboxes2)
-{
+static vector<BBox>excludeClosePerson(const float& excludeIou, const vector<BBox>& bboxes1, const vector<BBox>& bboxes2) {
 	vector<bool> iou_result;
 	vector<BBox> box_result;
 
 	iou_result = checkjaccardOverlap(excludeIou, bboxes1, bboxes2);
 
-	for (int i = 0; i < iou_result.size(); i++)
-	{
+	for (int i = 0; i < iou_result.size(); i++) {
 		if (!iou_result[i])
 			box_result.push_back(bboxes1[i]);
 	}
 	return box_result;
 }
 
-static vector<BBox>expandPersonBox(const float& wRatio, const float& hRatio, vector<BBox>& bboxes)
-{
+static vector<BBox>expandPersonBox(const float& wRatio, const float& hRatio, vector<BBox>& bboxes) {
 	vector<BBox> box_result;
 	BBox box;
 	int width, height, size, dx, dy;
 
-	for (int i = 0; i < bboxes.size(); i++)
-	{
+	for (int i = 0; i < bboxes.size(); i++) {
 		width = bboxes[i].xmax - bboxes[i].xmin + 1;
 		height = bboxes[i].ymax - bboxes[i].ymin + 1;
 
 		size = max(width*(1 + 2 * wRatio), height*(1 + 2 * hRatio));
 
-		if (size % 2)
-		{
+		if (size % 2) {
 			size = size + 1;
 		}
 		dx = (size - width) / 2;
@@ -226,8 +208,7 @@ static vector<BBox>expandPersonBox(const float& wRatio, const float& hRatio, vec
 	return box_result;
 }
 
-static void computeLocationMiddle(const BBox bbox, const int targetW, const int targetH, BBox& srcbox, BBox& dstbox)
-{
+static void computeLocationMiddle(const BBox bbox, const int targetW, const int targetH, BBox& srcbox, BBox& dstbox) {
 	dstbox.xmin = (targetW - (bbox.xmax - bbox.xmin + 1)) / 2;
 	dstbox.xmax = dstbox.xmin + (bbox.xmax - bbox.xmin + 1) - 1;
 	dstbox.ymin = (targetH - (bbox.ymax - bbox.ymin + 1)) / 2;
@@ -236,55 +217,41 @@ static void computeLocationMiddle(const BBox bbox, const int targetW, const int 
 	srcbox = bbox;
 }
 
-static void computeLocationCorner(const int width, const int height, const BBox& bbox, BBox& srcbox, BBox& dstbox)
-{
-	if (bbox.xmin < 0)
-	{
+static void computeLocationCorner(const int width, const int height, const BBox& bbox, BBox& srcbox, BBox& dstbox) {
+	if (bbox.xmin < 0) {
 		srcbox.xmin = 0;
 		dstbox.xmin = 0 - bbox.xmin;
-	}
-	else
-	{
+	} else {
 		srcbox.xmin = bbox.xmin;
 		dstbox.xmin = 0;
 	}
 
-	if (bbox.xmax > (width - 1))
-	{
+	if (bbox.xmax > (width - 1)) {
 		srcbox.xmax = width - 1;
-	}
-	else
-	{
+	} else {
 		srcbox.xmax = bbox.xmax;
 	}
 
 	dstbox.xmax = srcbox.xmax - srcbox.xmin + dstbox.xmin;
 
-	if (bbox.ymin < 0)
-	{
+	if (bbox.ymin < 0) {
 		srcbox.ymin = 0;
 		dstbox.ymin = 0 - bbox.ymin;
-	}
-	else
-	{ 
+	} else { 
 		srcbox.ymin = bbox.ymin;
 		dstbox.ymin = 0;
 	}
 	
-	if (bbox.ymax > (height - 1))
-	{
+	if (bbox.ymax > (height - 1)) {
 		srcbox.ymax = height - 1;
-	}
-	else
-	{ 
+	} else { 
 		srcbox.ymax = bbox.ymax;
 	}
 	dstbox.ymax = srcbox.ymax - srcbox.ymin + dstbox.ymin;
 }
 
 //将输入的box 处理一下, 返回处理过后的box
-static void process_box(const vector<BBox>& allPerson, cv::Mat& org_img, vector<BBox>&checkBoxes, vector<BBox>& expandBoxes, vector<BBox>& srcBoxes, vector<BBox>& dstBoxes)
-{
+static void process_box(const vector<BBox>& allPerson, cv::Mat& org_img, vector<BBox>&checkBoxes, vector<BBox>& expandBoxes, vector<BBox>& srcBoxes, vector<BBox>& dstBoxes) {
 	cv::Size input_geometry;
 	int width, height;
 	vector<BBox> check, expand;
@@ -301,8 +268,7 @@ static void process_box(const vector<BBox>& allPerson, cv::Mat& org_img, vector<
 
 	isOverlap = checkjaccardOverlap(expandExcludeIouVal, expand, expand);
 
-	for (int i = 0; i < expand.size(); i++)
-	{
+	for (int i = 0; i < expand.size(); i++) {
 		int cWidth = check[i].xmax - check[i].xmin + 1;
 		int cHeight = check[i].ymax - check[i].ymin + 1;
 		BBox srcBox, dstBox;
@@ -315,12 +281,9 @@ static void process_box(const vector<BBox>& allPerson, cv::Mat& org_img, vector<
 		int eHeight = expand[i].ymax - expand[i].ymin + 1;
 
 		//use not expand person
-		if (isOverlap[i])
-		{
+		if (isOverlap[i]) {
 			computeLocationMiddle(check[i], eWidth, eHeight, srcBox, dstBox);
-		}
-		else
-		{
+		} else {
 			computeLocationCorner(width, height, expand[i], srcBox, dstBox);
 		}
 
@@ -331,8 +294,7 @@ static void process_box(const vector<BBox>& allPerson, cv::Mat& org_img, vector<
 	}
 }
 
-static int compute_box_distance(const DETECT_BOX_S& pre, const DETECT_BOX_S& now)
-{
+static int compute_box_distance(const DETECT_BOX_S& pre, const DETECT_BOX_S& now) {
 	float preXCenter = pre.x + pre.w / 2;
 	float preYCenter = pre.y + pre.h / 2;
 	float nowXCenter = now.x + now.w / 2;
@@ -341,22 +303,18 @@ static int compute_box_distance(const DETECT_BOX_S& pre, const DETECT_BOX_S& now
 	return sqrt(pow(nowXCenter - preXCenter, 2) + pow(nowYCenter - preYCenter, 2));
 }
 
-vector<DETECT_BOX_S> postprocess_classify_uniform(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pstInfo, cv::Mat& org_img)
-{
+vector<DETECT_BOX_S> postprocess_classify_uniform(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pstInfo, cv::Mat& org_img) {
 	vector<DETECT_BOX_S> savebox;
 	Net<float> *caffe_net = pstInfo->caffe_net;
 	vector<BBox> allPerson, checkBoxes, expandBoxes, srcBoxes, dstBoxes;
 
-	if (classTypeNum.size() == 0)
-	{
-		for (int i = 0; i < (pstInfo->labels).size(); i++)
-		{
+	if (classTypeNum.size() == 0) {
+		for (int i = 0; i < (pstInfo->labels).size(); i++) {
 			classTypeNum.push_back(0);
 		}
 	}
 
-	for (int i = 0; i < retbox.size(); i++)
-	{
+	for (int i = 0; i < retbox.size(); i++) {
 		BBox tempBox;
 		tempBox.xmin = retbox[i].x;
 		tempBox.ymin = retbox[i].y;
@@ -364,13 +322,11 @@ vector<DETECT_BOX_S> postprocess_classify_uniform(vector<DETECT_BOX_S> retbox, M
 		tempBox.ymax = tempBox.ymin + retbox[i].h - 1;
 
 		//width and height must be even
-		if (int(retbox[i].w) % 2)
-		{
+		if (int(retbox[i].w) % 2) {
 			tempBox.xmax--;
 		}
 
-		if (int(retbox[i].h) % 2)
-		{
+		if (int(retbox[i].h) % 2) {
 			tempBox.ymax--;
 		}
 
@@ -379,8 +335,7 @@ vector<DETECT_BOX_S> postprocess_classify_uniform(vector<DETECT_BOX_S> retbox, M
 
 	process_box(allPerson, org_img, checkBoxes, expandBoxes, srcBoxes, dstBoxes);
 
-	for (int i = 0; i < checkBoxes.size(); i ++)
-	{
+	for (int i = 0; i < checkBoxes.size(); i ++) {
 		cv::Mat img_pad, mask;
 
 		//from crop to pad
@@ -449,12 +404,10 @@ vector<DETECT_BOX_S> postprocess_classify_uniform(vector<DETECT_BOX_S> retbox, M
 		int distance = compute_box_distance(preBox, tmpbox);
 		//cout <<"distance: " << distance;
 		//clear history
-		if (distance > newDistanceThreshold)
-		{
+		if (distance > newDistanceThreshold) {
 			while (!classType.empty())
 				classType.pop();
-			for (int i = 0; i < (pstInfo->labels).size(); i++)
-			{
+			for (int i = 0; i < (pstInfo->labels).size(); i++) {
 				classTypeNum[i] = 0;
 			}
 		}
@@ -464,8 +417,7 @@ vector<DETECT_BOX_S> postprocess_classify_uniform(vector<DETECT_BOX_S> retbox, M
 		preBox.x = tmpbox.x; 
 		preBox.y = tmpbox.y;
 
-		if (classType.size() > maxClassTypeNum)
-		{
+		if (classType.size() > maxClassTypeNum) {
 			int type = classType.front();
 			classTypeNum[type]--;
 			classType.pop();

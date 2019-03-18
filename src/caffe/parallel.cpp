@@ -1,6 +1,7 @@
 #ifndef CPU_ONLY
 #include <cuda_runtime.h>
 #endif
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <stdio.h>
 

@@ -34,8 +34,7 @@
 //! \sa                         operator=
 //! \sa                         isValid
 ////////////////////////////////////////////////////////////////////
-ChaspBase::ChaspBase()
-{
+ChaspBase::ChaspBase() {
     // Ensure that the ChaspMap singleton is constructed before any other possible static ChaspBase object
     // And if it's constructed before, it's also destroyed after.
     ChaspMap::map(); 
@@ -47,8 +46,7 @@ ChaspBase::ChaspBase()
 //!
 //! \sa                         isValid
 ////////////////////////////////////////////////////////////////////
-ChaspBase::ChaspBase(const ChaspBase& other)
-{
+ChaspBase::ChaspBase(const ChaspBase& other) {
     *this = other;
 
     // Ensure that the ChaspMap singleton is constructed before any other possible static ChaspBase object
@@ -59,8 +57,7 @@ ChaspBase::ChaspBase(const ChaspBase& other)
 ////////////////////////////////////////////////////////////////////
 //! Constructs a new object and links it to a private key.
 ////////////////////////////////////////////////////////////////////
-ChaspBase::ChaspBase(hasp_feature_t feature)
-{
+ChaspBase::ChaspBase(hasp_feature_t feature) {
     DIAG_VERIFY(construct(feature));
     DIAG_ASSERT(isValid());
     
@@ -69,8 +66,7 @@ ChaspBase::ChaspBase(hasp_feature_t feature)
     ChaspMap::map();     
 }
 
-ChaspBase::~ChaspBase()
-{
+ChaspBase::~ChaspBase() {
     DIAG_VERIFY(release());
 }
 
@@ -81,8 +77,7 @@ ChaspBase::~ChaspBase()
 ////////////////////////////////////////////////////////////////////
 //! Overloaded assignment operator.
 ////////////////////////////////////////////////////////////////////
-ChaspBase& ChaspBase::operator=(const ChaspBase& other)
-{
+ChaspBase& ChaspBase::operator=(const ChaspBase& other) {
     if (this != &other)
         addRef(other);
 
@@ -129,14 +124,12 @@ bool ChaspBase::operator!=(const ChaspBase& other) const
 //! \sa                         ChaspBase::construct
 //!                             ChaspBase::release
 ////////////////////////////////////////////////////////////////////
-bool ChaspBase::addRef(const ChaspBase& other)
-{
+bool ChaspBase::addRef(const ChaspBase& other) {
     // lock access
     ChaspMap map;
 
     // release attached key if present
-    if (!release())
-    {
+    if (!release()) {
         DIAG_ASSERT(!"Release failed");
         return false;
     }
@@ -144,8 +137,7 @@ bool ChaspBase::addRef(const ChaspBase& other)
     DIAG_ASSERT(m_handle.isNull());
     m_handle.clear();
 
-    if (!other.isValid())
-    {
+    if (!other.isValid()) {
         DIAG_ASSERT(!"Other not valid");
         return false;
     }
@@ -153,8 +145,7 @@ bool ChaspBase::addRef(const ChaspBase& other)
     ChaspHandle handle = other.handle();
 
     // add a reference
-    if (!map.addRef(handle))
-    {
+    if (!map.addRef(handle)) {
         DIAG_ASSERT(!"addRef failed");
         return false;
     }
@@ -172,10 +163,8 @@ bool ChaspBase::addRef(const ChaspBase& other)
 //! \sa                         ChaspBase::addRef
 //!                             ChaspBase::release
 ////////////////////////////////////////////////////////////////////
-bool ChaspBase::construct(hasp_feature_t feature)
-{
-    if (!release())
-    {
+bool ChaspBase::construct(hasp_feature_t feature) {
+    if (!release()) {
         DIAG_ASSERT(!"release failed");
         return false;
     }
@@ -190,8 +179,7 @@ bool ChaspBase::construct(hasp_feature_t feature)
 //! \return                     \a true on success, \a false 
 //!                             otherwhise.
 ////////////////////////////////////////////////////////////////////
-bool ChaspBase::dispose()
-{
+bool ChaspBase::dispose() {
     if (!isValid())
         return true;
 
@@ -285,8 +273,7 @@ bool ChaspBase::isValid() const
 //! \return                     \a true on success, \a false
 //!                             otherwhise.
 ////////////////////////////////////////////////////////////////////
-bool ChaspBase::release()
-{
+bool ChaspBase::release() {
     return (m_handle.isNull() || ChaspMap::release(m_handle));
 }
 

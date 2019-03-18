@@ -119,13 +119,11 @@ static const unsigned long64 K[80] =
 /*
  * SHA-512 context setup
  */
-void sha4_starts( sha4_context *ctx, int is384 )
-{
+void sha4_starts( sha4_context *ctx, int is384 ) {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
 
-    if( is384 == 0 )
-    {
+    if( is384 == 0 ) {
         /* SHA-512 */
         ctx->state[0] = UL64(0x6A09E667F3BCC908);
         ctx->state[1] = UL64(0xBB67AE8584CAA73B);
@@ -135,9 +133,7 @@ void sha4_starts( sha4_context *ctx, int is384 )
         ctx->state[5] = UL64(0x9B05688C2B3E6C1F);
         ctx->state[6] = UL64(0x1F83D9ABFB41BD6B);
         ctx->state[7] = UL64(0x5BE0CD19137E2179);
-    }
-    else
-    {
+    } else {
         /* SHA-384 */
         ctx->state[0] = UL64(0xCBBB9D5DC1059ED8);
         ctx->state[1] = UL64(0x629A292A367CD507);
@@ -152,8 +148,7 @@ void sha4_starts( sha4_context *ctx, int is384 )
     ctx->is384 = is384;
 }
 
-static void sha4_process( sha4_context *ctx, const unsigned char data[128] )
-{
+static void sha4_process( sha4_context *ctx, const unsigned char data[128] ) {
     int i;
     unsigned long64 temp1, temp2, W[80];
     unsigned long64 A, B, C, D, E, F, G, H;
@@ -177,13 +172,11 @@ static void sha4_process( sha4_context *ctx, const unsigned char data[128] )
     d += temp1; h = temp1 + temp2;              \
 }
 
-    for( i = 0; i < 16; i++ )
-    {
+    for( i = 0; i < 16; i++ ) {
         GET_UINT64_BE( W[i], data, i << 3 );
     }
 
-    for( ; i < 80; i++ )
-    {
+    for( ; i < 80; i++ ) {
         W[i] = S1(W[i -  2]) + W[i -  7] +
                S0(W[i - 15]) + W[i - 16];
     }
@@ -224,8 +217,7 @@ static void sha4_process( sha4_context *ctx, const unsigned char data[128] )
 /*
  * SHA-512 process buffer
  */
-void sha4_update( sha4_context *ctx, const unsigned char *input, size_t ilen )
-{
+void sha4_update( sha4_context *ctx, const unsigned char *input, size_t ilen ) {
     size_t fill;
     unsigned int left;
 
@@ -240,8 +232,7 @@ void sha4_update( sha4_context *ctx, const unsigned char *input, size_t ilen )
     if( ctx->total[0] < (unsigned long64) ilen )
         ctx->total[1]++;
 
-    if( left && ilen >= fill )
-    {
+    if( left && ilen >= fill ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, fill );
         sha4_process( ctx, ctx->buffer );
@@ -250,15 +241,13 @@ void sha4_update( sha4_context *ctx, const unsigned char *input, size_t ilen )
         left = 0;
     }
 
-    while( ilen >= 128 )
-    {
+    while( ilen >= 128 ) {
         sha4_process( ctx, input );
         input += 128;
         ilen  -= 128;
     }
 
-    if( ilen > 0 )
-    {
+    if( ilen > 0 ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, ilen );
     }
@@ -279,8 +268,7 @@ static const unsigned char sha4_padding[128] =
 /*
  * SHA-512 final digest
  */
-void sha4_finish( sha4_context *ctx, unsigned char output[64] )
-{
+void sha4_finish( sha4_context *ctx, unsigned char output[64] ) {
     size_t last, padn;
     unsigned long64 high, low;
     unsigned char msglen[16];
@@ -305,8 +293,7 @@ void sha4_finish( sha4_context *ctx, unsigned char output[64] )
     PUT_UINT64_BE( ctx->state[4], output, 32 );
     PUT_UINT64_BE( ctx->state[5], output, 40 );
 
-    if( ctx->is384 == 0 )
-    {
+    if( ctx->is384 == 0 ) {
         PUT_UINT64_BE( ctx->state[6], output, 48 );
         PUT_UINT64_BE( ctx->state[7], output, 56 );
     }
@@ -316,8 +303,7 @@ void sha4_finish( sha4_context *ctx, unsigned char output[64] )
  * output = SHA-512( input buffer )
  */
 void sha4( const unsigned char *input, size_t ilen,
-           unsigned char output[64], int is384 )
-{
+           unsigned char output[64], int is384 ) {
     sha4_context ctx;
 
     sha4_starts( &ctx, is384 );
@@ -331,8 +317,7 @@ void sha4( const unsigned char *input, size_t ilen,
 /*
  * output = SHA-512( file contents )
  */
-int sha4_file( const char *path, unsigned char output[64], int is384 )
-{
+int sha4_file( const char *path, unsigned char output[64], int is384 ) {
     FILE *f;
     size_t n;
     sha4_context ctx;
@@ -350,8 +335,7 @@ int sha4_file( const char *path, unsigned char output[64], int is384 )
 
     memset( &ctx, 0, sizeof( sha4_context ) );
 
-    if( ferror( f ) != 0 )
-    {
+    if( ferror( f ) != 0 ) {
         fclose( f );
         return( POLARSSL_ERR_SHA4_FILE_IO_ERROR );
     }
@@ -365,13 +349,11 @@ int sha4_file( const char *path, unsigned char output[64], int is384 )
  * SHA-512 HMAC context setup
  */
 void sha4_hmac_starts( sha4_context *ctx, const unsigned char *key, size_t keylen,
-                       int is384 )
-{
+                       int is384 ) {
     size_t i;
     unsigned char sum[64];
 
-    if( keylen > 128 )
-    {
+    if( keylen > 128 ) {
         sha4( key, keylen, sum, is384 );
         keylen = ( is384 ) ? 48 : 64;
         key = sum;
@@ -380,8 +362,7 @@ void sha4_hmac_starts( sha4_context *ctx, const unsigned char *key, size_t keyle
     memset( ctx->ipad, 0x36, 128 );
     memset( ctx->opad, 0x5C, 128 );
 
-    for( i = 0; i < keylen; i++ )
-    {
+    for( i = 0; i < keylen; i++ ) {
         ctx->ipad[i] = (unsigned char)( ctx->ipad[i] ^ key[i] );
         ctx->opad[i] = (unsigned char)( ctx->opad[i] ^ key[i] );
     }
@@ -396,16 +377,14 @@ void sha4_hmac_starts( sha4_context *ctx, const unsigned char *key, size_t keyle
  * SHA-512 HMAC process buffer
  */
 void sha4_hmac_update( sha4_context  *ctx,
-                       const unsigned char *input, size_t ilen )
-{
+                       const unsigned char *input, size_t ilen ) {
     sha4_update( ctx, input, ilen );
 }
 
 /*
  * SHA-512 HMAC final digest
  */
-void sha4_hmac_finish( sha4_context *ctx, unsigned char output[64] )
-{
+void sha4_hmac_finish( sha4_context *ctx, unsigned char output[64] ) {
     int is384, hlen;
     unsigned char tmpbuf[64];
 
@@ -424,8 +403,7 @@ void sha4_hmac_finish( sha4_context *ctx, unsigned char output[64] )
 /*
  * SHA-512 HMAC context reset
  */
-void sha4_hmac_reset( sha4_context *ctx )
-{
+void sha4_hmac_reset( sha4_context *ctx ) {
     sha4_starts( ctx, ctx->is384 );
     sha4_update( ctx, ctx->ipad, 128 );
 }
@@ -435,8 +413,7 @@ void sha4_hmac_reset( sha4_context *ctx )
  */
 void sha4_hmac( const unsigned char *key, size_t keylen,
                 const unsigned char *input, size_t ilen,
-                unsigned char output[64], int is384 )
-{
+                unsigned char output[64], int is384 ) {
     sha4_context ctx;
 
     sha4_hmac_starts( &ctx, key, keylen, is384 );
@@ -668,15 +645,13 @@ static const unsigned char sha4_hmac_test_sum[14][64] =
 /*
  * Checkup routine
  */
-int sha4_self_test( int verbose )
-{
+int sha4_self_test( int verbose ) {
     int i, j, k, buflen;
     unsigned char buf[1024];
     unsigned char sha4sum[64];
     sha4_context ctx;
 
-    for( i = 0; i < 6; i++ )
-    {
+    for( i = 0; i < 6; i++ ) {
         j = i % 3;
         k = i < 3;
 
@@ -685,8 +660,7 @@ int sha4_self_test( int verbose )
 
         sha4_starts( &ctx, k );
 
-        if( j == 2 )
-        {
+        if( j == 2 ) {
             memset( buf, 'a', buflen = 1000 );
 
             for( j = 0; j < 1000; j++ )
@@ -698,8 +672,7 @@ int sha4_self_test( int verbose )
 
         sha4_finish( &ctx, sha4sum );
 
-        if( memcmp( sha4sum, sha4_test_sum[i], 64 - k * 16 ) != 0 )
-        {
+        if( memcmp( sha4sum, sha4_test_sum[i], 64 - k * 16 ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 
@@ -713,16 +686,14 @@ int sha4_self_test( int verbose )
     if( verbose != 0 )
         printf( "\n" );
 
-    for( i = 0; i < 14; i++ )
-    {
+    for( i = 0; i < 14; i++ ) {
         j = i % 7;
         k = i < 7;
 
         if( verbose != 0 )
             printf( "  HMAC-SHA-%d test #%d: ", 512 - k * 128, j + 1 );
 
-        if( j == 5 || j == 6 )
-        {
+        if( j == 5 || j == 6 ) {
             memset( buf, '\xAA', buflen = 131 );
             sha4_hmac_starts( &ctx, buf, buflen, k );
         }
@@ -737,8 +708,7 @@ int sha4_self_test( int verbose )
 
         buflen = ( j == 4 ) ? 16 : 64 - k * 16;
 
-        if( memcmp( sha4sum, sha4_hmac_test_sum[i], buflen ) != 0 )
-        {
+        if( memcmp( sha4sum, sha4_hmac_test_sum[i], buflen ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 

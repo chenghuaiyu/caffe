@@ -10,6 +10,10 @@
 using namespace cv;
 using namespace std;
 
+#ifdef _WIN32
+char* ConvertLPWSTRToLPSTR(wchar_t * lpwszStrIn);
+string GetDLLPath();
+#endif
 
 string GetAppPath();
 bool IsDirExist(string strDirName);

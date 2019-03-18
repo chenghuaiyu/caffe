@@ -44,13 +44,11 @@ public:
 // Construction/Destruction
 ////////////////////////////////////////////////////////////////////
 
-ChaspTimeHelper::ChaspTimeHelper()
-{
+ChaspTimeHelper::ChaspTimeHelper() {
     memset(this, 0x00, sizeof(*this));
 }
 
-ChaspTimeHelper::~ChaspTimeHelper()
-{
+ChaspTimeHelper::~ChaspTimeHelper() {
     memset(this, 0x00, sizeof(*this));
 }
 
@@ -80,16 +78,14 @@ hasp_time_t ChaspTimeHelper::toTime() const
 ////////////////////////////////////////////////////////////////////
 //! Converts the given time \a time into the internal structure.
 ////////////////////////////////////////////////////////////////////
-bool ChaspTimeHelper::toTime(hasp_time_t time)
-{
+bool ChaspTimeHelper::toTime(hasp_time_t time) {
     if (!HASP_SUCCEEDED(hasp_hasptime_to_datetime(time,
                                                   &m_nDay,
                                                   &m_nMonth,
                                                   &m_nYear,
                                                   &m_nHour,
                                                   &m_nMinute,
-                                                  &m_nSecond)))
-    {
+                                                  &m_nSecond))) {
         memset(this, 0x00, sizeof(*this));
         return false;
     }
@@ -114,8 +110,7 @@ bool ChaspTimeHelper::toTime(hasp_time_t time)
 //! Initializes the object with the passed \a time.
 ////////////////////////////////////////////////////////////////////
 ChaspTime::ChaspTime(hasp_time_t time /* = 0 */)
-    : m_time(time)
-{
+    : m_time(time) {
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -124,8 +119,7 @@ ChaspTime::ChaspTime(hasp_time_t time /* = 0 */)
 ChaspTime::ChaspTime(unsigned int nYear, unsigned int nMonth, 
                      unsigned int nDay, unsigned int nHour, 
                      unsigned int nMinute, unsigned int nSecond)
-    : m_time(0)
-{
+    : m_time(0) {
     ChaspTimeHelper helper;
     helper.m_nYear = nYear;
     helper.m_nMonth = nMonth;
@@ -137,8 +131,7 @@ ChaspTime::ChaspTime(unsigned int nYear, unsigned int nMonth,
     m_time = helper.toTime();
 }
 
-ChaspTime::~ChaspTime()
-{
+ChaspTime::~ChaspTime() {
 }
 
 ////////////////////////////////////////////////////////////////////

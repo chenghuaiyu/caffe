@@ -17,8 +17,7 @@
 
 BOOL APIENTRY DllMain(HANDLE /* hModule */, 
                       DWORD  /* dwReason */, 
-                      LPVOID /* lpReserved */)
-{
+                      LPVOID /* lpReserved */) {
     return TRUE;
 }
 

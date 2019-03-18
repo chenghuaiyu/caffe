@@ -18,13 +18,11 @@ ChaspImpl::ChaspImpl(hasp_feature_t feature, ChaspHandle& handle)
       m_feature(feature),
       m_ulState(stIdle),
       m_ulRefCount(0),
-      m_ulAltered(0)
-{
+      m_ulAltered(0) {
     addRef(handle);
 }
 
-ChaspImpl::~ChaspImpl()
-{
+ChaspImpl::~ChaspImpl() {
     DIAG_ASSERT(0 == m_ulRefCount);
 
     logout(true);
@@ -39,8 +37,7 @@ ChaspImpl::~ChaspImpl()
 //! Increments the internal reference counter and updates
 //! the \a handle's \a ChaspHandle::m_ulAltered field.
 ////////////////////////////////////////////////////////////////////
-bool ChaspImpl::addRef(ChaspHandle& handle)
-{
+bool ChaspImpl::addRef(ChaspHandle& handle) {
     handle.m_ulAltered = m_ulAltered;
     return (0 < ++m_ulRefCount);
 }
@@ -131,8 +128,7 @@ haspStatus ChaspImpl::getSessionInfo(const char* pszFormat,
 haspStatus ChaspImpl::getInfo(const char* pszQuery,
                               const char* pszFormat,
                               hasp_vendor_code_t vendorCode,
-                              ChaspInfo& info)
-{
+                              ChaspInfo& info) {
     info.clear();
 
     return pszQuery && pszFormat ?
@@ -147,8 +143,7 @@ haspStatus ChaspImpl::detach(const char* pszAction,
 							 const char* pszScope, 
 							 hasp_vendor_code_t vendorCode, 
 							 const char* pszRecipient, 
-							 ChaspInfo& v2c)
-{
+							 ChaspInfo& v2c) {
 	v2c.clear();
 
 	return pszAction && pszScope && pszRecipient ?
@@ -161,8 +156,7 @@ haspStatus ChaspImpl::transfer(const char* pszAction,
 							 const char* pszScope, 
 							 hasp_vendor_code_t vendorCode, 
 							 const char* pszRecipient, 
-							 ChaspInfo& v2c)
-{
+							 ChaspInfo& v2c) {
 	v2c.clear();
 
 	return pszAction && pszScope && pszRecipient ?
@@ -173,8 +167,7 @@ haspStatus ChaspImpl::transfer(const char* pszAction,
 //! Wrapper for the \a hasp_get_version API function.
 ////////////////////////////////////////////////////////////////////
 haspStatus ChaspImpl::getVersion(hasp_vendor_code_t vendorCode,
-                                 ChaspVersion& version)
-{
+                                 ChaspVersion& version) {
     unsigned int nMajor = 0;
     unsigned int nMinor = 0;
     unsigned int nServer = 0;
@@ -258,8 +251,7 @@ haspStatus ChaspImpl::legacySetRtc(hasp_time_t time) const
 ////////////////////////////////////////////////////////////////////
 //! Wrapper for the \a hasp_login_scope API function.
 ////////////////////////////////////////////////////////////////////
-haspStatus ChaspImpl::login(hasp_vendor_code_t vendorCode,  const char* pszScope)
-{
+haspStatus ChaspImpl::login(hasp_vendor_code_t vendorCode,  const char* pszScope) {
     DIAG_ASSERT(0 < m_ulRefCount);
     if (0 >= m_ulRefCount)
         return HASP_INVALID_OBJECT;
@@ -280,16 +272,13 @@ haspStatus ChaspImpl::login(hasp_vendor_code_t vendorCode,  const char* pszScope
 ////////////////////////////////////////////////////////////////////
 //! Wrapper for the \a hasp_logout API function.
 ////////////////////////////////////////////////////////////////////
-haspStatus ChaspImpl::logout(bool bFinal /* = false */)
-{
+haspStatus ChaspImpl::logout(bool bFinal /* = false */) {
     // final call from dtor
     // Ref. counter shall be zero.
     // Perform logout when still active.
-    if (bFinal)
-    {
+    if (bFinal) {
         DIAG_ASSERT(0 == m_ulRefCount);
-        if (stActive == m_ulState)
-        {
+        if (stActive == m_ulState) {
             m_ulState = stIdle;
             hasp_logout(m_handle);
         }
@@ -302,15 +291,13 @@ haspStatus ChaspImpl::logout(bool bFinal /* = false */)
     if (0 >= m_ulRefCount)
         return HASP_INVALID_OBJECT;
 
-    if (!isLoggedIn())
-	{
+    if (!isLoggedIn()) {
         return HASP_INV_HND;
 	}
 
     haspStatus status = hasp_logout(m_handle);
 
-    if (HASP_SUCCEEDED(status))
-    {
+    if (HASP_SUCCEEDED(status)) {
         // alter the state and update 
         // the logout counter.
         m_ulState = stIdle;
@@ -325,8 +312,7 @@ haspStatus ChaspImpl::logout(bool bFinal /* = false */)
 //! If the reference counter drops below one the object will be
 //! destroyed.
 ////////////////////////////////////////////////////////////////////
-bool ChaspImpl::release()
-{
+bool ChaspImpl::release() {
     DIAG_ASSERT(0 < m_ulRefCount);
     if (0 == m_ulRefCount)
         return false;
@@ -403,8 +389,7 @@ haspStatus ChaspImpl::writeFile(hasp_fileid_t fileId,
 //! Wrapper for the \a hasp_update API function.
 ////////////////////////////////////////////////////////////////////
 haspStatus ChaspImpl::update(const char* pszUpdate, 
-                             ChaspInfo& acknowledge)
-{
+                             ChaspInfo& acknowledge) {
     if (NULL == pszUpdate)
         return HASP_INVALID_PARAMETER;
 

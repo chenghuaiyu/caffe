@@ -299,8 +299,7 @@ static const unsigned char odd_parity_table[128] = { 1,  2,  4,  7,  8,
         227, 229, 230, 233, 234, 236, 239, 241, 242, 244, 247, 248, 251, 253,
         254 };
 
-void des_key_set_parity( unsigned char key[DES_KEY_SIZE] )
-{
+void des_key_set_parity( unsigned char key[DES_KEY_SIZE] ) {
     int i;
 
     for( i = 0; i < DES_KEY_SIZE; i++ )
@@ -310,8 +309,7 @@ void des_key_set_parity( unsigned char key[DES_KEY_SIZE] )
 /*
  * Check the given key's parity, returns 1 on failure, 0 on SUCCESS
  */
-int des_key_check_key_parity( const unsigned char key[DES_KEY_SIZE] )
-{
+int des_key_check_key_parity( const unsigned char key[DES_KEY_SIZE] ) {
     int i;
 
     for( i = 0; i < DES_KEY_SIZE; i++ )
@@ -365,8 +363,7 @@ static const unsigned char weak_key_table[WEAK_KEY_COUNT][DES_KEY_SIZE] =
     { 0xFE, 0xE0, 0xFE, 0xE0, 0xFE, 0xF1, 0xFE, 0xF1 }
 };
 
-int des_key_check_weak( const unsigned char key[DES_KEY_SIZE] )
-{
+int des_key_check_weak( const unsigned char key[DES_KEY_SIZE] ) {
     int i;
 
     for( i = 0; i < WEAK_KEY_COUNT; i++ )
@@ -376,8 +373,7 @@ int des_key_check_weak( const unsigned char key[DES_KEY_SIZE] )
     return( 0 );
 }
 
-static void des_setkey( unsigned long SK[32], const unsigned char key[DES_KEY_SIZE] )
-{
+static void des_setkey( unsigned long SK[32], const unsigned char key[DES_KEY_SIZE] ) {
     int i;
     unsigned long X, Y, T;
 
@@ -406,15 +402,11 @@ static void des_setkey( unsigned long SK[32], const unsigned char key[DES_KEY_SI
     /*
      * calculate subkeys
      */
-    for( i = 0; i < 16; i++ )
-    {
-        if( i < 2 || i == 8 || i == 15 )
-        {
+    for( i = 0; i < 16; i++ ) {
+        if( i < 2 || i == 8 || i == 15 ) {
             X = ((X <<  1) | (X >> 27)) & 0x0FFFFFFF;
             Y = ((Y <<  1) | (Y >> 27)) & 0x0FFFFFFF;
-        }
-        else
-        {
+        } else {
             X = ((X <<  2) | (X >> 26)) & 0x0FFFFFFF;
             Y = ((Y <<  2) | (Y >> 26)) & 0x0FFFFFFF;
         }
@@ -448,8 +440,7 @@ static void des_setkey( unsigned long SK[32], const unsigned char key[DES_KEY_SI
 /*
  * DES key schedule (56-bit, encryption)
  */
-int des_setkey_enc( des_context *ctx, const unsigned char key[DES_KEY_SIZE] )
-{
+int des_setkey_enc( des_context *ctx, const unsigned char key[DES_KEY_SIZE] ) {
     des_setkey( ctx->sk, key );
 
     return( 0 );
@@ -458,14 +449,12 @@ int des_setkey_enc( des_context *ctx, const unsigned char key[DES_KEY_SIZE] )
 /*
  * DES key schedule (56-bit, decryption)
  */
-int des_setkey_dec( des_context *ctx, const unsigned char key[DES_KEY_SIZE] )
-{
+int des_setkey_dec( des_context *ctx, const unsigned char key[DES_KEY_SIZE] ) {
     int i;
 
     des_setkey( ctx->sk, key );
 
-    for( i = 0; i < 16; i += 2 )
-    {
+    for( i = 0; i < 16; i += 2 ) {
         SWAP( ctx->sk[i    ], ctx->sk[30 - i] );
         SWAP( ctx->sk[i + 1], ctx->sk[31 - i] );
     }
@@ -475,15 +464,13 @@ int des_setkey_dec( des_context *ctx, const unsigned char key[DES_KEY_SIZE] )
 
 static void des3_set2key( unsigned long esk[96],
                           unsigned long dsk[96],
-                          const unsigned char key[DES_KEY_SIZE*2] )
-{
+                          const unsigned char key[DES_KEY_SIZE*2] ) {
     int i;
 
     des_setkey( esk, key );
     des_setkey( dsk + 32, key + 8 );
 
-    for( i = 0; i < 32; i += 2 )
-    {
+    for( i = 0; i < 32; i += 2 ) {
         dsk[i     ] = esk[30 - i];
         dsk[i +  1] = esk[31 - i];
 
@@ -501,8 +488,7 @@ static void des3_set2key( unsigned long esk[96],
 /*
  * Triple-DES key schedule (112-bit, encryption)
  */
-int des3_set2key_enc( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 2] )
-{
+int des3_set2key_enc( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 2] ) {
     unsigned long sk[96];
 
     des3_set2key( ctx->sk, sk, key );
@@ -514,8 +500,7 @@ int des3_set2key_enc( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 
 /*
  * Triple-DES key schedule (112-bit, decryption)
  */
-int des3_set2key_dec( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 2] )
-{
+int des3_set2key_dec( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 2] ) {
     unsigned long sk[96];
 
     des3_set2key( sk, ctx->sk, key );
@@ -526,16 +511,14 @@ int des3_set2key_dec( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 
 
 static void des3_set3key( unsigned long esk[96],
                           unsigned long dsk[96],
-                          const unsigned char key[24] )
-{
+                          const unsigned char key[24] ) {
     int i;
 
     des_setkey( esk, key );
     des_setkey( dsk + 32, key +  8 );
     des_setkey( esk + 64, key + 16 );
 
-    for( i = 0; i < 32; i += 2 )
-    {
+    for( i = 0; i < 32; i += 2 ) {
         dsk[i     ] = esk[94 - i];
         dsk[i +  1] = esk[95 - i];
 
@@ -550,8 +533,7 @@ static void des3_set3key( unsigned long esk[96],
 /*
  * Triple-DES key schedule (168-bit, encryption)
  */
-int des3_set3key_enc( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 3] )
-{
+int des3_set3key_enc( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 3] ) {
     unsigned long sk[96];
 
     des3_set3key( ctx->sk, sk, key );
@@ -563,8 +545,7 @@ int des3_set3key_enc( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 
 /*
  * Triple-DES key schedule (168-bit, decryption)
  */
-int des3_set3key_dec( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 3] )
-{
+int des3_set3key_dec( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 3] ) {
     unsigned long sk[96];
 
     des3_set3key( sk, ctx->sk, key );
@@ -578,8 +559,7 @@ int des3_set3key_dec( des3_context *ctx, const unsigned char key[DES_KEY_SIZE * 
  */
 int des_crypt_ecb( des_context *ctx,
                     const unsigned char input[8],
-                    unsigned char output[8] )
-{
+                    unsigned char output[8] ) {
     int i;
     unsigned long X, Y, T, *SK;
 
@@ -590,8 +570,7 @@ int des_crypt_ecb( des_context *ctx,
 
     DES_IP( X, Y );
 
-    for( i = 0; i < 8; i++ )
-    {
+    for( i = 0; i < 8; i++ ) {
         DES_ROUND( Y, X );
         DES_ROUND( X, Y );
     }
@@ -612,18 +591,15 @@ int des_crypt_cbc( des_context *ctx,
                     size_t length,
                     unsigned char iv[8],
                     const unsigned char *input,
-                    unsigned char *output )
-{
+                    unsigned char *output ) {
     int i;
     unsigned char temp[8];
 
     if( length % 8 )
         return( POLARSSL_ERR_DES_INVALID_INPUT_LENGTH );
 
-    if( mode == DES_ENCRYPT )
-    {
-        while( length > 0 )
-        {
+    if( mode == DES_ENCRYPT ) {
+        while( length > 0 ) {
             for( i = 0; i < 8; i++ )
                 output[i] = (unsigned char)( input[i] ^ iv[i] );
 
@@ -637,8 +613,7 @@ int des_crypt_cbc( des_context *ctx,
     }
     else /* DES_DECRYPT */
     {
-        while( length > 0 )
-        {
+        while( length > 0 ) {
             memcpy( temp, input, 8 );
             des_crypt_ecb( ctx, input, output );
 
@@ -661,8 +636,7 @@ int des_crypt_cbc( des_context *ctx,
  */
 int des3_crypt_ecb( des3_context *ctx,
                      const unsigned char input[8],
-                     unsigned char output[8] )
-{
+                     unsigned char output[8] ) {
     int i;
     unsigned long X, Y, T, *SK;
 
@@ -673,20 +647,17 @@ int des3_crypt_ecb( des3_context *ctx,
 
     DES_IP( X, Y );
 
-    for( i = 0; i < 8; i++ )
-    {
+    for( i = 0; i < 8; i++ ) {
         DES_ROUND( Y, X );
         DES_ROUND( X, Y );
     }
 
-    for( i = 0; i < 8; i++ )
-    {
+    for( i = 0; i < 8; i++ ) {
         DES_ROUND( X, Y );
         DES_ROUND( Y, X );
     }
 
-    for( i = 0; i < 8; i++ )
-    {
+    for( i = 0; i < 8; i++ ) {
         DES_ROUND( Y, X );
         DES_ROUND( X, Y );
     }
@@ -707,18 +678,15 @@ int des3_crypt_cbc( des3_context *ctx,
                      size_t length,
                      unsigned char iv[8],
                      const unsigned char *input,
-                     unsigned char *output )
-{
+                     unsigned char *output ) {
     int i;
     unsigned char temp[8];
 
     if( length % 8 )
         return( POLARSSL_ERR_DES_INVALID_INPUT_LENGTH );
 
-    if( mode == DES_ENCRYPT )
-    {
-        while( length > 0 )
-        {
+    if( mode == DES_ENCRYPT ) {
+        while( length > 0 ) {
             for( i = 0; i < 8; i++ )
                 output[i] = (unsigned char)( input[i] ^ iv[i] );
 
@@ -732,8 +700,7 @@ int des3_crypt_cbc( des3_context *ctx,
     }
     else /* DES_DECRYPT */
     {
-        while( length > 0 )
-        {
+        while( length > 0 ) {
             memcpy( temp, input, 8 );
             des3_crypt_ecb( ctx, input, output );
 
@@ -808,8 +775,7 @@ static const unsigned char des3_test_cbc_enc[3][8] =
 /*
  * Checkup routine
  */
-int des_self_test( int verbose )
-{
+int des_self_test( int verbose ) {
     int i, j, u, v;
     des_context ctx;
     des3_context ctx3;
@@ -823,8 +789,7 @@ int des_self_test( int verbose )
     /*
      * ECB mode
      */
-    for( i = 0; i < 6; i++ )
-    {
+    for( i = 0; i < 6; i++ ) {
         u = i >> 1;
         v = i  & 1;
 
@@ -835,8 +800,7 @@ int des_self_test( int verbose )
 
         memcpy( buf, des3_test_buf, 8 );
 
-        switch( i )
-        {
+        switch( i ) {
         case 0:
             des_setkey_dec( &ctx, (unsigned char *) des3_test_keys );
             break;
@@ -865,8 +829,7 @@ int des_self_test( int verbose )
             return( 1 );
         }
 
-        for( j = 0; j < 10000; j++ )
-        {
+        for( j = 0; j < 10000; j++ ) {
             if( u == 0 )
                 des_crypt_ecb( &ctx, buf, buf );
             else
@@ -876,8 +839,7 @@ int des_self_test( int verbose )
         if( ( v == DES_DECRYPT &&
                 memcmp( buf, des3_test_ecb_dec[u], 8 ) != 0 ) ||
             ( v != DES_DECRYPT &&
-                memcmp( buf, des3_test_ecb_enc[u], 8 ) != 0 ) )
-        {
+                memcmp( buf, des3_test_ecb_enc[u], 8 ) != 0 ) ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 
@@ -894,8 +856,7 @@ int des_self_test( int verbose )
     /*
      * CBC mode
      */
-    for( i = 0; i < 6; i++ )
-    {
+    for( i = 0; i < 6; i++ ) {
         u = i >> 1;
         v = i  & 1;
 
@@ -908,8 +869,7 @@ int des_self_test( int verbose )
         memcpy( prv, des3_test_iv,  8 );
         memcpy( buf, des3_test_buf, 8 );
 
-        switch( i )
-        {
+        switch( i ) {
         case 0:
             des_setkey_dec( &ctx, (unsigned char *) des3_test_keys );
             break;
@@ -938,20 +898,15 @@ int des_self_test( int verbose )
             return( 1 );
         }
 
-        if( v == DES_DECRYPT )
-        {
-            for( j = 0; j < 10000; j++ )
-            {
+        if( v == DES_DECRYPT ) {
+            for( j = 0; j < 10000; j++ ) {
                 if( u == 0 )
                     des_crypt_cbc( &ctx, v, 8, iv, buf, buf );
                 else
                     des3_crypt_cbc( &ctx3, v, 8, iv, buf, buf );
             }
-        }
-        else
-        {
-            for( j = 0; j < 10000; j++ )
-            {
+        } else {
+            for( j = 0; j < 10000; j++ ) {
                 unsigned char tmp[8];
 
                 if( u == 0 )
@@ -970,8 +925,7 @@ int des_self_test( int verbose )
         if( ( v == DES_DECRYPT &&
                 memcmp( buf, des3_test_cbc_dec[u], 8 ) != 0 ) ||
             ( v != DES_DECRYPT &&
-                memcmp( buf, des3_test_cbc_enc[u], 8 ) != 0 ) )
-        {
+                memcmp( buf, des3_test_cbc_enc[u], 8 ) != 0 ) ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 

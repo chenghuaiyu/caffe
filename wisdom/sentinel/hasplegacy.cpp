@@ -23,16 +23,14 @@
 ////////////////////////////////////////////////////////////////////
 //! Intializes the object.
 ////////////////////////////////////////////////////////////////////
-ChaspLegacy::ChaspLegacy()
-{
+ChaspLegacy::ChaspLegacy() {
 }
 
 ////////////////////////////////////////////////////////////////////
 //! Copy constructor intializing object with other's private key.
 ////////////////////////////////////////////////////////////////////
 ChaspLegacy::ChaspLegacy(const Chasp& other)
-    : ChaspBase(other)
-{
+    : ChaspBase(other) {
     if (!other.hasLegacy())
         DIAG_VERIFY(release());
 }
@@ -41,8 +39,7 @@ ChaspLegacy::ChaspLegacy(const Chasp& other)
 //! Copy constructor intializing object with other's private key.
 ////////////////////////////////////////////////////////////////////
 ChaspLegacy::ChaspLegacy(const ChaspLegacy& other)
-    : ChaspBase(other)
-{
+    : ChaspBase(other) {
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -54,10 +51,8 @@ ChaspLegacy::ChaspLegacy(const ChaspLegacy& other)
 //! private key after releasing its private key object.
 ////////////////////////////////////////////////////////////////////
 
-ChaspLegacy& ChaspLegacy::operator=(const Chasp& other)
-{
-    if ((*this != other) && other.hasLegacy())
-    {
+ChaspLegacy& ChaspLegacy::operator=(const Chasp& other) {
+    if ((*this != other) && other.hasLegacy()) {
         dynamic_cast<ChaspBase&>(*this) = 
             dynamic_cast<const ChaspBase&>(other);
     }
@@ -65,8 +60,7 @@ ChaspLegacy& ChaspLegacy::operator=(const Chasp& other)
     return *this;
 }
 
-ChaspLegacy& ChaspLegacy::operator=(const ChaspLegacy& other)
-{
+ChaspLegacy& ChaspLegacy::operator=(const ChaspLegacy& other) {
     dynamic_cast<ChaspBase&>(*this) = 
         dynamic_cast<const ChaspBase&>(other);
 

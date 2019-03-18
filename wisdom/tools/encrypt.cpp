@@ -10,8 +10,7 @@
 #define MAX_MODEL_LENGTH (1024*1024)
 #define MAX_WEIGHT_LENGTH (1024*1024*500)
 
-void VimEncrypt2FileRc4(char* infile1, char* infile2, char *outfile, char*pwd)
-{
+void VimEncrypt2FileRc4(char* infile1, char* infile2, char *outfile, char*pwd) {
     rc4 rc4_cona((unsigned char *)pwd, strlen(pwd));
     char buf[BUF_SIZE];
     int uLen;
@@ -31,16 +30,14 @@ void VimEncrypt2FileRc4(char* infile1, char* infile2, char *outfile, char*pwd)
     fwrite(&flen2, 1, sizeof(int), fdst);
     
     uLen = fread(buf, 1, BUF_SIZE, fsrc1);
-    while (uLen>0)
-    {
+    while (uLen>0) {
         rc4_cona.rc4_encode((unsigned char*)buf,uLen);
         fwrite(buf, 1, uLen, fdst);
         uLen = fread(buf, 1, BUF_SIZE, fsrc1);
     }
     
     uLen = fread(buf, 1, BUF_SIZE, fsrc2);
-    while (uLen>0)
-    {
+    while (uLen>0) {
         rc4_cona.rc4_encode((unsigned char*)buf,BUF_SIZE);
         fwrite(buf, 1, uLen, fdst);
         uLen = fread(buf, 1, BUF_SIZE, fsrc2);
@@ -52,8 +49,7 @@ void VimEncrypt2FileRc4(char* infile1, char* infile2, char *outfile, char*pwd)
 }
 
 
-void VimDecrypt2FileRc4(char* infile, char *outfile1, char* outfile2 ,char*pwd)
-{
+void VimDecrypt2FileRc4(char* infile, char *outfile1, char* outfile2 ,char*pwd) {
     rc4 rc4_cona((unsigned char *)pwd, strlen(pwd));
     char buf[BUF_SIZE];
     int uLen;
@@ -68,18 +64,13 @@ void VimDecrypt2FileRc4(char* infile, char *outfile1, char* outfile2 ,char*pwd)
     fseek(fdst1, 0, SEEK_SET);
     fseek(fdst2, 0, SEEK_SET);
     
-    while (flen1 > 0)
-    {
-        if (flen1 > BUF_SIZE)
-        {
+    while (flen1 > 0) {
+        if (flen1 > BUF_SIZE) {
             uLen = fread(buf, 1, BUF_SIZE, fsrc);
-        }
-        else
-        {
+        } else {
             uLen = fread(buf, 1, flen1, fsrc);
         }
-        if (uLen <= 0)
-        {
+        if (uLen <= 0) {
             break;
         }
         rc4_cona.rc4_encode((unsigned char*)buf,uLen);
@@ -87,18 +78,13 @@ void VimDecrypt2FileRc4(char* infile, char *outfile1, char* outfile2 ,char*pwd)
         flen1 -= uLen;
     }
     
-    while (flen2 > 0)
-    {
-        if (flen2 > BUF_SIZE)
-        {
+    while (flen2 > 0) {
+        if (flen2 > BUF_SIZE) {
             uLen = fread(buf, 1, BUF_SIZE, fsrc);
-        }
-        else
-        {
+        } else {
             uLen = fread(buf, 1, flen2, fsrc);
         }
-        if (uLen <= 0)
-        {
+        if (uLen <= 0) {
             break;
         }
         rc4_cona.rc4_encode((unsigned char*)buf,uLen);

@@ -83,6 +83,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testrc4encode", "testrc4enc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vocchecker", "vocchecker\vocchecker.vcxproj", "{D3D6B84A-490C-4A63-8A3F-3A05728F4123}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CE228333-034E-40C3-88AE-B8C9BB7B5D71}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SCWObjectDetectionV2Test", "SCWObjectDetectionV2Test\SCWObjectDetectionV2Test.vcxproj", "{2FFF3F81-6693-44C8-8579-EECC5503E4DC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CBC3F434-DBFA-404D-87A9-DDECD0FC817B} = {CBC3F434-DBFA-404D-87A9-DDECD0FC817B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SCWObjectDetectionV2", "SCWObjectDetectionV2\SCWObjectDetectionV2.vcxproj", "{CBC3F434-DBFA-404D-87A9-DDECD0FC817B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -169,6 +178,14 @@ Global
 		{D3D6B84A-490C-4A63-8A3F-3A05728F4123}.Debug|x64.Build.0 = Debug|x64
 		{D3D6B84A-490C-4A63-8A3F-3A05728F4123}.Release|x64.ActiveCfg = Release|x64
 		{D3D6B84A-490C-4A63-8A3F-3A05728F4123}.Release|x64.Build.0 = Release|x64
+		{2FFF3F81-6693-44C8-8579-EECC5503E4DC}.Debug|x64.ActiveCfg = Debug|x64
+		{2FFF3F81-6693-44C8-8579-EECC5503E4DC}.Debug|x64.Build.0 = Debug|x64
+		{2FFF3F81-6693-44C8-8579-EECC5503E4DC}.Release|x64.ActiveCfg = Release|x64
+		{2FFF3F81-6693-44C8-8579-EECC5503E4DC}.Release|x64.Build.0 = Release|x64
+		{CBC3F434-DBFA-404D-87A9-DDECD0FC817B}.Debug|x64.ActiveCfg = Debug|x64
+		{CBC3F434-DBFA-404D-87A9-DDECD0FC817B}.Debug|x64.Build.0 = Debug|x64
+		{CBC3F434-DBFA-404D-87A9-DDECD0FC817B}.Release|x64.ActiveCfg = Release|x64
+		{CBC3F434-DBFA-404D-87A9-DDECD0FC817B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

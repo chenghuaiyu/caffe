@@ -10,14 +10,12 @@
 
 char g_OutXml[MAX_LENG + 1];
 
-char* XmlOutput(vector<DETECT_FILE_S> files, vector<string> labels)
-{
+char* XmlOutput(vector<DETECT_FILE_S> files, vector<string> labels) {
 	vector<DETECT_BOX_S> boxes;
     
     tinyxml2::XMLDocument doc;
 
-    for (int i = 0; i < files.size(); i += 1)
-    {
+    for (int i = 0; i < files.size(); i += 1) {
         tinyxml2::XMLElement* annotation = doc.NewElement( "annotation" );
         tinyxml2::XMLElement* filename = doc.NewElement( "filename" );
         string filenameonly = GetFileNameByFilePathName(files[i].filename);
@@ -36,8 +34,7 @@ char* XmlOutput(vector<DETECT_FILE_S> files, vector<string> labels)
         annotation->InsertEndChild( size );
             
         boxes = files[i].boxes;
-        for (int j = 0; j < boxes.size(); j++)
-        {
+        for (int j = 0; j < boxes.size(); j++) {
             int label = static_cast<int>(boxes[j].label);
 			int score = static_cast<int>(boxes[j].score * 100);
             int x = static_cast<int>(boxes[j].x);
@@ -84,15 +81,13 @@ char* XmlOutput(vector<DETECT_FILE_S> files, vector<string> labels)
     return g_OutXml;
 }
 
-vector<DETECT_FILE_S> XmlParse(char* info, vector<string> labels)
-{
+vector<DETECT_FILE_S> XmlParse(char* info, vector<string> labels) {
 	vector<DETECT_FILE_S> files;
     tinyxml2::XMLDocument doc;
 	tinyxml2::XMLError err = doc.Parse(info);
     
     tinyxml2::XMLElement* annotation = doc.FirstChildElement( "annotation" );
-    while(annotation)
-    {
+    while(annotation) {
 		DETECT_FILE_S dfile;
 		tinyxml2::XMLElement* filename = annotation->FirstChildElement("filename");
 		tinyxml2::XMLElement* size = annotation->FirstChildElement("size");
@@ -105,8 +100,7 @@ vector<DETECT_FILE_S> XmlParse(char* info, vector<string> labels)
 		dfile.boxes.clear();
             
 		tinyxml2::XMLElement* object = annotation->FirstChildElement("object");
-		while (object)
-        {
+		while (object) {
 			tinyxml2::XMLElement* name = object->FirstChildElement("name");
 			tinyxml2::XMLElement* score = object->FirstChildElement("score");
 			tinyxml2::XMLElement* bndbox = object->FirstChildElement("bndbox");
@@ -116,8 +110,7 @@ vector<DETECT_FILE_S> XmlParse(char* info, vector<string> labels)
 			tinyxml2::XMLElement* ymax = bndbox->FirstChildElement("ymax");
 			vector <string>::iterator iElement = find(labels.begin(), labels.end(), name->GetText());
 			int label = 0;
-			if (iElement != labels.end())
-			{
+			if (iElement != labels.end()) {
 				label = distance(labels.begin(), iElement);
 			}
 			DETECT_BOX_S outbox;
@@ -138,15 +131,13 @@ vector<DETECT_FILE_S> XmlParse(char* info, vector<string> labels)
 	return files;
 }
 
-void XmlSave(string src, string dst, string fn, char* info, int savenobox)
-{
+void XmlSave(string src, string dst, string fn, char* info, int savenobox) {
 	vector<DETECT_FILE_S> files;
 	tinyxml2::XMLDocument doc;
 	doc.Parse(info);
 
 	tinyxml2::XMLElement* annotation = doc.FirstChildElement("annotation");
-	while (annotation)
-	{
+	while (annotation) {
 		DETECT_FILE_S dfile;
 		tinyxml2::XMLElement* filename = annotation->FirstChildElement("filename");
 		tinyxml2::XMLElement* size = annotation->FirstChildElement("size");
@@ -159,8 +150,7 @@ void XmlSave(string src, string dst, string fn, char* info, int savenobox)
 		dfile.boxes.clear();
 
 		tinyxml2::XMLElement* object = annotation->FirstChildElement("object");
-		if ((object == 0) && (!savenobox))
-		{
+		if ((object == 0) && (!savenobox)) {
 			annotation = annotation->NextSiblingElement("annotation");
 			continue;
 		}
@@ -187,8 +177,7 @@ void XmlSave(string src, string dst, string fn, char* info, int savenobox)
 		fwrite(info, 1, strlen(info), fileXml);
 		fclose(fileXml);
 
-		while (object)
-		{
+		while (object) {
 			//save jpeg with box
 			tinyxml2::XMLElement* name = object->FirstChildElement("name");
 			tinyxml2::XMLElement* score = object->FirstChildElement("score");

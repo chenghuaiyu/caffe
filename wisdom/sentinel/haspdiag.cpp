@@ -24,8 +24,7 @@
     //
     ////////////////////////////////////////////////////////////////
     bool pascal DIAGAssertFailedLine(const char* lpszFileName, 
-                                     int nLine)
-    {
+                                     int nLine) {
         // next is lend from MFC :)
         MSG msg;
         BOOL bQuit = PeekMessage(&msg, NULL, WM_QUIT, WM_QUIT, PM_REMOVE);
@@ -45,8 +44,7 @@
     //
     //
     ////////////////////////////////////////////////////////////////
-    void pascal DIAGOutputString(const char* lpsz)
-    {
+    void pascal DIAGOutputString(const char* lpsz) {
         ::OutputDebugStringA(lpsz);
     }
 

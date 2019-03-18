@@ -40,13 +40,11 @@
 /*
  * PadLock detection routine
  */
-int padlock_supports( int feature )
-{
+int padlock_supports( int feature ) {
     static int flags = -1;
     int ebx, edx;
 
-    if( flags == -1 )
-    {
+    if( flags == -1 ) {
         asm( "movl  %%ebx, %0           \n"     \
              "movl  $0xC0000000, %%eax  \n"     \
              "cpuid                     \n"     \
@@ -74,8 +72,7 @@ int padlock_supports( int feature )
 int padlock_xcryptecb( aes_context *ctx,
                        int mode,
                        const unsigned char input[16],
-                       unsigned char output[16] )
-{
+                       unsigned char output[16] ) {
     int ebx;
     unsigned long *rk;
     unsigned long *blk;
@@ -115,8 +112,7 @@ int padlock_xcryptcbc( aes_context *ctx,
                        size_t length,
                        unsigned char iv[16],
                        const unsigned char *input,
-                       unsigned char *output )
-{
+                       unsigned char *output ) {
     int ebx;
     size_t count;
     unsigned long *rk;

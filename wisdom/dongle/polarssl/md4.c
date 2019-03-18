@@ -65,8 +65,7 @@
 /*
  * MD4 context setup
  */
-void md4_starts( md4_context *ctx )
-{
+void md4_starts( md4_context *ctx ) {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
 
@@ -76,8 +75,7 @@ void md4_starts( md4_context *ctx )
     ctx->state[3] = 0x10325476;
 }
 
-static void md4_process( md4_context *ctx, const unsigned char data[64] )
-{
+static void md4_process( md4_context *ctx, const unsigned char data[64] ) {
     unsigned long X[16], A, B, C, D;
 
     GET_ULONG_LE( X[ 0], data,  0 );
@@ -182,8 +180,7 @@ static void md4_process( md4_context *ctx, const unsigned char data[64] )
 /*
  * MD4 process buffer
  */
-void md4_update( md4_context *ctx, const unsigned char *input, size_t ilen )
-{
+void md4_update( md4_context *ctx, const unsigned char *input, size_t ilen ) {
     size_t fill;
     unsigned long left;
 
@@ -199,8 +196,7 @@ void md4_update( md4_context *ctx, const unsigned char *input, size_t ilen )
     if( ctx->total[0] < (unsigned long) ilen )
         ctx->total[1]++;
 
-    if( left && ilen >= fill )
-    {
+    if( left && ilen >= fill ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, fill );
         md4_process( ctx, ctx->buffer );
@@ -209,15 +205,13 @@ void md4_update( md4_context *ctx, const unsigned char *input, size_t ilen )
         left = 0;
     }
 
-    while( ilen >= 64 )
-    {
+    while( ilen >= 64 ) {
         md4_process( ctx, input );
         input += 64;
         ilen  -= 64;
     }
 
-    if( ilen > 0 )
-    {
+    if( ilen > 0 ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, ilen );
     }
@@ -234,8 +228,7 @@ static const unsigned char md4_padding[64] =
 /*
  * MD4 final digest
  */
-void md4_finish( md4_context *ctx, unsigned char output[16] )
-{
+void md4_finish( md4_context *ctx, unsigned char output[16] ) {
     unsigned long last, padn;
     unsigned long high, low;
     unsigned char msglen[8];
@@ -262,8 +255,7 @@ void md4_finish( md4_context *ctx, unsigned char output[16] )
 /*
  * output = MD4( input buffer )
  */
-void md4( const unsigned char *input, size_t ilen, unsigned char output[16] )
-{
+void md4( const unsigned char *input, size_t ilen, unsigned char output[16] ) {
     md4_context ctx;
 
     md4_starts( &ctx );
@@ -277,8 +269,7 @@ void md4( const unsigned char *input, size_t ilen, unsigned char output[16] )
 /*
  * output = MD4( file contents )
  */
-int md4_file( const char *path, unsigned char output[16] )
-{
+int md4_file( const char *path, unsigned char output[16] ) {
     FILE *f;
     size_t n;
     md4_context ctx;
@@ -296,8 +287,7 @@ int md4_file( const char *path, unsigned char output[16] )
 
     memset( &ctx, 0, sizeof( md4_context ) );
 
-    if( ferror( f ) != 0 )
-    {
+    if( ferror( f ) != 0 ) {
         fclose( f );
         return( POLARSSL_ERR_MD4_FILE_IO_ERROR );
     }
@@ -310,13 +300,11 @@ int md4_file( const char *path, unsigned char output[16] )
 /*
  * MD4 HMAC context setup
  */
-void md4_hmac_starts( md4_context *ctx, const unsigned char *key, size_t keylen )
-{
+void md4_hmac_starts( md4_context *ctx, const unsigned char *key, size_t keylen ) {
     size_t i;
     unsigned char sum[16];
 
-    if( keylen > 64 )
-    {
+    if( keylen > 64 ) {
         md4( key, keylen, sum );
         keylen = 16;
         key = sum;
@@ -325,8 +313,7 @@ void md4_hmac_starts( md4_context *ctx, const unsigned char *key, size_t keylen 
     memset( ctx->ipad, 0x36, 64 );
     memset( ctx->opad, 0x5C, 64 );
 
-    for( i = 0; i < keylen; i++ )
-    {
+    for( i = 0; i < keylen; i++ ) {
         ctx->ipad[i] = (unsigned char)( ctx->ipad[i] ^ key[i] );
         ctx->opad[i] = (unsigned char)( ctx->opad[i] ^ key[i] );
     }
@@ -340,16 +327,14 @@ void md4_hmac_starts( md4_context *ctx, const unsigned char *key, size_t keylen 
 /*
  * MD4 HMAC process buffer
  */
-void md4_hmac_update( md4_context *ctx, const unsigned char *input, size_t ilen )
-{
+void md4_hmac_update( md4_context *ctx, const unsigned char *input, size_t ilen ) {
     md4_update( ctx, input, ilen );
 }
 
 /*
  * MD4 HMAC final digest
  */
-void md4_hmac_finish( md4_context *ctx, unsigned char output[16] )
-{
+void md4_hmac_finish( md4_context *ctx, unsigned char output[16] ) {
     unsigned char tmpbuf[16];
 
     md4_finish( ctx, tmpbuf );
@@ -364,8 +349,7 @@ void md4_hmac_finish( md4_context *ctx, unsigned char output[16] )
 /*
  * MD4 HMAC context reset
  */
-void md4_hmac_reset( md4_context *ctx )
-{
+void md4_hmac_reset( md4_context *ctx ) {
     md4_starts( ctx );
     md4_update( ctx, ctx->ipad, 64 );
 }
@@ -375,8 +359,7 @@ void md4_hmac_reset( md4_context *ctx )
  */
 void md4_hmac( const unsigned char *key, size_t keylen,
                const unsigned char *input, size_t ilen,
-               unsigned char output[16] )
-{
+               unsigned char output[16] ) {
     md4_context ctx;
 
     md4_hmac_starts( &ctx, key, keylen );
@@ -424,21 +407,18 @@ static const unsigned char md4_test_sum[7][16] =
 /*
  * Checkup routine
  */
-int md4_self_test( int verbose )
-{
+int md4_self_test( int verbose ) {
     int i;
     unsigned char md4sum[16];
 
-    for( i = 0; i < 7; i++ )
-    {
+    for( i = 0; i < 7; i++ ) {
         if( verbose != 0 )
             printf( "  MD4 test #%d: ", i + 1 );
 
         md4( (unsigned char *) md4_test_str[i],
              strlen( md4_test_str[i] ), md4sum );
 
-        if( memcmp( md4sum, md4_test_sum[i], 16 ) != 0 )
-        {
+        if( memcmp( md4sum, md4_test_sum[i], 16 ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 

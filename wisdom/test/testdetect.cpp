@@ -39,12 +39,10 @@ HINSTANCE hmod;
 
 #endif
 
-int OsInitEnv(void)
-{
+int OsInitEnv(void) {
 #ifndef _LINUX_
 	hmod = ::LoadLibrary(_TEXT("detection.dll"));
-	if (NULL == hmod)
-	{
+	if (NULL == hmod) {
 	    std::cout << "fail to LoadLibrary"  << endl;
 	    return -1;
 	}
@@ -66,8 +64,7 @@ int OsInitEnv(void)
 #endif	
 }
 
-void OsUninitEnv(void)
-{
+void OsUninitEnv(void) {
 #ifndef _LINUX_
 	FreeLibrary(hmod);
 #else
@@ -76,8 +73,7 @@ void OsUninitEnv(void)
 }
 
 
-int OsDetectionInit(char *objectName, char *DeviceName)
-{
+int OsDetectionInit(char *objectName, char *DeviceName) {
 #ifndef _LINUX_
 	return m_lpDetectionInit(objectName, DeviceName);
 #else
@@ -85,8 +81,7 @@ int OsDetectionInit(char *objectName, char *DeviceName)
 #endif
 }
 
-char* OsDetectionMat(cv::Mat& org_img, int missErrorRatio)
-{
+char* OsDetectionMat(cv::Mat& org_img, int missErrorRatio) {
 #ifndef _LINUX_
 	return m_lpDetectionMat(org_img, missErrorRatio);
 #else
@@ -94,8 +89,7 @@ char* OsDetectionMat(cv::Mat& org_img, int missErrorRatio)
 #endif	
 }
 
-char* OsDetection(char *imagesPath, int missErrorRatio)
-{
+char* OsDetection(char *imagesPath, int missErrorRatio) {
 #ifndef _LINUX_
 	return m_lpDetection(imagesPath, missErrorRatio);
 #else
@@ -103,8 +97,7 @@ char* OsDetection(char *imagesPath, int missErrorRatio)
 #endif	
 }
 
-void OsDetectionUnInit(void)
-{
+void OsDetectionUnInit(void) {
 #ifndef _LINUX_
 	m_lpDetectionUnInit();
 #else
@@ -112,8 +105,7 @@ void OsDetectionUnInit(void)
 #endif	
 }
 
-bool OsDetectionDraw(cv::Mat& org_img, char* pBox)
-{
+bool OsDetectionDraw(cv::Mat& org_img, char* pBox) {
 #ifndef _LINUX_
 	return m_lpDetectionDraw(org_img, pBox);
 #else
@@ -121,8 +113,7 @@ bool OsDetectionDraw(cv::Mat& org_img, char* pBox)
 #endif		
 }
 
-void OsDetectionSave(string src, string dst, string fn, char* pBox, int savenobox)
-{
+void OsDetectionSave(string src, string dst, string fn, char* pBox, int savenobox) {
 #ifndef _LINUX_
 	m_lpDetectionSave(src, dst, fn, pBox, savenobox);
 #else
@@ -130,8 +121,7 @@ void OsDetectionSave(string src, string dst, string fn, char* pBox, int savenobo
 #endif	
 }
 
-int Test_Detection_video(string dstDir, string srcFilename, int missErrorRatio)
-{
+int Test_Detection_video(string dstDir, string srcFilename, int missErrorRatio) {
 	VideoCapture cap;
 	int total_frames, processed_frames = 0;
 	Mat frame;
@@ -143,8 +133,7 @@ int Test_Detection_video(string dstDir, string srcFilename, int missErrorRatio)
 	char* out;
 	
 	//初始化解码器
-	if (!cap.open(srcFilename))
-	{
+	if (!cap.open(srcFilename)) {
 		std::cout << "Can't open video file " << srcFilename << endl;
 		return -1;
 	}
@@ -168,22 +157,18 @@ int Test_Detection_video(string dstDir, string srcFilename, int missErrorRatio)
 	time = 0;
 	avgFps = 0;
 	
-	while (1)
-	{	
+	while (1) {	
 		//解码video
 		cap >> frame;
 		
-		if (!frame.empty())
-		{
+		if (!frame.empty()) {
 			//AI处理
 			out = OsDetectionMat(frame, missErrorRatio);
-			if (NULL != out)
-			{
+			if (NULL != out) {
 				//绘制框
 				OsDetectionDraw(frame, out);
 			}
-			//if (!result)
-			{
+			/*if (!result)*/ {
 				//计算平均帧率
 				time = (static_cast<double>(clock() - start_clock) /
 					CLOCKS_PER_SEC);
@@ -215,8 +200,7 @@ int Test_Detection_video(string dstDir, string srcFilename, int missErrorRatio)
 		
 		++processed_frames;
 		
-		if (processed_frames == total_frames)
-		{
+		if (processed_frames == total_frames) {
 			//释放解码器和视频生成器
 			cap.release();
 			videoWriter.release();
@@ -226,14 +210,12 @@ int Test_Detection_video(string dstDir, string srcFilename, int missErrorRatio)
 	return 0;
 }
 
-void Test_Detection_image(string srcdir, string dstDir, string srcFilename, int missErrorRatio)
-{
+void Test_Detection_image(string srcdir, string dstDir, string srcFilename, int missErrorRatio) {
 	char* out;
 	
 	//解码image文件，AI处理
 	out = OsDetection((char *)srcFilename.c_str(), missErrorRatio);
-	if (NULL != out)
-	{
+	if (NULL != out) {
 		//绘制框，写文件
 		OsDetectionSave(srcdir, dstDir, srcFilename, out, 0);
 	}
@@ -278,15 +260,11 @@ void Test_Detection(string srcdir, string dstdir, int missErrorRatio, char* obje
 }
 
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
 	string srcdir, dstdir;
-	if (argc < 3)
-	{
+	if (argc < 3) {
 		std::cout << "parameter format: directory_of_image_files directory_to_save_result" << endl;
-	}
-	else
-	{
+	} else {
 		srcdir = argv[1];
 		dstdir = argv[2];
 		

@@ -4,6 +4,7 @@
 #endif
 
 #include <boost/thread.hpp>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <cmath>
 #include <cstdio>

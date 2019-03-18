@@ -18,26 +18,21 @@ const cv::Scalar_<float> BlackPixel(0, 0, 0);
 
 FloatArray::FloatArray(const float* data, int size) : Data(data), Size(size) {}
 
-_CaffeModel::_CaffeModel(const string &netFile, const string &modelFile)
-{
+_CaffeModel::_CaffeModel(const string &netFile, const string &modelFile) {
   _net = new Net<float>(netFile, Phase::TEST);
   _net->CopyTrainedLayersFrom(modelFile);
 }
 
-_CaffeModel::~_CaffeModel()
-{
-	if (_net)
-	{
+_CaffeModel::~_CaffeModel() {
+	if (_net) {
 		delete _net;
 		_net = nullptr;
 	}
 }
 
-void _CaffeModel::SetDevice(int deviceId)
-{
+void _CaffeModel::SetDevice(int deviceId) {
   // Set GPU
-  if (deviceId >= 0)
-  {
+  if (deviceId >= 0) {
     Caffe::set_mode(Caffe::GPU);
     Caffe::SetDevice(deviceId);
   }
@@ -45,26 +40,22 @@ void _CaffeModel::SetDevice(int deviceId)
     Caffe::set_mode(Caffe::CPU);
 }
 
-int _CaffeModel::GetInputImageWidth()
-{
+int _CaffeModel::GetInputImageWidth() {
     MemoryDataLayer<float> * layer = (MemoryDataLayer<float>*)_net->layer_by_name("data").get();
     return layer->width();
 }
 
-int _CaffeModel::GetInputImageHeight()
-{
+int _CaffeModel::GetInputImageHeight() {
     MemoryDataLayer<float> * layer = (MemoryDataLayer<float>*)_net->layer_by_name("data").get();
     return layer->height();
 }
 
-int _CaffeModel::GetInputImageChannels()
-{
+int _CaffeModel::GetInputImageChannels() {
     MemoryDataLayer<float> * layer = (MemoryDataLayer<float>*)_net->layer_by_name("data").get();
     return layer->channels();
 }
 
-cv::Mat CVReadImage(const string &imageFile, int height, int width, int interpolation)
-{
+cv::Mat CVReadImage(const string &imageFile, int height, int width, int interpolation) {
   float means[3] = { 103.939, 116.779, 123.68 }; //REVIEW ktran: why hardcoded and why is it useful?
 
 	cv::Mat cv_img_origin = cv::imread(imageFile);
@@ -84,8 +75,7 @@ cv::Mat CVReadImage(const string &imageFile, int height, int width, int interpol
 	double maxSize = std::max(cv_img_origin.rows, cv_img_origin.cols);
   resize(cv_img_float, resizedImg, cv::Size(), double(width) / maxSize, double(height) / maxSize, interpolation);
   
-  if (resizedImg.cols < width)
-  {
+  if (resizedImg.cols < width) {
     cv::Mat blankImg(height, width - resizedImg.cols, CV_32FC3, BlackPixel);
     hconcat(resizedImg, blankImg, resizedImg);
   }
@@ -97,8 +87,7 @@ cv::Mat CVReadImage(const string &imageFile, int height, int width, int interpol
   return resizedImg;
 }
 
-void Evaluate(caffe::Net<float>* net, const string &imageFile, int interpolation)
-{
+void Evaluate(caffe::Net<float>* net, const string &imageFile, int interpolation) {
   //Step 1: read image and prefill the input blob
   Blob<float>* input_blob = net->input_blobs()[0];
   int height = input_blob->height();
@@ -107,10 +96,8 @@ void Evaluate(caffe::Net<float>* net, const string &imageFile, int interpolation
   
   float* src_data = &img.at<cv::Vec3f>(0, 0)[0];	// h*w*c
   float* input_data = input_blob->mutable_cpu_data();
-  for (int c = 0; c < 3; ++c)
-  {
-    for (int h = 0; h < height; ++h)
-    {
+  for (int c = 0; c < 3; ++c) {
+    for (int h = 0; h < height; ++h) {
       float *src = src_data + h * width * 3 + c;
       for (int w = 0; w < width; ++w, ++input_data)
         *input_data = src[w * 3];
@@ -122,27 +109,23 @@ void Evaluate(caffe::Net<float>* net, const string &imageFile, int interpolation
   net->ForwardPrefilled(&loss);
 }
 
-FloatArray _CaffeModel::ExtractOutputs(const string &imageFile, int interpolation, const string &blobName)
-{
+FloatArray _CaffeModel::ExtractOutputs(const string &imageFile, int interpolation, const string &blobName) {
   Evaluate(_net, imageFile, interpolation);
   auto blob = _net->blob_by_name(blobName);
   return FloatArray(blob->cpu_data(), blob->count());
 }
 
-vector<FloatArray> _CaffeModel::ExtractOutputs(const string &imageFile, int interpolation, const vector<string> &layerNames)
-{
+vector<FloatArray> _CaffeModel::ExtractOutputs(const string &imageFile, int interpolation, const vector<string> &layerNames) {
   Evaluate(_net, imageFile, interpolation);
   vector<FloatArray> results;
-  for (auto& name : layerNames)
-  {
+  for (auto& name : layerNames) {
     auto blob = _net->blob_by_name(name);
     results.push_back(FloatArray(blob->cpu_data(), blob->count()));
   }
   return results;
 }
 
-void EvaluateBitmap(caffe::Net<float>* net, const string &imageData, int interpolation)
-{
+void EvaluateBitmap(caffe::Net<float>* net, const string &imageData, int interpolation) {
     // Net initialization
     float loss = 0.0;
     shared_ptr<MemoryDataLayer<float> > memory_data_layer;
@@ -166,19 +149,16 @@ void EvaluateBitmap(caffe::Net<float>* net, const string &imageData, int interpo
 
 }
 
-FloatArray _CaffeModel::ExtractBitmapOutputs(const std::string &imageData, int interpolation, const string &blobName)
-{
+FloatArray _CaffeModel::ExtractBitmapOutputs(const std::string &imageData, int interpolation, const string &blobName) {
     EvaluateBitmap(_net, imageData, interpolation);
     auto blob = _net->blob_by_name(blobName);
     return FloatArray(blob->cpu_data(), blob->count());
 }
 
-vector<FloatArray> _CaffeModel::ExtractBitmapOutputs(const std::string &imageData, int interpolation, const vector<string> &layerNames)
-{
+vector<FloatArray> _CaffeModel::ExtractBitmapOutputs(const std::string &imageData, int interpolation, const vector<string> &layerNames) {
     EvaluateBitmap(_net, imageData, interpolation);
     vector<FloatArray> results;
-    for (auto& name : layerNames)
-    {
+    for (auto& name : layerNames) {
         auto blob = _net->blob_by_name(name);
         results.push_back(FloatArray(blob->cpu_data(), blob->count()));
     }

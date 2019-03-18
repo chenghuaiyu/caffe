@@ -13,13 +13,11 @@
 // Construction/Destruction
 ////////////////////////////////////////////////////////////////////
 
-ChaspHandle::ChaspHandle()
-{
+ChaspHandle::ChaspHandle() {
     clear();
 }
 
-ChaspHandle::~ChaspHandle()
-{
+ChaspHandle::~ChaspHandle() {
     clear();
 }
 
@@ -46,8 +44,7 @@ bool ChaspHandle::operator!=(const ChaspHandle& other) const
 ////////////////////////////////////////////////////////////////////
 //! Clears the handle
 ////////////////////////////////////////////////////////////////////
-void ChaspHandle::clear()
-{
+void ChaspHandle::clear() {
     memset(this, 0x00, sizeof(*this));
 }
 

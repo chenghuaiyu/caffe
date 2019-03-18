@@ -199,8 +199,7 @@ public:
     DynArray() :
         _mem( _pool ),
         _allocated( INITIAL_SIZE ),
-        _size( 0 )
-    {
+        _size( 0 ) {
     }
 
     ~DynArray() {
@@ -1898,8 +1897,7 @@ private:
 };
 
 template<class NodeType, int PoolElementSize>
-inline NodeType* XMLDocument::CreateUnlinkedNode( MemPoolT<PoolElementSize>& pool )
-{
+inline NodeType* XMLDocument::CreateUnlinkedNode( MemPoolT<PoolElementSize>& pool ) {
     TIXMLASSERT( sizeof( NodeType ) == PoolElementSize );
     TIXMLASSERT( sizeof( NodeType ) == pool.ItemSize() );
     NodeType* returnNode = new (pool.Alloc()) NodeType( this );
@@ -1930,17 +1928,13 @@ inline NodeType* XMLDocument::CreateUnlinkedNode( MemPoolT<PoolElementSize>& poo
 
 	@verbatim
 	XMLElement* root = document.FirstChildElement( "Document" );
-	if ( root )
-	{
+	if ( root ) {
 		XMLElement* element = root->FirstChildElement( "Element" );
-		if ( element )
-		{
+		if ( element ) {
 			XMLElement* child = element->FirstChildElement( "Child" );
-			if ( child )
-			{
+			if ( child ) {
 				XMLElement* child2 = child->NextSiblingElement( "Child" );
-				if ( child2 )
-				{
+				if ( child2 ) {
 					// Finally do something useful.
 	@endverbatim
 
@@ -1951,8 +1945,7 @@ inline NodeType* XMLDocument::CreateUnlinkedNode( MemPoolT<PoolElementSize>& poo
 	@verbatim
 	XMLHandle docHandle( &document );
 	XMLElement* child2 = docHandle.FirstChildElement( "Document" ).FirstChildElement( "Element" ).FirstChildElement().NextSiblingElement();
-	if ( child2 )
-	{
+	if ( child2 ) {
 		// do something useful
 	@endverbatim
 

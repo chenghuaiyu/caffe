@@ -10,13 +10,11 @@
 /*                                    rc4                                    */
 /*****************************************************************************/
 //Downlaod by http://www.codefans.net
-rc4::rc4(unsigned char *key_data_ptr,int nLen)
-{
+rc4::rc4(unsigned char *key_data_ptr,int nLen) {
     prepare_key(key_data_ptr,nLen);
 }
 
-void rc4::prepare_key(unsigned char *key_data_ptr, int key_data_len)
-{
+void rc4::prepare_key(unsigned char *key_data_ptr, int key_data_len) {
     unsigned char index1;
     unsigned char index2;
     unsigned char* state;
@@ -32,22 +30,19 @@ void rc4::prepare_key(unsigned char *key_data_ptr, int key_data_len)
     index1 = 0;
     index2 = 0;
     
-    for(counter = 0; counter < 256; counter++)
-    {
+    for(counter = 0; counter < 256; counter++) {
         index2 = (key_data_ptr[index1] + state[counter] + index2) % 256;
         swap_byte(&state[counter], &state[index2]);
         index1 = (index1 + 1) % key_data_len;
     }
 }
 
-void rc4::swap_byte(unsigned char *a, unsigned char *b)
-{
+void rc4::swap_byte(unsigned char *a, unsigned char *b) {
     unsigned char x;
     x=*a;*a=*b;*b=x;
 }
 
-void rc4::rc4_encode(unsigned char *buffer_ptr, int buffer_len)
-{
+void rc4::rc4_encode(unsigned char *buffer_ptr, int buffer_len) {
     unsigned char x;
     unsigned char y;
     unsigned char* state;
@@ -58,8 +53,7 @@ void rc4::rc4_encode(unsigned char *buffer_ptr, int buffer_len)
     y = key.y;
     state = &key.state[0];
     
-    for(counter = 0; counter < buffer_len; counter++)
-    {
+    for(counter = 0; counter < buffer_len; counter++) {
         x = (x + 1) % 256;
         y = (state[x] + y) % 256;
         swap_byte(&state[x], &state[y]);
@@ -78,8 +72,7 @@ void rc4::rc4_encode(unsigned char *buffer_ptr, int buffer_len)
 #define MAX_WEIGHT_LENGTH (1024*1024*500)
 
 bool VimDecrypt2BufRc4(const char* infile, const char *pwd, char** out1, 
-                            char** out2, int *len1, int *len2)
-{
+                            char** out2, int *len1, int *len2) {
     rc4 rc4_cona((unsigned char *)pwd, strlen(pwd));
     char buf[BUF_SIZE];
     int uLen;
@@ -92,8 +85,7 @@ bool VimDecrypt2BufRc4(const char* infile, const char *pwd, char** out1,
     uLen = fread(&modelLength, 1, sizeof(int), fsrc);
     uLen = fread(&weightLength, 1, sizeof(int), fsrc);
 
-    if (modelLength > MAX_MODEL_LENGTH || weightLength > MAX_WEIGHT_LENGTH)
-    {
+    if (modelLength > MAX_MODEL_LENGTH || weightLength > MAX_WEIGHT_LENGTH) {
         fclose(fsrc);
         return false;
     }
@@ -106,18 +98,13 @@ bool VimDecrypt2BufRc4(const char* infile, const char *pwd, char** out1,
     printf("modelLength:%d, weightLength:%d\n", modelLength, weightLength);
 
     int tmp = modelLength;
-    while (tmp  > 0)
-    {
-        if (tmp  > BUF_SIZE)
-        {
+    while (tmp  > 0) {
+        if (tmp  > BUF_SIZE) {
             uLen = fread(buf, 1, BUF_SIZE, fsrc);
-        }
-        else
-        {
+        } else {
             uLen = fread(buf, 1, tmp, fsrc);
         }
-        if (uLen <= 0)
-        {
+        if (uLen <= 0) {
             break;
         }
         rc4_cona.rc4_encode((unsigned char*)buf, uLen);
@@ -127,18 +114,13 @@ bool VimDecrypt2BufRc4(const char* infile, const char *pwd, char** out1,
     }
 
     tmp = weightLength;
-    while (tmp > 0)
-    {
-        if (tmp > BUF_SIZE)
-        {
+    while (tmp > 0) {
+        if (tmp > BUF_SIZE) {
             uLen = fread(buf, 1, BUF_SIZE, fsrc);
-        }
-        else
-        {
+        } else {
             uLen = fread(buf, 1, tmp, fsrc);
         }
-        if (uLen <= 0)
-        {
+        if (uLen <= 0) {
             break;
         }
         rc4_cona.rc4_encode((unsigned char*)buf, uLen);

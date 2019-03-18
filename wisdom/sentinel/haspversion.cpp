@@ -17,16 +17,14 @@ ChaspVersion::ChaspVersion()
     : m_nMajorVersion(0),
       m_nMinorVersion(0),
       m_nServerBuild(0),
-      m_nBuildNumber(0)
-{
+      m_nBuildNumber(0) {
 }
 
 ChaspVersion::ChaspVersion(const ChaspVersion& version)
     : m_nMajorVersion(0),
       m_nMinorVersion(0),
       m_nServerBuild(0),
-      m_nBuildNumber(0)
-{
+      m_nBuildNumber(0) {
     *this = version;
 }
 
@@ -37,12 +35,10 @@ ChaspVersion::ChaspVersion(unsigned int nMajorVersion,
     : m_nMajorVersion(nMajorVersion), 
       m_nMinorVersion(nMinorVersion), 
       m_nServerBuild(nServerBuild), 
-      m_nBuildNumber(nBuildNumber)
-{
+      m_nBuildNumber(nBuildNumber) {
 }
 
-ChaspVersion::~ChaspVersion()
-{
+ChaspVersion::~ChaspVersion() {
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -52,10 +48,8 @@ ChaspVersion::~ChaspVersion()
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-ChaspVersion& ChaspVersion::operator=(const ChaspVersion& version)
-{
-    if (this != &version)
-    {
+ChaspVersion& ChaspVersion::operator=(const ChaspVersion& version) {
+    if (this != &version) {
         m_nMajorVersion = version.majorVersion();
         m_nMinorVersion = version.minorVersion();
         m_nServerBuild = version.serverBuild();

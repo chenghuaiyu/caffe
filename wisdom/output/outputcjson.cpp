@@ -31,8 +31,7 @@ typedef struct cImageJSON {
 #define MAX_LENG (1024*1024)
 char g_OutSring[MAX_LENG+1];
 
-char* JsonCreateSpec(std::vector<cImageJSON> &imgArrayJSON, vector<string> labels)
-{
+char* JsonCreateSpec(std::vector<cImageJSON> &imgArrayJSON, vector<string> labels) {
     int i, j, k;
     char *out;
     int outlength = 0;
@@ -42,12 +41,10 @@ char* JsonCreateSpec(std::vector<cImageJSON> &imgArrayJSON, vector<string> label
     root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "result", result = cJSON_CreateArray());
 
-    for (i = 0; i < imgArrayJSON.size(); i++)
-    {
+    for (i = 0; i < imgArrayJSON.size(); i++) {
         cJSON *resultImage, *coordsImage;
         cImageJSON imageJSON = imgArrayJSON[i];
-		if (imageJSON.coords.size() == 0)
-		{
+		if (imageJSON.coords.size() == 0) {
 			cJSON_AddItemToObject(result, "", resultImage = cJSON_CreateObject());
 			cJSON_AddStringToObject(resultImage, "imgname", imageJSON.imgname.c_str());
 			cJSON_AddStringToObject(resultImage, "objecttype", labels[0].c_str());
@@ -56,14 +53,11 @@ char* JsonCreateSpec(std::vector<cImageJSON> &imgArrayJSON, vector<string> label
 			cJSON_AddItemToObject(resultImage, "coords", coords = cJSON_CreateArray());
 			continue;
 		}
-        for (k = 0; k < labels.size(); k++)
-        {
+        for (k = 0; k < labels.size(); k++) {
             string label = labels[k];
             int found = 0;
-            for (j = 0; j < imageJSON.coords.size(); j++)
-            {
-                if ((found == 0) && (imageJSON.coords[j].objecttype == label))
-                {
+            for (j = 0; j < imageJSON.coords.size(); j++) {
+                if ((found == 0) && (imageJSON.coords[j].objecttype == label)) {
                     found = 1;
                     cJSON_AddItemToObject(result, "", resultImage = cJSON_CreateObject());
                     cJSON_AddStringToObject(resultImage, "imgname", imageJSON.imgname.c_str());
@@ -72,8 +66,7 @@ char* JsonCreateSpec(std::vector<cImageJSON> &imgArrayJSON, vector<string> label
 					cJSON_AddNumberToObject(resultImage, "height", imageJSON.height);
 					cJSON_AddItemToObject(resultImage, "coords", coords = cJSON_CreateArray());
                 }
-                if (found)
-                {
+                if (found) {
                     cJSON_AddItemToObject(coords, "", coordsImage = cJSON_CreateObject());
                     cJSON_AddNumberToObject(coordsImage, "x1", imageJSON.coords[j].x1);
                     cJSON_AddNumberToObject(coordsImage, "y1", imageJSON.coords[j].y1);
@@ -101,23 +94,20 @@ char* JsonCreateSpec(std::vector<cImageJSON> &imgArrayJSON, vector<string> label
     return g_OutSring;
 }
 
-char* JsonOutputSpec(vector<DETECT_FILE_S> files, vector<string> labels)
-{
+char* JsonOutputSpec(vector<DETECT_FILE_S> files, vector<string> labels) {
     std::vector<cImageJSON> imgArrayJSON;
     cImageJSON imgJSON;
     cImageCoordsJSON imageCoords;
 	vector<DETECT_BOX_S> boxes;
 
-    for (int i = 0; i < files.size(); i += 1)
-    {
+    for (int i = 0; i < files.size(); i += 1) {
         imgJSON.coords.clear();
         imgJSON.imgname = files[i].filename;
         imgJSON.width = files[i].width;
         imgJSON.height = files[i].height;
             
         boxes = files[i].boxes;
-        for (int j = 0; j < boxes.size(); j++)
-        {
+        for (int j = 0; j < boxes.size(); j++) {
             int label = static_cast<int>(boxes[j].label);
             int score = static_cast<int>(boxes[j].score*100);
             imageCoords.objecttype = labels[label];
@@ -139,8 +129,7 @@ char* JsonOutputSpec(vector<DETECT_FILE_S> files, vector<string> labels)
     return JsonCreateSpec(imgArrayJSON, labels);
 }
 
-char* JsonCreate(std::vector<cImageJSON> &imgArrayJSON)
-{
+char* JsonCreate(std::vector<cImageJSON> &imgArrayJSON) {
     int i, j;
     char *out;
     int outlength = 0;
@@ -150,8 +139,7 @@ char* JsonCreate(std::vector<cImageJSON> &imgArrayJSON)
     root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "result", result = cJSON_CreateArray());
 
-    for (i = 0; i < imgArrayJSON.size(); i++)
-    {
+    for (i = 0; i < imgArrayJSON.size(); i++) {
         cJSON *resultImage, *coordsImage;
         cImageJSON imageJSON = imgArrayJSON[i];
         cJSON_AddItemToObject(result, "", resultImage = cJSON_CreateObject());
@@ -160,8 +148,7 @@ char* JsonCreate(std::vector<cImageJSON> &imgArrayJSON)
         cJSON_AddNumberToObject(resultImage, "height", imageJSON.height);
         cJSON_AddItemToObject(resultImage, "coords", coords = cJSON_CreateArray());
 
-        for (j = 0; j < imageJSON.coords.size(); j++)
-        {
+        for (j = 0; j < imageJSON.coords.size(); j++) {
             cJSON_AddItemToObject(coords, "", coordsImage = cJSON_CreateObject());
             cJSON_AddStringToObject(coordsImage, "objecttype", imageJSON.coords[j].objecttype.c_str());
             cJSON_AddNumberToObject(coordsImage, "score", imageJSON.coords[j].score);
@@ -188,23 +175,20 @@ char* JsonCreate(std::vector<cImageJSON> &imgArrayJSON)
     return g_OutSring;
 }
 
-char* JsonOutput(vector<DETECT_FILE_S> files, vector<string> labels)
-{
+char* JsonOutput(vector<DETECT_FILE_S> files, vector<string> labels) {
     std::vector<cImageJSON> imgArrayJSON;
     cImageJSON imgJSON;
     cImageCoordsJSON imageCoords;
 	vector<DETECT_BOX_S> boxes;
 
-    for (int i = 0; i < files.size(); i += 1)
-    {
+    for (int i = 0; i < files.size(); i += 1) {
         imgJSON.coords.clear();
         imgJSON.imgname = GetFileNameByFilePathName(files[i].filename);
         imgJSON.width = files[i].width;
         imgJSON.height = files[i].height;
             
         boxes = files[i].boxes;
-        for (int j = 0; j < boxes.size(); j++)
-        {
+        for (int j = 0; j < boxes.size(); j++) {
             int label = static_cast<int>(boxes[j].label);
             int score = static_cast<int>(boxes[j].score*100);
             imageCoords.objecttype = labels[label];
@@ -226,15 +210,13 @@ char* JsonOutput(vector<DETECT_FILE_S> files, vector<string> labels)
     return JsonCreate(imgArrayJSON);
 }
 
-vector<DETECT_FILE_S> JsonParse(char* info, vector<string> labels)
-{
+vector<DETECT_FILE_S> JsonParse(char* info, vector<string> labels) {
     vector<DETECT_FILE_S> files;
     cJSON * json = cJSON_Parse(info);
     cJSON * result = cJSON_GetObjectItem(json, "result");
     int filenum = cJSON_GetArraySize(result);
     printf("filenum:%d\n", filenum);
-    for (int i = 0; i < filenum; i++)
-    {
+    for (int i = 0; i < filenum; i++) {
         DETECT_FILE_S dfile;
         cJSON * tmpfile = cJSON_GetArrayItem(result,i);
         cJSON * kongge = cJSON_GetObjectItem(tmpfile, "");
@@ -249,14 +231,12 @@ vector<DETECT_FILE_S> JsonParse(char* info, vector<string> labels)
         dfile.boxes.clear();
         int boxnum = cJSON_GetArraySize(coords);
         printf("boxnum:%d\n", boxnum);
-        for (int j = 0; j < boxnum; j++)
-        {
+        for (int j = 0; j < boxnum; j++) {
             cJSON * tmpbox = cJSON_GetArrayItem(coords,j);
             cJSON * objecttype = cJSON_GetObjectItem(tmpbox, "objecttype");
             vector <string>::iterator iElement = find(labels.begin(), labels.end(),objecttype->valuestring);  
             int label = 0;
-            if ( iElement != labels.end() )  
-            {  
+            if ( iElement != labels.end() ) {  
                 label = distance(labels.begin(),iElement);  
             }  
             cJSON * score = cJSON_GetObjectItem(tmpbox, "score");
@@ -288,8 +268,7 @@ vector<DETECT_FILE_S> JsonParse(char* info, vector<string> labels)
     return files;
 }
 
-void JsonSaveInfo(string dst, string fn, char* info)
-{
+void JsonSaveInfo(string dst, string fn, char* info) {
     string fileNameOnly = GetFileNameWithNoSuffix(fn.c_str());
     string filePathName = dst;
     filePathName += "/Annotations/";
@@ -300,8 +279,7 @@ void JsonSaveInfo(string dst, string fn, char* info)
     fclose(fileJson);
 }
 
-void JsonSaveJpeg(string src, string dst, string fn, char* info)
-{
+void JsonSaveJpeg(string src, string dst, string fn, char* info) {
     int ret;
     
     fn = GetFileNameByFilePathName(fn.c_str());
@@ -319,15 +297,13 @@ void JsonSaveJpeg(string src, string dst, string fn, char* info)
     imwrite(dst_fn.c_str(), org_img);
 }
 
-void JsonSaveJpegWithBox(string src, string dst, string fn, char* info,int savenobox)
-{
+void JsonSaveJpegWithBox(string src, string dst, string fn, char* info,int savenobox) {
     int ret;
 
     cJSON * json = cJSON_Parse(info);
     cJSON * result = cJSON_GetObjectItem(json, "result");
     int filenum = cJSON_GetArraySize(result);
-    for (int i = 0; i < filenum; i++)
-    {
+    for (int i = 0; i < filenum; i++) {
         cJSON * tmpfile = cJSON_GetArrayItem(result,i);
         cJSON * imgname = cJSON_GetObjectItem(tmpfile, "imgname");
         std::string src_fn = "";
@@ -337,12 +313,10 @@ void JsonSaveJpegWithBox(string src, string dst, string fn, char* info,int saven
         
         cJSON * coords = cJSON_GetObjectItem(tmpfile, "coords");
         int boxnum = cJSON_GetArraySize(coords);
-        if ((boxnum == 0) && (!savenobox))
-        {
+        if ((boxnum == 0) && (!savenobox)) {
             continue;
         }
-        for (int j = 0; j < boxnum; j++)
-        {
+        for (int j = 0; j < boxnum; j++) {
             cJSON * tmpbox = cJSON_GetArrayItem(coords,j);
             cJSON * objecttype = cJSON_GetObjectItem(tmpbox, "objecttype");
             string label = objecttype->valuestring;
@@ -378,20 +352,17 @@ void JsonSaveJpegWithBox(string src, string dst, string fn, char* info,int saven
     free(out);
 }
 
-void JsonSaveAll(string src, string dst, char* info,int savenobox)
-{
+void JsonSaveAll(string src, string dst, char* info,int savenobox) {
     int ret;
 
     cJSON * json = cJSON_Parse(info);
     cJSON * result = cJSON_GetObjectItem(json, "result");
     int filenum = cJSON_GetArraySize(result);
-    for (int i = 0; i < filenum; i++)
-    {
+    for (int i = 0; i < filenum; i++) {
         cJSON * tmpfile = cJSON_GetArrayItem(result,i);
         cJSON * coords = cJSON_GetObjectItem(tmpfile, "coords");
         int boxnum = cJSON_GetArraySize(coords);
-        if ((boxnum == 0) && (!savenobox))
-        {
+        if ((boxnum == 0) && (!savenobox)) {
             continue;
         }
 
@@ -419,8 +390,7 @@ void JsonSaveAll(string src, string dst, char* info,int savenobox)
         fclose(fileJson);
 
         //save jpeg with box
-        for (int j = 0; j < boxnum; j++)
-        {
+        for (int j = 0; j < boxnum; j++) {
             cJSON * tmpbox = cJSON_GetArrayItem(coords,j);
             cJSON * objecttype = cJSON_GetObjectItem(tmpbox, "objecttype");
             string label = objecttype->valuestring;
@@ -457,8 +427,7 @@ void JsonSaveAll(string src, string dst, char* info,int savenobox)
     free(out);
 }
 
-void JsonSave(string src, string dst, string fn, char* info, int savenobox)
-{
+void JsonSave(string src, string dst, string fn, char* info, int savenobox) {
 #if 0
     /* save cjson */
     cout << "save cjson" << endl;

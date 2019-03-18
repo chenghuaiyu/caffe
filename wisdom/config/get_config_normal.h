@@ -8,5 +8,6 @@
 using namespace std;
 
 int GetModelInfoNormal(string configfile, MODEL_INFO_S *pstInfo, string strpath);
+int LoadFile2ModelInfo(string configfile, MODEL_INFO_S *pstInfo);
 
 #endif

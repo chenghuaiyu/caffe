@@ -1,0 +1,6 @@
+EXPORTS
+	SCWInitObjectDetection
+	SCWUninitObjectDetection
+	SCWDetectObjectByFile
+	SCWDetectObjectByFileBuf
+	SCWRelease

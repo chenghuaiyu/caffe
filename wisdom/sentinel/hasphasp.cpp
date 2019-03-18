@@ -83,32 +83,28 @@
 // Construction/Destruction
 ////////////////////////////////////////////////////////////////////
 
-Chasp::Chasp()
-{
+Chasp::Chasp() {
 }
 
 ////////////////////////////////////////////////////////////////////
 //! Copy constructor.
 ////////////////////////////////////////////////////////////////////
 Chasp::Chasp(const Chasp& other)
-    : ChaspBase(other)
-{
+    : ChaspBase(other) {
 }
 
 ////////////////////////////////////////////////////////////////////
 //! Copy constructor.
 ////////////////////////////////////////////////////////////////////
 Chasp::Chasp(const ChaspBase& other)
-    : ChaspBase(other)
-{
+    : ChaspBase(other) {
 }
 
 ////////////////////////////////////////////////////////////////////
 //! Constructs a new object and links it to a private key.
 ////////////////////////////////////////////////////////////////////
 Chasp::Chasp(const ChaspFeature& feature)
-    : ChaspBase(feature.feature())
-{
+    : ChaspBase(feature.feature()) {
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -118,8 +114,7 @@ Chasp::Chasp(const ChaspFeature& feature)
 ////////////////////////////////////////////////////////////////////
 // Assignment operator
 ////////////////////////////////////////////////////////////////////
-Chasp& Chasp::operator=(const ChaspBase& other)
-{
+Chasp& Chasp::operator=(const ChaspBase& other) {
     dynamic_cast<ChaspBase&>(*this) = other;
     return *this;
 }
@@ -127,8 +122,7 @@ Chasp& Chasp::operator=(const ChaspBase& other)
 ////////////////////////////////////////////////////////////////////
 // 
 ////////////////////////////////////////////////////////////////////
-Chasp& Chasp::operator=(const Chasp& other)
-{
+Chasp& Chasp::operator=(const Chasp& other) {
     dynamic_cast<ChaspBase&>(*this) = other;
     return *this;
 }
@@ -286,8 +280,7 @@ ChaspFile Chasp::getFile(hasp_fileid_t fileId) const
 haspStatus Chasp::getInfo(const char* pszQuery, 
                           const char* pszFormat, 
                           hasp_vendor_code_t vendorCode, 
-                          std::string& info)
-{
+                          std::string& info) {
     info.resize(0);
     ChaspInfo _info;
 
@@ -308,8 +301,7 @@ haspStatus Chasp::getInfo(const char* pszQuery,
 haspStatus Chasp::getInfo(const char* pszQuery, 
                           const std::string& format, 
                           hasp_vendor_code_t vendorCode, 
-                          std::string& info)
-{
+                          std::string& info) {
     return Chasp::getInfo(pszQuery,
                           format.c_str(),
                           vendorCode,
@@ -322,8 +314,7 @@ haspStatus Chasp::getInfo(const char* pszQuery,
 haspStatus Chasp::getInfo(const std::string& query, 
                           const char* pszFormat, 
                           hasp_vendor_code_t vendorCode, 
-                          std::string& info)
-{
+                          std::string& info) {
     return Chasp::getInfo(query.c_str(),
                           pszFormat,
                           vendorCode,
@@ -336,8 +327,7 @@ haspStatus Chasp::getInfo(const std::string& query,
 haspStatus Chasp::getInfo(const std::string& query, 
                           const std::string& format, 
                           hasp_vendor_code_t vendorCode, 
-                          std::string& info)
-{
+                          std::string& info) {
     return Chasp::getInfo(query.c_str(),
                           format.c_str(),
                           vendorCode,
@@ -348,8 +338,7 @@ haspStatus Chasp::getInfo(const std::string& query,
 //
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::detach(const std::string& action, const std::string& scope, hasp_vendor_code_t vendorCode, 
-						 const std::string& recipient, std::string& v2c)
-{
+						 const std::string& recipient, std::string& v2c) {
 	return Chasp::detach(action.c_str(),
 						 scope.c_str(),
 						 vendorCode,
@@ -361,8 +350,7 @@ haspStatus Chasp::detach(const std::string& action, const std::string& scope, ha
 //
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::detach(const char* pszAction, const char* pszScope, hasp_vendor_code_t vendorCode, 
-						 const char* pszRecipient, std::string& v2c)
-{
+						 const char* pszRecipient, std::string& v2c) {
 	v2c.resize(0);
 	ChaspInfo _info;
 
@@ -383,8 +371,7 @@ haspStatus Chasp::detach(const char* pszAction, const char* pszScope, hasp_vendo
 //
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::transfer(const std::string& action, const std::string& scope, hasp_vendor_code_t vendorCode, 
-						 const std::string& recipient, std::string& v2c)
-{
+						 const std::string& recipient, std::string& v2c) {
 	return Chasp::transfer(action.c_str(),
 						 scope.c_str(),
 						 vendorCode,
@@ -396,8 +383,7 @@ haspStatus Chasp::transfer(const std::string& action, const std::string& scope, 
 //
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::transfer(const char* pszAction, const char* pszScope, hasp_vendor_code_t vendorCode, 
-						 const char* pszRecipient, std::string& v2c)
-{
+						 const char* pszRecipient, std::string& v2c) {
 	v2c.resize(0);
 	ChaspInfo _info;
 
@@ -455,8 +441,7 @@ haspStatus Chasp::getRtc(ChaspTime& time) const
     hasp_time_t rtc = 0;
     haspStatus status = HASP_KEYPTR->getRtc(rtc);
 
-    if (HASP_SUCCEEDED(status))
-    {
+    if (HASP_SUCCEEDED(status)) {
         ChaspTime _time(rtc);
         time = _time;
     }
@@ -494,8 +479,7 @@ haspStatus Chasp::getSessionInfo(const std::string& format,
 //! Returns the hasp version
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::getVersion(hasp_vendor_code_t vendorCode,
-                             ChaspVersion& version)
-{
+                             ChaspVersion& version) {
     return ChaspImpl::getVersion(vendorCode, version);
 }
 
@@ -513,8 +497,7 @@ bool Chasp::hasLegacy() const
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-std::string Chasp::keyInfo()
-{ 
+std::string Chasp::keyInfo() { 
     return std::string(HASP_KEYINFO); 
 }
 
@@ -529,8 +512,7 @@ std::string Chasp::keyInfo()
 //! \sa                         ChaspImpl::loginScope
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::login(hasp_vendor_code_t vendorCode, 
-                        const std::string& scope)
-{
+                        const std::string& scope) {
     return login(vendorCode, scope.c_str());
 }
 
@@ -538,8 +520,7 @@ haspStatus Chasp::login(hasp_vendor_code_t vendorCode,
 //
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::login(hasp_vendor_code_t vendorCode, 
-                        const char* pszScope /* = 0*/)
-{
+                        const char* pszScope /* = 0*/) {
     HASP_PROLOGUE(m_handle);
     return HASP_KEYPTR->login(vendorCode, pszScope);
 }
@@ -551,8 +532,7 @@ haspStatus Chasp::login(hasp_vendor_code_t vendorCode,
 //!
 //! \sa                         ChaspImpl::logout
 ////////////////////////////////////////////////////////////////////
-haspStatus Chasp::logout()
-{
+haspStatus Chasp::logout() {
     HASP_PROLOGUE(m_handle);
     haspStatus status = HASP_KEYPTR->logout();
 
@@ -564,8 +544,7 @@ haspStatus Chasp::logout()
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-std::string Chasp::sessionInfo()
-{ 
+std::string Chasp::sessionInfo() { 
     return std::string(HASP_SESSIONINFO); 
 }
 
@@ -579,8 +558,7 @@ void Chasp::synchronize() const
     ChaspImpl* pKey = map.getKey(m_handle);
 
     DIAG_ASSERT(NULL != pKey);
-    if (NULL != pKey)
-    {
+    if (NULL != pKey) {
         // keep the logout counter current
         ChaspHandle& handle = const_cast<ChaspHandle&>(m_handle);
         handle.m_ulAltered = pKey->altered();
@@ -610,8 +588,7 @@ std::string Chasp::toString() const
 //! Performs HASP protection key update operation.
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::update(const char* pszUpdate, 
-                         ChaspInfo& acknowledge)
-{
+                         ChaspInfo& acknowledge) {
     return ChaspImpl::update(pszUpdate, acknowledge);
 }
 
@@ -619,8 +596,7 @@ haspStatus Chasp::update(const char* pszUpdate,
 //
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::update(const char* pszUpdate, 
-                         std::string& acknowledge)
-{
+                         std::string& acknowledge) {
     acknowledge.resize(0);
     ChaspInfo ack;
     
@@ -635,20 +611,17 @@ haspStatus Chasp::update(const char* pszUpdate,
 //
 ////////////////////////////////////////////////////////////////////
 haspStatus Chasp::update(const std::string& update, 
-                         std::string& acknowledge)
-{ 
+                         std::string& acknowledge) { 
     return Chasp::update(update.c_str(), acknowledge);
 }
 
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-std::string Chasp::updateInfo()
-{ 
+std::string Chasp::updateInfo() { 
     return std::string(HASP_UPDATEINFO); 
 }
 
-std::string Chasp::recipientInfo()
-{ 
+std::string Chasp::recipientInfo() { 
     return std::string(HASP_RECIPIENT); 
 }

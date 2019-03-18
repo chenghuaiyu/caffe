@@ -24,8 +24,7 @@ namespace CaffeLibMC {
   public:
     static int DeviceCount;
 
-    static CaffeModel()
-    {
+    static CaffeModel() {
 #ifndef CPU_ONLY
       int count;
       cudaGetDeviceCount(&count);
@@ -35,45 +34,38 @@ namespace CaffeLibMC {
 #endif
     }
 
-    static void SetDevice(int deviceId)
-    {
+    static void SetDevice(int deviceId) {
       _CaffeModel::SetDevice(deviceId);
     }
 
-    CaffeModel(String ^netFile, String ^modelFile)
-    {
+    CaffeModel(String ^netFile, String ^modelFile) {
       m_net = new _CaffeModel(TO_NATIVE_STRING(netFile), TO_NATIVE_STRING(modelFile));
     }
 
     // destructor to call finalizer
-    ~CaffeModel()
-    {
+    ~CaffeModel() {
       this->!CaffeModel();
     }
 
     // finalizer to release unmanaged resource
-    !CaffeModel()
-    {
+    !CaffeModel() {
       delete m_net;
       m_net = NULL;
     }
 
-    array<float>^ ExtractOutputs(String^ imageFile, int interpolation, String^ blobName)
-    {
+    array<float>^ ExtractOutputs(String^ imageFile, int interpolation, String^ blobName) {
       FloatArray intermediate = m_net->ExtractOutputs(TO_NATIVE_STRING(imageFile), interpolation, TO_NATIVE_STRING(blobName));
       MARSHAL_ARRAY(intermediate, outputs)
         return outputs;
     }
 
-    array<array<float>^>^ ExtractOutputs(String^ imageFile, int interpolation, array<String^>^ blobNames)
-    {
+    array<array<float>^>^ ExtractOutputs(String^ imageFile, int interpolation, array<String^>^ blobNames) {
       std::vector<std::string> names;
       for each(String^ name in blobNames)
         names.push_back(TO_NATIVE_STRING(name));
       std::vector<FloatArray> intermediates = m_net->ExtractOutputs(TO_NATIVE_STRING(imageFile), interpolation, names);
       auto outputs = gcnew array<array<float>^>(static_cast<int>(names.size()));
-      for (int i = 0; i < names.size(); ++i)
-      {
+      for (int i = 0; i < names.size(); ++i) {
         auto intermediate = intermediates[i];
         MARSHAL_ARRAY(intermediate, values)
           outputs[i] = values;
@@ -81,8 +73,7 @@ namespace CaffeLibMC {
       return outputs;
     }
 
-    string ConvertToDatum(Bitmap ^imgData)
-    {
+    string ConvertToDatum(Bitmap ^imgData) {
         string datum_string;
 
         int width = m_net->GetInputImageWidth();
@@ -92,12 +83,9 @@ namespace CaffeLibMC {
 
         // resize image
         Bitmap ^resizedBmp;
-        if (width == imgData->Width && height == imgData->Height)
-        {
+        if (width == imgData->Width && height == imgData->Height) {
             resizedBmp = imgData->Clone(rc, PixelFormat::Format24bppRgb);
-        }
-        else
-        {
+        } else {
             resizedBmp = gcnew Bitmap((Image ^)imgData, width, height);
             resizedBmp = resizedBmp->Clone(rc, PixelFormat::Format24bppRgb);
         }
@@ -108,13 +96,10 @@ namespace CaffeLibMC {
         // prepare string buffer to call Caffe model
         datum_string.resize(3 * width * height);
         char *buff = &datum_string[0];
-        for (int c = 0; c < 3; ++c)
-        {
-            for (int h = 0; h < height; ++h)
-            {
+        for (int c = 0; c < 3; ++c) {
+            for (int h = 0; h < height; ++h) {
                 int line_offset = h * bmpData->Stride + c;
-                for (int w = 0; w < width; ++w)
-                {
+                for (int w = 0; w < width; ++w) {
                     *buff++ = bmpBuffer[line_offset + w * 3];
                 }
             }
@@ -124,8 +109,7 @@ namespace CaffeLibMC {
         return datum_string;
     }
 
-    array<float>^ ExtractOutputs(Bitmap^ imgData, String^ blobName)
-    {
+    array<float>^ ExtractOutputs(Bitmap^ imgData, String^ blobName) {
         string datum_string = ConvertToDatum(imgData);
 
         FloatArray intermediate = m_net->ExtractBitmapOutputs(datum_string, 0, TO_NATIVE_STRING(blobName));
@@ -133,8 +117,7 @@ namespace CaffeLibMC {
             return outputs;
     }
 
-    array<array<float>^>^ ExtractOutputs(Bitmap^ imgData, array<String^>^ blobNames)
-    {
+    array<array<float>^>^ ExtractOutputs(Bitmap^ imgData, array<String^>^ blobNames) {
         string datum_string = ConvertToDatum(imgData);
 
         vector<string> names;
@@ -142,8 +125,7 @@ namespace CaffeLibMC {
             names.push_back(TO_NATIVE_STRING(name));
         vector<FloatArray> intermediates = m_net->ExtractBitmapOutputs(datum_string, 0, names);
         auto outputs = gcnew array<array<float>^>(static_cast<int>(names.size()));
-        for (int i = 0; i < names.size(); ++i)
-        {
+        for (int i = 0; i < names.size(); ++i) {
             auto intermediate = intermediates[i];
             MARSHAL_ARRAY(intermediate, values)
                 outputs[i] = values;

@@ -24,22 +24,18 @@
 ////////////////////////////////////////////////////////////////////
 
 ChaspLock::ChaspLock()
-    : m_bInit(false)
-{
+    : m_bInit(false) {
     __try
     {
         ::InitializeCriticalSection(&m_critLock);
         m_bInit = true;
     }
-    __except(EXCEPTION_EXECUTE_HANDLER)
-    {
+    __except(EXCEPTION_EXECUTE_HANDLER) {
     }
 }
 
-ChaspLock::~ChaspLock()
-{
-    if (m_bInit)
-    {
+ChaspLock::~ChaspLock() {
+    if (m_bInit) {
         ::DeleteCriticalSection(&m_critLock);
         m_bInit = false;
     }
@@ -60,8 +56,7 @@ bool ChaspLock::isInit() const
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspLock::lock()
-{
+bool ChaspLock::lock() {
     DIAG_ASSERT(m_bInit);
 
     if (!m_bInit)
@@ -72,8 +67,7 @@ bool ChaspLock::lock()
         ::EnterCriticalSection(&m_critLock);
         return true;
     }
-    __except(EXCEPTION_EXECUTE_HANDLER)
-    {
+    __except(EXCEPTION_EXECUTE_HANDLER) {
     }
 
     return false;
@@ -82,8 +76,7 @@ bool ChaspLock::lock()
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspLock::unlock()
-{
+bool ChaspLock::unlock() {
     DIAG_ASSERT(m_bInit);
 
     if (!m_bInit)
@@ -94,8 +87,7 @@ bool ChaspLock::unlock()
         ::LeaveCriticalSection(&m_critLock);
         return true;
     }
-    __except(EXCEPTION_EXECUTE_HANDLER)
-    {
+    __except(EXCEPTION_EXECUTE_HANDLER) {
     }
 
     return false;
@@ -109,18 +101,15 @@ bool ChaspLock::unlock()
 ////////////////////////////////////////////////////////////////////
 
 ChaspLock::ChaspLock()
-    : m_bInit(false)
-{
+    : m_bInit(false) {
     m_bInit = (0 == ::pthread_mutexattr_init(&m_attrRecursive)) &&
               (0 == ::pthread_mutexattr_settype(&m_attrRecursive, 
                                                  PTHREAD_MUTEX_RECURSIVE)) &&
               (0 == ::pthread_mutex_init(&m_mutex, &m_attrRecursive));
 }
 
-ChaspLock::~ChaspLock()
-{
-    if (m_bInit)
-    {
+ChaspLock::~ChaspLock() {
+    if (m_bInit) {
         pthread_mutex_destroy(&m_mutex);
         pthread_mutexattr_destroy(&m_attrRecursive);
     }
@@ -141,8 +130,7 @@ bool ChaspLock::isInit() const
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspLock::lock()
-{
+bool ChaspLock::lock() {
     DIAG_ASSERT(m_bInit);
     return m_bInit && (0 == ::pthread_mutex_lock(&m_mutex));
 }
@@ -150,8 +138,7 @@ bool ChaspLock::lock()
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspLock::unlock()
-{
+bool ChaspLock::unlock() {
     DIAG_ASSERT(m_bInit);
     return m_bInit && (0 == ::pthread_mutex_unlock(&m_mutex));
 }

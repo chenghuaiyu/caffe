@@ -2,17 +2,14 @@
 #include <Winscard.h>
 #include "tendyron.h"
 
-BOOL TDR_GetFirstReaderName(char ** ppszReaders)
-{
-	if (NULL == ppszReaders)
-	{
+BOOL TDR_GetFirstReaderName(char ** ppszReaders) {
+	if (NULL == ppszReaders) {
 		return FALSE;
 	}
 	//establish the context
 	SCARDCONTEXT context;	//the context
 	int iRv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &context);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf(("Fail:SCardListReaders 0x%X\n"), iRv);
 		return FALSE;
 	}
@@ -24,8 +21,7 @@ BOOL TDR_GetFirstReaderName(char ** ppszReaders)
 		NULL,
 		tchReaders,
 		&dwLenReaders);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf(("Fail:SCardListReaders 0x%X\n"), iRv);
 		SCardReleaseContext(context);
 		return FALSE;
@@ -35,8 +31,7 @@ BOOL TDR_GetFirstReaderName(char ** ppszReaders)
 	SCARDHANDLE scardHandle;	//the handle of the device
 	DWORD dwAP = 0;
 	iRv = SCardConnectA(context, tchReaders, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &scardHandle, &dwAP);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf("Card not ready: %d", iRv);
 		SCardReleaseContext(context);
 		return FALSE;
@@ -51,17 +46,14 @@ BOOL TDR_GetFirstReaderName(char ** ppszReaders)
 	return TRUE;
 }
 
-BOOL TDR_GetFirstReaderNameW(wchar_t ** ppszReaders)
-{
-	if (NULL == ppszReaders)
-	{
+BOOL TDR_GetFirstReaderNameW(wchar_t ** ppszReaders) {
+	if (NULL == ppszReaders) {
 		return FALSE;
 	}
 	//establish the context
 	SCARDCONTEXT context;	//the context
 	int iRv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &context);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf(("Fail:SCardListReaders 0x%X\n"), iRv);
 		return FALSE;
 	}
@@ -80,8 +72,7 @@ BOOL TDR_GetFirstReaderNameW(wchar_t ** ppszReaders)
 		NULL,
 		tchReaders,
 		&dwLenReaders);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf(("Fail:SCardListReaders 0x%X\n"), iRv);
 		SCardReleaseContext(context);
 		return FALSE;
@@ -91,8 +82,7 @@ BOOL TDR_GetFirstReaderNameW(wchar_t ** ppszReaders)
 	SCARDHANDLE scardHandle;	//the handle of the device
 	DWORD dwAP = 0;
 	iRv = SCardConnectW(context, tchReaders, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &scardHandle, &dwAP);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf("Card not ready: %d", iRv);
 		SCardReleaseContext(context);
 		return FALSE;
@@ -104,15 +94,13 @@ BOOL TDR_GetFirstReaderNameW(wchar_t ** ppszReaders)
 	SCARD_READERSTATEW readerStates = { 0 };
 	readerStates.szReader = tchReaders;
 	iRv = SCardGetStatusChangeW(context, INFINITE, &readerStates, 1);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf("Card not ready: %d", iRv);
 		SCardReleaseContext(context);
 		return FALSE;
 	}
 	//the pnp reader popup
-	if (SCARD_E_NO_READERS_AVAILABLE == iRv)
-	{
+	if (SCARD_E_NO_READERS_AVAILABLE == iRv) {
 		printf("Card popup: %d", iRv);
 		SCardReleaseContext(context);
 		return FALSE;
@@ -121,17 +109,13 @@ BOOL TDR_GetFirstReaderNameW(wchar_t ** ppszReaders)
 	DWORD dwChanges = (readerStates.dwEventState ^ readerStates.dwCurrentState) & MAXWORD;
 	readerStates.dwCurrentState = readerStates.dwEventState;
 
-	if (SCARD_STATE_PRESENT & dwChanges & readerStates.dwEventState)//&& !(SCARD_STATE_MUTE & readerStates.dwEventState)
-	{//the readr insert
+	if (SCARD_STATE_PRESENT & dwChanges & readerStates.dwEventState /*&& !(SCARD_STATE_MUTE & readerStates.dwEventState*/) {//the readr insert
 		printf("Card ready: %d", dwChanges);
-	}
-	else if (SCARD_STATE_EMPTY & dwChanges & readerStates.dwEventState)
-	{//the card pop up
+	} else if (SCARD_STATE_EMPTY & dwChanges & readerStates.dwEventState) {//the card pop up
 		printf("Card popup: %d", dwChanges);
 		SCardReleaseContext(context);
 		return FALSE;
-	}
-	else {
+	} else {
 		printf("Card not ready: %d", dwChanges);
 		SCardReleaseContext(context);
 		return FALSE;
@@ -153,18 +137,15 @@ void TDR_FreeMemory(void ** ppMem) {
 	*ppMem = NULL;
 }
 
-BOOL TDR_SendCommand(LPCSTR readerName, int m_dwProtocal, const unsigned char * pucBufIn, unsigned long usLenIn, unsigned char ** ppucBufOut, unsigned long * pulLenOut)
-{
-	if (0 == strlen(readerName) || NULL == pucBufIn || 0 == usLenIn || NULL == ppucBufOut || NULL == pulLenOut)
-	{
+BOOL TDR_SendCommand(LPCSTR readerName, int m_dwProtocal, const unsigned char * pucBufIn, unsigned long usLenIn, unsigned char ** ppucBufOut, unsigned long * pulLenOut) {
+	if (0 == strlen(readerName) || NULL == pucBufIn || 0 == usLenIn || NULL == ppucBufOut || NULL == pulLenOut) {
 		return FALSE;
 	}
 
 	//establish the context
 	SCARDCONTEXT context;	//the context
 	int iRv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &context);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf("Error: SCardEstablishContext: 0x%X \n\n", iRv);
 		return FALSE;
 	}
@@ -177,16 +158,12 @@ BOOL TDR_SendCommand(LPCSTR readerName, int m_dwProtocal, const unsigned char * 
 		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 		&handle,
 		&dwAP);
-	if (SCARD_S_SUCCESS != iRv)
-	{
-		if (0x8010000F == iRv)
-		{
+	if (SCARD_S_SUCCESS != iRv) {
+		if (0x8010000F == iRv) {
 			printf(("Error: SCardConnect: 请求的协议与目前跟智能卡一起使用的协议不兼容:0x%X \n\n"), iRv);
-		}
-		else if (0x80100066 == iRv){
+		} else if (0x80100066 == iRv){
 			printf(("Error: SCardConnect: 智能卡没有响应重置:0x%X \n\n"), iRv);
-		}
-		else{
+		} else {
 			printf(("Error: SCardConnect: 0x%X \n\n"), iRv);
 		}
 		SCardReleaseContext(context);
@@ -204,8 +181,7 @@ BOOL TDR_SendCommand(LPCSTR readerName, int m_dwProtocal, const unsigned char * 
 			ucBufOut,
 			pulLenOut
 			);
-	}
-	else{
+	} else {
 		iRv = SCardTransmit(handle,
 			SCARD_PCI_T1,
 			pucBufIn,
@@ -218,23 +194,18 @@ BOOL TDR_SendCommand(LPCSTR readerName, int m_dwProtocal, const unsigned char * 
 
 	SCardDisconnect(handle, SCARD_LEAVE_CARD);
 	SCardReleaseContext(context);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		*pulLenOut = 0;
-		if (0x8010000F == iRv)
-		{
+		if (0x8010000F == iRv) {
 			printf(("Error: SCardTransmit: 请求的协议与目前跟智能卡一起使用的协议不兼容:0x%X \n\n"), iRv);
-		}
-		else  if (0x80100066 == iRv){
+		} else if (0x80100066 == iRv){
 			printf(("Error: SCardTransmit: 智能卡没有响应重置:0x%X \n\n"), iRv);
-		}
-		else{
+		} else {
 			printf(("Error: SCardTransmit: 0x%X \n\n"), iRv);
 		}
 		return FALSE;
 	}
-	if (2 > *pulLenOut || 0x90 != ucBufOut[*pulLenOut - 2] || 0 != ucBufOut[*pulLenOut - 1])
-	{
+	if (2 > *pulLenOut || 0x90 != ucBufOut[*pulLenOut - 2] || 0 != ucBufOut[*pulLenOut - 1]) {
 		printf(("Error: SCardTransmit end: 0x%02X%02X \n\n"), ucBufOut[*pulLenOut - 2], ucBufOut[*pulLenOut - 1]);
 		return FALSE;
 	}
@@ -245,18 +216,15 @@ BOOL TDR_SendCommand(LPCSTR readerName, int m_dwProtocal, const unsigned char * 
 }
 
 
-BOOL TDR_SendCommandW(LPCWSTR readerName, int m_dwProtocal, const unsigned char * pucBufIn, unsigned long usLenIn, unsigned char ** ppucBufOut, unsigned long * pulLenOut)
-{
-	if (0 == wcslen(readerName) || NULL == pucBufIn || 0 == usLenIn || NULL == ppucBufOut || NULL == pulLenOut)
-	{
+BOOL TDR_SendCommandW(LPCWSTR readerName, int m_dwProtocal, const unsigned char * pucBufIn, unsigned long usLenIn, unsigned char ** ppucBufOut, unsigned long * pulLenOut) {
+	if (0 == wcslen(readerName) || NULL == pucBufIn || 0 == usLenIn || NULL == ppucBufOut || NULL == pulLenOut) {
 		return FALSE;
 	}
 
 	//establish the context
 	SCARDCONTEXT context;	//the context
 	int iRv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &context);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		printf("Error: SCardEstablishContext: 0x%X \n\n", iRv);
 		return FALSE;
 	}
@@ -269,16 +237,12 @@ BOOL TDR_SendCommandW(LPCWSTR readerName, int m_dwProtocal, const unsigned char 
 		SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1,
 		&handle,
 		&dwAP);
-	if (SCARD_S_SUCCESS != iRv)
-	{
-		if (0x8010000F == iRv)
-		{
+	if (SCARD_S_SUCCESS != iRv) {
+		if (0x8010000F == iRv) {
 			printf(("Error: SCardConnect: 请求的协议与目前跟智能卡一起使用的协议不兼容:0x%X \n\n"), iRv);
-		}
-		else if (0x80100066 == iRv){
+		} else if (0x80100066 == iRv){
 			printf(("Error: SCardConnect: 智能卡没有响应重置:0x%X \n\n"), iRv);
-		}
-		else{
+		} else {
 			printf(("Error: SCardConnect: 0x%X \n\n"), iRv);
 		}
 		SCardReleaseContext(context);
@@ -296,8 +260,7 @@ BOOL TDR_SendCommandW(LPCWSTR readerName, int m_dwProtocal, const unsigned char 
 			ucBufOut,
 			pulLenOut
 			);
-	}
-	else{
+	} else {
 		iRv = SCardTransmit(handle,
 			SCARD_PCI_T1,
 			pucBufIn,
@@ -310,17 +273,13 @@ BOOL TDR_SendCommandW(LPCWSTR readerName, int m_dwProtocal, const unsigned char 
 
 	SCardDisconnect(handle, SCARD_LEAVE_CARD);
 	SCardReleaseContext(context);
-	if (SCARD_S_SUCCESS != iRv)
-	{
+	if (SCARD_S_SUCCESS != iRv) {
 		*pulLenOut = 0;
-		if (0x8010000F == iRv)
-		{
+		if (0x8010000F == iRv) {
 			printf(("Error: SCardTransmit: 请求的协议与目前跟智能卡一起使用的协议不兼容:0x%X \n\n"), iRv);
-		}
-		else  if (0x80100066 == iRv){
+		} else if (0x80100066 == iRv){
 			printf(("Error: SCardTransmit: 智能卡没有响应重置:0x%X \n\n"), iRv);
-		}
-		else{
+		} else {
 			printf(("Error: SCardTransmit: 0x%X \n\n"), iRv);
 		}
 		return FALSE;
@@ -439,8 +398,7 @@ char cRsakey_N[iNum] = "84FC1CC83CEFE7927535AA9A130B43BDB78544C21A9167FF47BE761B
 char cRsakey_E[iNum] = "00010001";
 
 BOOL tendyronRsa(unsigned char * pcRSAHEXdata, unsigned char ** ppcRSAresult) {
-	if (NULL == pcRSAHEXdata || NULL == ppcRSAresult)
-	{
+	if (NULL == pcRSAHEXdata || NULL == ppcRSAresult) {
 		return FALSE;
 	}
 
@@ -449,22 +407,19 @@ BOOL tendyronRsa(unsigned char * pcRSAHEXdata, unsigned char ** ppcRSAresult) {
 	rsa_MFC.len = LEN_INPUT_1024;
 
 	int irv = mpi_read_string(&rsa_MFC.N, 16, cRsakey_N);
-	if (0 != irv)
-	{
+	if (0 != irv) {
 		printf("ReadString error");
 		return FALSE;
 	}
 	irv = mpi_read_string(&rsa_MFC.E, 16, cRsakey_E);
-	if (0 != irv)
-	{
+	if (0 != irv) {
 		printf("ReadString error");
 		return FALSE;
 	}
 
 	*ppcRSAresult = new unsigned char[rsa_MFC.len];
 	irv = rsa_public(&rsa_MFC, pcRSAHEXdata, *ppcRSAresult);
-	if (0 != irv)
-	{
+	if (0 != irv) {
 		printf("rsa error");
 		return FALSE;
 	}

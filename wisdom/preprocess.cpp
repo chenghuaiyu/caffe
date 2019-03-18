@@ -12,6 +12,7 @@
 #include "google/protobuf/text_format.h"
 #include <google/protobuf/io/coded_stream.h>
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -42,8 +43,7 @@ using ::google::protobuf::Message;
 using namespace std;
 using namespace cv;
 
-void WrapInputLayer(const cv::Mat& img, std::vector<cv::Mat> *input_channels, MODEL_INFO_S *pstInfo)
-{
+void WrapInputLayer(const cv::Mat& img, std::vector<cv::Mat> *input_channels, MODEL_INFO_S *pstInfo) {
     Blob<float>* input_layer = pstInfo->caffe_net->input_blobs()[0];
     int width = input_layer->width();
     int height = input_layer->height();
@@ -53,18 +53,14 @@ void WrapInputLayer(const cv::Mat& img, std::vector<cv::Mat> *input_channels, MO
     cv::Size input_geometry;
     cv::Mat sample_resize;
     input_geometry = cv::Size(width, height);
-    if (img.size() != input_geometry)
-    {
+    if (img.size() != input_geometry) {
         cv::resize(img, sample_resize, input_geometry);
-    }
-    else
-    {
+    } else {
         sample_resize = img;
     }
 
     //split to input_layer
-    for (int j = 0; j < input_layer->channels(); ++j)
-    {
+    for (int j = 0; j < input_layer->channels(); ++j) {
         cv::Mat channel(height, width, CV_32FC1, input_data);
         input_channels->push_back(channel);
         input_data += width * height;
@@ -82,8 +78,7 @@ void WrapInputLayer(const cv::Mat& img, std::vector<cv::Mat> *input_channels, MO
     }
 }
 
-cv::Mat Preprocess(const cv::Mat &img)
-{
+cv::Mat Preprocess(const cv::Mat &img) {
     /* Convert the input image to the input image format of the network. */
     cv::Mat sample;
     if (img.channels() == 4)

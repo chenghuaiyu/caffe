@@ -12,6 +12,7 @@
 #include "google/protobuf/text_format.h"
 #include <google/protobuf/io/coded_stream.h>
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -72,14 +73,10 @@ float JaccardOverlap(const DETECT_BOX_S bbox1, const DETECT_BOX_S bbox2) {
   }
 }
 
-vector<DETECT_BOX_S> SortBox(vector<DETECT_BOX_S> box) 
-{
-    for (int i = 0; i < box.size(); i++)
-    {
-        for (int j = i; j < box.size(); j++)
-        {
-            if (box[i].score < box[j].score)
-            {
+vector<DETECT_BOX_S> SortBox(vector<DETECT_BOX_S> box) {
+    for (int i = 0; i < box.size(); i++) {
+        for (int j = i; j < box.size(); j++) {
+            if (box[i].score < box[j].score) {
                 DETECT_BOX_S temp = box[i];
                 box[i] = box[j];
                 box[j] = temp;
@@ -90,14 +87,11 @@ vector<DETECT_BOX_S> SortBox(vector<DETECT_BOX_S> box)
     return box;
 }
 
-vector<DETECT_BOX_S> GetLabelBox(vector<DETECT_BOX_S> retbox, const float label) 
-{
+vector<DETECT_BOX_S> GetLabelBox(vector<DETECT_BOX_S> retbox, const float label) {
     vector<DETECT_BOX_S> labelBox;
 
-    for (int i = 0; i < retbox.size(); ++i) 
-    {
-        if (retbox[i].label == label)
-        {
+    for (int i = 0; i < retbox.size(); ++i) {
+        if (retbox[i].label == label) {
             labelBox.push_back(retbox[i]);
         }
     }
@@ -107,36 +101,29 @@ vector<DETECT_BOX_S> GetLabelBox(vector<DETECT_BOX_S> retbox, const float label)
     return labelBox;
 }
 
-vector<DETECT_BOX_S> ApplyNMSFast(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pstInfo) 
-{
+vector<DETECT_BOX_S> ApplyNMSFast(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pstInfo) {
     float adaptive_threshold = 0.30;
     vector<DETECT_BOX_S> newretbox;
     
-    for (int i = 0; i < pstInfo->labels.size(); i++)
-    {
+    for (int i = 0; i < pstInfo->labels.size(); i++) {
         vector<DETECT_BOX_S> labelboxesold;
         vector<DETECT_BOX_S> labelboxesnew;
         labelboxesold = GetLabelBox(retbox, (float)i);
         labelboxesnew.clear();
 
         // Do nms.
-        while(labelboxesold.size())
-        {
+        while(labelboxesold.size()) {
             DETECT_BOX_S tmpbox = labelboxesold[0];
             bool keep = true;
-            for (int k = 0; k < labelboxesnew.size(); ++k) 
-            {
-                if (keep) 
-                {
+            for (int k = 0; k < labelboxesnew.size(); ++k) {
+                if (keep) {
                     float overlap = JaccardOverlap(tmpbox, labelboxesnew[k]);
                     keep = overlap <= adaptive_threshold;
-                } else 
-                {
+                } else {
                     break;
                 }
             }
-            if (keep) 
-            {
+            if (keep) {
                 labelboxesnew.push_back(tmpbox);
             }
             labelboxesold.erase(labelboxesold.begin());
@@ -150,8 +137,7 @@ vector<DETECT_BOX_S> ApplyNMSFast(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pst
     return newretbox;
 }
 
-vector<DETECT_BOX_S> run_caffe_once_case1(cv::Mat& org_img, cv::Rect& padrect, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_once_case1(cv::Mat& org_img, cv::Rect& padrect, MODEL_INFO_S *pstInfo) {
     Net<float> *caffe_net = pstInfo->caffe_net;
     vector<DETECT_BOX_S> retbox;
     /* run caffe */
@@ -162,17 +148,14 @@ vector<DETECT_BOX_S> run_caffe_once_case1(cv::Mat& org_img, cv::Rect& padrect, M
     int num_det = rect->height();
     std::cout << "num_det:" << num_det << endl;
     const float* result_vec = rect->cpu_data();
-    for (int i = 0; i < num_det; i++)
-    {
+    for (int i = 0; i < num_det; i++) {
         DETECT_BOX_S tmpbox;
         int label = result_vec[i * 7 + 1]; 
         float score = result_vec[i * 7 + 2];
-        if (label < 0)
-        {
+        if (label < 0) {
             continue;
         }
-		if (score < pstInfo->scores[label])
-        {
+		if (score < pstInfo->scores[label]) {
             continue;
         }
         cv::Rect cvrect;
@@ -200,8 +183,7 @@ vector<DETECT_BOX_S> run_caffe_once_case1(cv::Mat& org_img, cv::Rect& padrect, M
     return retbox;
 }
 
-vector<DETECT_BOX_S> run_caffe_small_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_small_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
     Net<float> *caffe_net = pstInfo->caffe_net;
     vector<DETECT_BOX_S> retbox;
     std::cout << "run_caffe_small" << endl;
@@ -236,8 +218,7 @@ vector<DETECT_BOX_S> run_caffe_small_case1(cv::Mat& org_img, MODEL_INFO_S *pstIn
     retbox = run_caffe_once_case1(org_img, padrect, pstInfo);
     return retbox;
 }
-vector<DETECT_BOX_S> run_caffe_pad_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_pad_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
     Net<float> *caffe_net = pstInfo->caffe_net;
     vector<DETECT_BOX_S> retbox;
     std::cout << "run_caffe_pad" << endl;
@@ -270,8 +251,7 @@ vector<DETECT_BOX_S> run_caffe_pad_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo
     return retbox;
 }
 
-vector<DETECT_BOX_S> run_caffe_largeW_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_largeW_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
     Net<float> *caffe_net = pstInfo->caffe_net;
     vector<DETECT_BOX_S> retbox1;
     vector<DETECT_BOX_S> retbox2;
@@ -285,14 +265,10 @@ vector<DETECT_BOX_S> run_caffe_largeW_case1(cv::Mat& org_img, MODEL_INFO_S *pstI
     int step = max((srcw+overlap+1)/2, srch);
     std::cout << "step:" << step << endl;
 
-    for (int i = 0; i < srcw; i += (step - overlap))
-    {
-        if ((i + step) >= srcw)
-        {
+    for (int i = 0; i < srcw; i += (step - overlap)) {
+        if ((i + step) >= srcw) {
             x = srcw - step;
-        }
-        else
-        {
+        } else {
             x = i;
         }
         int h_valid = min(step,srch);
@@ -303,14 +279,12 @@ vector<DETECT_BOX_S> run_caffe_largeW_case1(cv::Mat& org_img, MODEL_INFO_S *pstI
         img(src_roi).copyTo(img_once);
 
         retbox2 = run_caffe_pad_case1(img_once, pstInfo);
-        for (int j = 0; j < retbox2.size(); j++)
-        {
+        for (int j = 0; j < retbox2.size(); j++) {
             retbox2[j].x += x;
         }
         retbox1.insert(retbox1.end(), retbox2.begin(), retbox2.end());
 
-        if ((i + step) >= srcw)
-        {
+        if ((i + step) >= srcw) {
             break;
         }
     }
@@ -320,8 +294,7 @@ vector<DETECT_BOX_S> run_caffe_largeW_case1(cv::Mat& org_img, MODEL_INFO_S *pstI
     return retbox1;
 }
 
-vector<DETECT_BOX_S> run_caffe_other_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_other_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
 	Net<float> *caffe_net = pstInfo->caffe_net;
     vector<DETECT_BOX_S> retbox;
     std::cout << "run_caffe_others" << endl;
@@ -335,27 +308,19 @@ vector<DETECT_BOX_S> run_caffe_other_case1(cv::Mat& org_img, MODEL_INFO_S *pstIn
     return retbox;
 }
 
-vector<DETECT_BOX_S> run_caffe_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_case1(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
     vector<DETECT_BOX_S> retbox;
     Blob<float>* input_layer = pstInfo->caffe_net->input_blobs()[0];
     int width = input_layer->width();
     int height = input_layer->height();
     
-    if ((org_img.rows < height / 2) && (org_img.cols < width / 2))
-    {
+    if ((org_img.rows < height / 2) && (org_img.cols < width / 2)) {
         retbox = run_caffe_small_case1(org_img, pstInfo);
-    }
-    else if ((org_img.rows < height) && (org_img.cols < width))
-    {
+    } else if ((org_img.rows < height) && (org_img.cols < width)) {
         retbox = run_caffe_pad_case1(org_img, pstInfo);
-    }
-    else if ((org_img.cols >= width) && (org_img.cols > org_img.rows))
-    {
+    } else if ((org_img.cols >= width) && (org_img.cols > org_img.rows)) {
         retbox = run_caffe_largeW_case1(org_img, pstInfo);
-    }
-    else
-    {
+    } else {
         retbox = run_caffe_other_case1(org_img, pstInfo);
     }
 

@@ -14,6 +14,7 @@
 #include "google/protobuf/text_format.h"
 #include <google/protobuf/io/coded_stream.h>
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>

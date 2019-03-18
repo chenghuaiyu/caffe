@@ -72,30 +72,25 @@ static const unsigned char PI_SUBST[256] =
 /*
  * MD2 context setup
  */
-void md2_starts( md2_context *ctx )
-{
+void md2_starts( md2_context *ctx ) {
     memset( ctx->cksum, 0, 16 );
     memset( ctx->state, 0, 46 );
     memset( ctx->buffer, 0, 16 );
     ctx->left = 0;
 }
 
-static void md2_process( md2_context *ctx )
-{
+static void md2_process( md2_context *ctx ) {
     int i, j;
     unsigned char t = 0;
 
-    for( i = 0; i < 16; i++ )
-    {
+    for( i = 0; i < 16; i++ ) {
         ctx->state[i + 16] = ctx->buffer[i];
         ctx->state[i + 32] =
             (unsigned char)( ctx->buffer[i] ^ ctx->state[i]);
     }
 
-    for( i = 0; i < 18; i++ )
-    {
-        for( j = 0; j < 48; j++ )
-        {
+    for( i = 0; i < 18; i++ ) {
+        for( j = 0; j < 48; j++ ) {
             ctx->state[j] = (unsigned char)
                ( ctx->state[j] ^ PI_SUBST[t] );
             t  = ctx->state[j];
@@ -106,8 +101,7 @@ static void md2_process( md2_context *ctx )
 
     t = ctx->cksum[15];
 
-    for( i = 0; i < 16; i++ )
-    {
+    for( i = 0; i < 16; i++ ) {
         ctx->cksum[i] = (unsigned char)
            ( ctx->cksum[i] ^ PI_SUBST[ctx->buffer[i] ^ t] );
         t  = ctx->cksum[i];
@@ -117,12 +111,10 @@ static void md2_process( md2_context *ctx )
 /*
  * MD2 process buffer
  */
-void md2_update( md2_context *ctx, const unsigned char *input, size_t ilen )
-{
+void md2_update( md2_context *ctx, const unsigned char *input, size_t ilen ) {
     size_t fill;
 
-    while( ilen > 0 )
-    {
+    while( ilen > 0 ) {
         if( ctx->left + ilen > 16 )
             fill = 16 - ctx->left;
         else
@@ -134,8 +126,7 @@ void md2_update( md2_context *ctx, const unsigned char *input, size_t ilen )
         input += fill;
         ilen  -= fill;
 
-        if( ctx->left == 16 )
-        {
+        if( ctx->left == 16 ) {
             ctx->left = 0;
             md2_process( ctx );
         }
@@ -145,8 +136,7 @@ void md2_update( md2_context *ctx, const unsigned char *input, size_t ilen )
 /*
  * MD2 final digest
  */
-void md2_finish( md2_context *ctx, unsigned char output[16] )
-{
+void md2_finish( md2_context *ctx, unsigned char output[16] ) {
     size_t i;
     unsigned char x;
 
@@ -166,8 +156,7 @@ void md2_finish( md2_context *ctx, unsigned char output[16] )
 /*
  * output = MD2( input buffer )
  */
-void md2( const unsigned char *input, size_t ilen, unsigned char output[16] )
-{
+void md2( const unsigned char *input, size_t ilen, unsigned char output[16] ) {
     md2_context ctx;
 
     md2_starts( &ctx );
@@ -181,8 +170,7 @@ void md2( const unsigned char *input, size_t ilen, unsigned char output[16] )
 /*
  * output = MD2( file contents )
  */
-int md2_file( const char *path, unsigned char output[16] )
-{
+int md2_file( const char *path, unsigned char output[16] ) {
     FILE *f;
     size_t n;
     md2_context ctx;
@@ -200,8 +188,7 @@ int md2_file( const char *path, unsigned char output[16] )
 
     memset( &ctx, 0, sizeof( md2_context ) );
 
-    if( ferror( f ) != 0 )
-    {
+    if( ferror( f ) != 0 ) {
         fclose( f );
         return( POLARSSL_ERR_MD2_FILE_IO_ERROR );
     }
@@ -214,13 +201,11 @@ int md2_file( const char *path, unsigned char output[16] )
 /*
  * MD2 HMAC context setup
  */
-void md2_hmac_starts( md2_context *ctx, const unsigned char *key, size_t keylen )
-{
+void md2_hmac_starts( md2_context *ctx, const unsigned char *key, size_t keylen ) {
     size_t i;
     unsigned char sum[16];
 
-    if( keylen > 16 )
-    {
+    if( keylen > 16 ) {
         md2( key, keylen, sum );
         keylen = 16;
         key = sum;
@@ -229,8 +214,7 @@ void md2_hmac_starts( md2_context *ctx, const unsigned char *key, size_t keylen 
     memset( ctx->ipad, 0x36, 16 );
     memset( ctx->opad, 0x5C, 16 );
 
-    for( i = 0; i < keylen; i++ )
-    {
+    for( i = 0; i < keylen; i++ ) {
         ctx->ipad[i] = (unsigned char)( ctx->ipad[i] ^ key[i] );
         ctx->opad[i] = (unsigned char)( ctx->opad[i] ^ key[i] );
     }
@@ -244,16 +228,14 @@ void md2_hmac_starts( md2_context *ctx, const unsigned char *key, size_t keylen 
 /*
  * MD2 HMAC process buffer
  */
-void md2_hmac_update( md2_context *ctx, const unsigned char *input, size_t ilen )
-{
+void md2_hmac_update( md2_context *ctx, const unsigned char *input, size_t ilen ) {
     md2_update( ctx, input, ilen );
 }
 
 /*
  * MD2 HMAC final digest
  */
-void md2_hmac_finish( md2_context *ctx, unsigned char output[16] )
-{
+void md2_hmac_finish( md2_context *ctx, unsigned char output[16] ) {
     unsigned char tmpbuf[16];
 
     md2_finish( ctx, tmpbuf );
@@ -268,8 +250,7 @@ void md2_hmac_finish( md2_context *ctx, unsigned char output[16] )
 /*
  * MD2 HMAC context reset
  */
-void md2_hmac_reset( md2_context *ctx )
-{
+void md2_hmac_reset( md2_context *ctx ) {
     md2_starts( ctx );
     md2_update( ctx, ctx->ipad, 16 );
 }
@@ -279,8 +260,7 @@ void md2_hmac_reset( md2_context *ctx )
  */
 void md2_hmac( const unsigned char *key, size_t keylen,
                const unsigned char *input, size_t ilen,
-               unsigned char output[16] )
-{
+               unsigned char output[16] ) {
     md2_context ctx;
 
     md2_hmac_starts( &ctx, key, keylen );
@@ -328,21 +308,18 @@ static const unsigned char md2_test_sum[7][16] =
 /*
  * Checkup routine
  */
-int md2_self_test( int verbose )
-{
+int md2_self_test( int verbose ) {
     int i;
     unsigned char md2sum[16];
 
-    for( i = 0; i < 7; i++ )
-    {
+    for( i = 0; i < 7; i++ ) {
         if( verbose != 0 )
             printf( "  MD2 test #%d: ", i + 1 );
 
         md2( (unsigned char *) md2_test_str[i],
              strlen( md2_test_str[i] ), md2sum );
 
-        if( memcmp( md2sum, md2_test_sum[i], 16 ) != 0 )
-        {
+        if( memcmp( md2sum, md2_test_sum[i], 16 ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 

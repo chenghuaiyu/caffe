@@ -64,8 +64,7 @@
 /*
  * MD5 context setup
  */
-void md5_starts( md5_context *ctx )
-{
+void md5_starts( md5_context *ctx ) {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
 
@@ -75,8 +74,7 @@ void md5_starts( md5_context *ctx )
     ctx->state[3] = 0x10325476;
 }
 
-static void md5_process( md5_context *ctx, const unsigned char data[64] )
-{
+static void md5_process( md5_context *ctx, const unsigned char data[64] ) {
     unsigned long X[16], A, B, C, D;
 
     GET_ULONG_LE( X[ 0], data,  0 );
@@ -201,8 +199,7 @@ static void md5_process( md5_context *ctx, const unsigned char data[64] )
 /*
  * MD5 process buffer
  */
-void md5_update( md5_context *ctx, const unsigned char *input, size_t ilen )
-{
+void md5_update( md5_context *ctx, const unsigned char *input, size_t ilen ) {
     size_t fill;
     unsigned long left;
 
@@ -218,8 +215,7 @@ void md5_update( md5_context *ctx, const unsigned char *input, size_t ilen )
     if( ctx->total[0] < (unsigned long) ilen )
         ctx->total[1]++;
 
-    if( left && ilen >= fill )
-    {
+    if( left && ilen >= fill ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, fill );
         md5_process( ctx, ctx->buffer );
@@ -228,15 +224,13 @@ void md5_update( md5_context *ctx, const unsigned char *input, size_t ilen )
         left = 0;
     }
 
-    while( ilen >= 64 )
-    {
+    while( ilen >= 64 ) {
         md5_process( ctx, input );
         input += 64;
         ilen  -= 64;
     }
 
-    if( ilen > 0 )
-    {
+    if( ilen > 0 ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, ilen );
     }
@@ -253,8 +247,7 @@ static const unsigned char md5_padding[64] =
 /*
  * MD5 final digest
  */
-void md5_finish( md5_context *ctx, unsigned char output[16] )
-{
+void md5_finish( md5_context *ctx, unsigned char output[16] ) {
     unsigned long last, padn;
     unsigned long high, low;
     unsigned char msglen[8];
@@ -281,8 +274,7 @@ void md5_finish( md5_context *ctx, unsigned char output[16] )
 /*
  * output = MD5( input buffer )
  */
-void md5( const unsigned char *input, size_t ilen, unsigned char output[16] )
-{
+void md5( const unsigned char *input, size_t ilen, unsigned char output[16] ) {
     md5_context ctx;
 
     md5_starts( &ctx );
@@ -296,8 +288,7 @@ void md5( const unsigned char *input, size_t ilen, unsigned char output[16] )
 /*
  * output = MD5( file contents )
  */
-int md5_file( const char *path, unsigned char output[16] )
-{
+int md5_file( const char *path, unsigned char output[16] ) {
     FILE *f;
     size_t n;
     md5_context ctx;
@@ -315,8 +306,7 @@ int md5_file( const char *path, unsigned char output[16] )
 
     memset( &ctx, 0, sizeof( md5_context ) );
 
-    if( ferror( f ) != 0 )
-    {
+    if( ferror( f ) != 0 ) {
         fclose( f );
         return( POLARSSL_ERR_MD5_FILE_IO_ERROR );
     }
@@ -329,13 +319,11 @@ int md5_file( const char *path, unsigned char output[16] )
 /*
  * MD5 HMAC context setup
  */
-void md5_hmac_starts( md5_context *ctx, const unsigned char *key, size_t keylen )
-{
+void md5_hmac_starts( md5_context *ctx, const unsigned char *key, size_t keylen ) {
     size_t i;
     unsigned char sum[16];
 
-    if( keylen > 64 )
-    {
+    if( keylen > 64 ) {
         md5( key, keylen, sum );
         keylen = 16;
         key = sum;
@@ -344,8 +332,7 @@ void md5_hmac_starts( md5_context *ctx, const unsigned char *key, size_t keylen 
     memset( ctx->ipad, 0x36, 64 );
     memset( ctx->opad, 0x5C, 64 );
 
-    for( i = 0; i < keylen; i++ )
-    {
+    for( i = 0; i < keylen; i++ ) {
         ctx->ipad[i] = (unsigned char)( ctx->ipad[i] ^ key[i] );
         ctx->opad[i] = (unsigned char)( ctx->opad[i] ^ key[i] );
     }
@@ -359,16 +346,14 @@ void md5_hmac_starts( md5_context *ctx, const unsigned char *key, size_t keylen 
 /*
  * MD5 HMAC process buffer
  */
-void md5_hmac_update( md5_context *ctx, const unsigned char *input, size_t ilen )
-{
+void md5_hmac_update( md5_context *ctx, const unsigned char *input, size_t ilen ) {
     md5_update( ctx, input, ilen );
 }
 
 /*
  * MD5 HMAC final digest
  */
-void md5_hmac_finish( md5_context *ctx, unsigned char output[16] )
-{
+void md5_hmac_finish( md5_context *ctx, unsigned char output[16] ) {
     unsigned char tmpbuf[16];
 
     md5_finish( ctx, tmpbuf );
@@ -383,8 +368,7 @@ void md5_hmac_finish( md5_context *ctx, unsigned char output[16] )
 /*
  * MD5 HMAC context reset
  */
-void md5_hmac_reset( md5_context *ctx )
-{
+void md5_hmac_reset( md5_context *ctx ) {
     md5_starts( ctx );
     md5_update( ctx, ctx->ipad, 64 );
 }
@@ -394,8 +378,7 @@ void md5_hmac_reset( md5_context *ctx )
  */
 void md5_hmac( const unsigned char *key, size_t keylen,
                const unsigned char *input, size_t ilen,
-               unsigned char output[16] )
-{
+               unsigned char output[16] ) {
     md5_context ctx;
 
     md5_hmac_starts( &ctx, key, keylen );
@@ -510,22 +493,19 @@ static const unsigned char md5_hmac_test_sum[7][16] =
 /*
  * Checkup routine
  */
-int md5_self_test( int verbose )
-{
+int md5_self_test( int verbose ) {
     int i, buflen;
     unsigned char buf[1024];
     unsigned char md5sum[16];
     md5_context ctx;
 
-    for( i = 0; i < 7; i++ )
-    {
+    for( i = 0; i < 7; i++ ) {
         if( verbose != 0 )
             printf( "  MD5 test #%d: ", i + 1 );
 
         md5( md5_test_buf[i], md5_test_buflen[i], md5sum );
 
-        if( memcmp( md5sum, md5_test_sum[i], 16 ) != 0 )
-        {
+        if( memcmp( md5sum, md5_test_sum[i], 16 ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 
@@ -539,13 +519,11 @@ int md5_self_test( int verbose )
     if( verbose != 0 )
         printf( "\n" );
 
-    for( i = 0; i < 7; i++ )
-    {
+    for( i = 0; i < 7; i++ ) {
         if( verbose != 0 )
             printf( "  HMAC-MD5 test #%d: ", i + 1 );
 
-        if( i == 5 || i == 6 )
-        {
+        if( i == 5 || i == 6 ) {
             memset( buf, '\xAA', buflen = 80 );
             md5_hmac_starts( &ctx, buf, buflen );
         }
@@ -560,8 +538,7 @@ int md5_self_test( int verbose )
 
         buflen = ( i == 4 ) ? 12 : 16;
 
-        if( memcmp( md5sum, md5_hmac_test_sum[i], buflen ) != 0 )
-        {
+        if( memcmp( md5sum, md5_hmac_test_sum[i], buflen ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 

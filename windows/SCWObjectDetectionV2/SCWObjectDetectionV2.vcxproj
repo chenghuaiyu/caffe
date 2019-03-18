@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(NUGET_PACKAGES)\glog.0.3.3.0\build\native\glog.props" Condition="Exists('$(NUGET_PACKAGES)\glog.0.3.3.0\build\native\glog.props')" />
+  <Import Project="$(NUGET_PACKAGES)\gflags.2.1.2.1\build\native\gflags.props" Condition="Exists('$(NUGET_PACKAGES)\gflags.2.1.2.1\build\native\gflags.props')" />
+  <Import Project="$(NUGET_PACKAGES)\OpenCV.2.4.11\build\native\OpenCV.props" Condition="Exists('$(NUGET_PACKAGES)\OpenCV.2.4.11\build\native\OpenCV.props')" />
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{CBC3F434-DBFA-404D-87A9-DDECD0FC817B}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <RootNamespace>SCWObjectDetectionV2</RootNamespace>
+    <NuGetPackageImportStamp>82610725</NuGetPackageImportStamp>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="Exists('$(SolutionDir)\CommonSettings.props')">
+    <Import Project="$(SolutionDir)\CommonSettings.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <AdditionalDependencies>libcaffe.lib;Winscard.lib;libhasp_windows_x64_24990.lib;$(CudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\wisdom\sentinel\$(platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>SCWObjectDetectionV2.def</ModuleDefinitionFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>"$(ScriptsDir)\FixGFlagsNaming.cmd" "$(OutDir)" $(Configuration)</Command>
+    </PostBuildEvent>
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <AdditionalDependencies>libcaffe.lib;Winscard.lib;libhasp_windows_x64_24990.lib;$(CudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\wisdom\sentinel\$(platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>SCWObjectDetectionV2.def</ModuleDefinitionFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>"$(ScriptsDir)\FixGFlagsNaming.cmd" "$(OutDir)" $(Configuration)</Command>
+    </PostBuildEvent>
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PreprocessorDefinitions>WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libcaffe\libcaffe.vcxproj">
+      <Project>{a9acef83-7b63-4574-a554-89ce869ea141}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\wisdom\config\get_config.cpp" />
+    <ClCompile Include="..\..\wisdom\config\get_config_normal.cpp" />
+    <ClCompile Include="..\..\wisdom\config\get_config_xml.cpp" />
+    <ClCompile Include="..\..\wisdom\decryption\decryption.cpp" />
+    <ClCompile Include="..\..\wisdom\decryption\rc4.cpp" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\aes.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\bignum.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\des.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md2.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md4.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md5.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\md_wrap.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\padlock.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\rsa.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha1.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha2.c" />
+    <ClCompile Include="..\..\wisdom\dongle\polarssl\sha4.c" />
+    <ClCompile Include="..\..\wisdom\dongle\tendyron.cpp" />
+    <ClCompile Include="..\..\wisdom\output\cjson.cpp" />
+    <ClCompile Include="..\..\wisdom\output\output.cpp" />
+    <ClCompile Include="..\..\wisdom\output\outputcjson.cpp" />
+    <ClCompile Include="..\..\wisdom\output\outputxml.cpp" />
+    <ClCompile Include="..\..\wisdom\output\tinyxml2.cpp" />
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess.cpp" />
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess_case1.cpp" />
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess_classify.cpp" />
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess_classify_uniform.cpp" />
+    <ClCompile Include="..\..\wisdom\postprocess\postprocess_normal.cpp" />
+    <ClCompile Include="..\..\wisdom\preprocess.cpp" />
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe.cpp" />
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case1.cpp" />
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case2.cpp" />
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case3.cpp" />
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_case4.cpp" />
+    <ClCompile Include="..\..\wisdom\runcaffe\run_caffe_normal.cpp" />
+    <ClCompile Include="..\..\wisdom\SCWObjectDetectionV2.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\errorprinter.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspbase.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspdiag.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspenc64.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspfeature.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspfile.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\hasphandle.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\hasphasp.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspimpl.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspinfo.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\hasplegacy.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\hasplock.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspmain.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspmap.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\hasptime.cpp" />
+    <ClCompile Include="..\..\wisdom\sentinel\haspversion.cpp" />
+    <ClCompile Include="..\..\wisdom\tools\encrypt.cpp" />
+    <ClCompile Include="..\..\wisdom\util\util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\wisdom\common.h" />
+    <ClInclude Include="..\..\wisdom\config\get_config.h" />
+    <ClInclude Include="..\..\wisdom\config\get_config_normal.h" />
+    <ClInclude Include="..\..\wisdom\config\get_config_xml.h" />
+    <ClInclude Include="..\..\wisdom\decryption\decryption.h" />
+    <ClInclude Include="..\..\wisdom\decryption\rc4.hpp" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\aes.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\base.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\bignum.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\bn_mul.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\config.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\des.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md2.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md4.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md5.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\md_wrap.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\padlock.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\rsa.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha1.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha2.h" />
+    <ClInclude Include="..\..\wisdom\dongle\polarssl\sha4.h" />
+    <ClInclude Include="..\..\wisdom\dongle\tendyron.h" />
+    <ClInclude Include="..\..\wisdom\output\cjson.h" />
+    <ClInclude Include="..\..\wisdom\output\output.h" />
+    <ClInclude Include="..\..\wisdom\output\outputcjson.h" />
+    <ClInclude Include="..\..\wisdom\output\outputxml.h" />
+    <ClInclude Include="..\..\wisdom\output\tinyxml2.h" />
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess.h" />
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess_case1.h" />
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess_classify.h" />
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess_classify_uniform.h" />
+    <ClInclude Include="..\..\wisdom\postprocess\postprocess_normal.h" />
+    <ClInclude Include="..\..\wisdom\preprocess.hpp" />
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe.hpp" />
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case1.hpp" />
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case2.hpp" />
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case3.hpp" />
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case4.hpp" />
+    <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_normal.hpp" />
+    <ClInclude Include="..\..\wisdom\SCWObjectDetectionV2.h" />
+    <ClInclude Include="..\..\wisdom\sentinel\errorprinter.h" />
+    <ClInclude Include="..\..\wisdom\sentinel\haspdiag.h" />
+    <ClInclude Include="..\..\wisdom\sentinel\hasp_api.h" />
+    <ClInclude Include="..\..\wisdom\sentinel\hasp_api_cpp.h" />
+    <ClInclude Include="..\..\wisdom\sentinel\hasp_api_cpp_.h" />
+    <ClInclude Include="..\..\wisdom\sentinel\vendor_code.h" />
+    <ClInclude Include="..\..\wisdom\tools\encrypt.hpp" />
+    <ClInclude Include="..\..\wisdom\util\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\wisdom\SCWObjectDetectionV2.def" />
+    <None Include="..\..\wisdom\sentinel\DECXO.hvc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="$(SolutionDir)\CommonSettings.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(NUGET_PACKAGES)\OpenBLAS.0.2.14.1\build\native\openblas.targets" Condition="Exists('$(NUGET_PACKAGES)\OpenBLAS.0.2.14.1\build\native\openblas.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\OpenCV.2.4.11\build\native\OpenCV.targets" Condition="Exists('$(NUGET_PACKAGES)\OpenCV.2.4.11\build\native\OpenCV.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\hdf5-v120-complete.1.8.15.2\build\native\hdf5-v120.targets" Condition="Exists('$(NUGET_PACKAGES)\hdf5-v120-complete.1.8.15.2\build\native\hdf5-v120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\boost_chrono-vc120.1.59.0.0\build\native\boost_chrono-vc120.targets" Condition="Exists('$(NUGET_PACKAGES)\boost_chrono-vc120.1.59.0.0\build\native\boost_chrono-vc120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets" Condition="Exists('$(NUGET_PACKAGES)\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\boost_filesystem-vc120.1.59.0.0\build\native\boost_filesystem-vc120.targets" Condition="Exists('$(NUGET_PACKAGES)\boost_filesystem-vc120.1.59.0.0\build\native\boost_filesystem-vc120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\boost_system-vc120.1.59.0.0\build\native\boost_system-vc120.targets" Condition="Exists('$(NUGET_PACKAGES)\boost_system-vc120.1.59.0.0\build\native\boost_system-vc120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\boost.1.59.0.0\build\native\boost.targets" Condition="Exists('$(NUGET_PACKAGES)\boost.1.59.0.0\build\native\boost.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\boost_thread-vc120.1.59.0.0\build\native\boost_thread-vc120.targets" Condition="Exists('$(NUGET_PACKAGES)\boost_thread-vc120.1.59.0.0\build\native\boost_thread-vc120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\boost_python2.7-vc120.1.59.0.0\build\native\boost_python-vc120.targets" Condition="Exists('$(NUGET_PACKAGES)\boost_python2.7-vc120.1.59.0.0\build\native\boost_python-vc120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\gflags.2.1.2.1\build\native\gflags.targets" Condition="Exists('$(NUGET_PACKAGES)\gflags.2.1.2.1\build\native\gflags.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\glog.0.3.3.0\build\native\glog.targets" Condition="Exists('$(NUGET_PACKAGES)\glog.0.3.3.0\build\native\glog.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\protobuf-v120.2.6.1\build\native\protobuf-v120.targets" Condition="Exists('$(NUGET_PACKAGES)\protobuf-v120.2.6.1\build\native\protobuf-v120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets" Condition="Exists('$(NUGET_PACKAGES)\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets')" />
+    <Import Project="$(NUGET_PACKAGES)\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets" Condition="Exists('$(NUGET_PACKAGES)\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\OpenBLAS.0.2.14.1\build\native\openblas.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\OpenBLAS.0.2.14.1\build\native\openblas.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\OpenCV.2.4.11\build\native\OpenCV.props')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\OpenCV.2.4.11\build\native\OpenCV.props'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\OpenCV.2.4.11\build\native\OpenCV.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\OpenCV.2.4.11\build\native\OpenCV.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\hdf5-v120-complete.1.8.15.2\build\native\hdf5-v120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\hdf5-v120-complete.1.8.15.2\build\native\hdf5-v120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\boost_chrono-vc120.1.59.0.0\build\native\boost_chrono-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\boost_chrono-vc120.1.59.0.0\build\native\boost_chrono-vc120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\boost_filesystem-vc120.1.59.0.0\build\native\boost_filesystem-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\boost_filesystem-vc120.1.59.0.0\build\native\boost_filesystem-vc120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\boost_system-vc120.1.59.0.0\build\native\boost_system-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\boost_system-vc120.1.59.0.0\build\native\boost_system-vc120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\boost.1.59.0.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\boost.1.59.0.0\build\native\boost.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\boost_thread-vc120.1.59.0.0\build\native\boost_thread-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\boost_thread-vc120.1.59.0.0\build\native\boost_thread-vc120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\boost_python2.7-vc120.1.59.0.0\build\native\boost_python-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\boost_python2.7-vc120.1.59.0.0\build\native\boost_python-vc120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\gflags.2.1.2.1\build\native\gflags.props')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\gflags.2.1.2.1\build\native\gflags.props'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\gflags.2.1.2.1\build\native\gflags.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\gflags.2.1.2.1\build\native\gflags.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\glog.0.3.3.0\build\native\glog.props')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\glog.0.3.3.0\build\native\glog.props'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\glog.0.3.3.0\build\native\glog.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\glog.0.3.3.0\build\native\glog.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\protobuf-v120.2.6.1\build\native\protobuf-v120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\protobuf-v120.2.6.1\build\native\protobuf-v120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets'))" />
+    <Error Condition="!Exists('$(NUGET_PACKAGES)\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(NUGET_PACKAGES)\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets'))" />
+  </Target>
+</Project>

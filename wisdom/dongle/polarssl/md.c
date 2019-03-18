@@ -71,13 +71,11 @@ static const int supported_digests[] = {
         0
 };
 
-const int *md_list( void )
-{
+const int *md_list( void ) {
     return supported_digests;
 }
 
-const md_info_t *md_info_from_string( const char *md_name )
-{
+const md_info_t *md_info_from_string( const char *md_name ) {
     if( NULL == md_name )
         return NULL;
 
@@ -113,10 +111,8 @@ const md_info_t *md_info_from_string( const char *md_name )
     return NULL;
 }
 
-const md_info_t *md_info_from_type( md_type_t md_type )
-{
-    switch( md_type )
-    {
+const md_info_t *md_info_from_type( md_type_t md_type ) {
+    switch( md_type ) {
 #if defined(POLARSSL_MD2_C)
         case POLARSSL_MD_MD2:
             return &md2_info;
@@ -150,8 +146,7 @@ const md_info_t *md_info_from_type( md_type_t md_type )
     }
 }
 
-int md_init_ctx( md_context_t *ctx, const md_info_t *md_info )
-{
+int md_init_ctx( md_context_t *ctx, const md_info_t *md_info ) {
     if( md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -168,8 +163,7 @@ int md_init_ctx( md_context_t *ctx, const md_info_t *md_info )
     return 0;
 }
 
-int md_free_ctx( md_context_t *ctx )
-{
+int md_free_ctx( md_context_t *ctx ) {
     if( ctx == NULL || ctx->md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -179,8 +173,7 @@ int md_free_ctx( md_context_t *ctx )
     return 0;
 }
 
-int md_starts( md_context_t *ctx )
-{
+int md_starts( md_context_t *ctx ) {
     if( ctx == NULL || ctx->md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -189,8 +182,7 @@ int md_starts( md_context_t *ctx )
     return 0;
 }
 
-int md_update( md_context_t *ctx, const unsigned char *input, size_t ilen )
-{
+int md_update( md_context_t *ctx, const unsigned char *input, size_t ilen ) {
     if( ctx == NULL || ctx->md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -199,8 +191,7 @@ int md_update( md_context_t *ctx, const unsigned char *input, size_t ilen )
     return 0;
 }
 
-int md_finish( md_context_t *ctx, unsigned char *output )
-{
+int md_finish( md_context_t *ctx, unsigned char *output ) {
     if( ctx == NULL || ctx->md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -210,8 +201,7 @@ int md_finish( md_context_t *ctx, unsigned char *output )
 }
 
 int md( const md_info_t *md_info, const unsigned char *input, size_t ilen,
-            unsigned char *output )
-{
+            unsigned char *output ) {
     if ( md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -220,8 +210,7 @@ int md( const md_info_t *md_info, const unsigned char *input, size_t ilen,
     return 0;
 }
 
-int md_file( const md_info_t *md_info, const char *path, unsigned char *output )
-{
+int md_file( const md_info_t *md_info, const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     int ret;
 #endif
@@ -243,8 +232,7 @@ int md_file( const md_info_t *md_info, const char *path, unsigned char *output )
 #endif
 }
 
-int md_hmac_starts( md_context_t *ctx, const unsigned char *key, size_t keylen )
-{
+int md_hmac_starts( md_context_t *ctx, const unsigned char *key, size_t keylen ) {
     if( ctx == NULL || ctx->md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -253,8 +241,7 @@ int md_hmac_starts( md_context_t *ctx, const unsigned char *key, size_t keylen )
     return 0;
 }
 
-int md_hmac_update( md_context_t *ctx, const unsigned char *input, size_t ilen )
-{
+int md_hmac_update( md_context_t *ctx, const unsigned char *input, size_t ilen ) {
     if( ctx == NULL || ctx->md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -263,8 +250,7 @@ int md_hmac_update( md_context_t *ctx, const unsigned char *input, size_t ilen )
     return 0;
 }
 
-int md_hmac_finish( md_context_t *ctx, unsigned char *output)
-{
+int md_hmac_finish( md_context_t *ctx, unsigned char *output) {
     if( ctx == NULL || ctx->md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -273,8 +259,7 @@ int md_hmac_finish( md_context_t *ctx, unsigned char *output)
     return 0;
 }
 
-int md_hmac_reset( md_context_t *ctx )
-{
+int md_hmac_reset( md_context_t *ctx ) {
     if( ctx == NULL || ctx->md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 
@@ -285,8 +270,7 @@ int md_hmac_reset( md_context_t *ctx )
 
 int md_hmac( const md_info_t *md_info, const unsigned char *key, size_t keylen,
                 const unsigned char *input, size_t ilen,
-                unsigned char *output )
-{
+                unsigned char *output ) {
     if( md_info == NULL )
         return POLARSSL_ERR_MD_BAD_INPUT_DATA;
 

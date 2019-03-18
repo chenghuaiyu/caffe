@@ -14,7 +14,27 @@ using caffe::Net;
 using caffe::LabelMap;
 
 using namespace std;
- 
+
+struct MyRect {
+	int left;
+	int top;
+	int right;
+	int bottom;
+	MyRect(int l, int t, int r, int b) {
+		left = l;
+		top = t;
+		right = r;
+		bottom = b;
+	}
+};
+
+struct MyImgRes {
+	string strImgname;
+	int width;
+	int height;
+	std::map<std::string, std::vector<std::pair<MyRect, int>>> mapObject;
+};
+
  typedef struct {
    float label;
    float score;

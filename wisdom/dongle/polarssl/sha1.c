@@ -64,8 +64,7 @@
 /*
  * SHA-1 context setup
  */
-void sha1_starts( sha1_context *ctx )
-{
+void sha1_starts( sha1_context *ctx ) {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
 
@@ -76,8 +75,7 @@ void sha1_starts( sha1_context *ctx )
     ctx->state[4] = 0xC3D2E1F0;
 }
 
-static void sha1_process( sha1_context *ctx, const unsigned char data[64] )
-{
+static void sha1_process( sha1_context *ctx, const unsigned char data[64] ) {
     unsigned long temp, W[16], A, B, C, D, E;
 
     GET_ULONG_BE( W[ 0], data,  0 );
@@ -235,8 +233,7 @@ static void sha1_process( sha1_context *ctx, const unsigned char data[64] )
 /*
  * SHA-1 process buffer
  */
-void sha1_update( sha1_context *ctx, const unsigned char *input, size_t ilen )
-{
+void sha1_update( sha1_context *ctx, const unsigned char *input, size_t ilen ) {
     size_t fill;
     unsigned long left;
 
@@ -252,8 +249,7 @@ void sha1_update( sha1_context *ctx, const unsigned char *input, size_t ilen )
     if( ctx->total[0] < (unsigned long) ilen )
         ctx->total[1]++;
 
-    if( left && ilen >= fill )
-    {
+    if( left && ilen >= fill ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, fill );
         sha1_process( ctx, ctx->buffer );
@@ -262,15 +258,13 @@ void sha1_update( sha1_context *ctx, const unsigned char *input, size_t ilen )
         left = 0;
     }
 
-    while( ilen >= 64 )
-    {
+    while( ilen >= 64 ) {
         sha1_process( ctx, input );
         input += 64;
         ilen  -= 64;
     }
 
-    if( ilen > 0 )
-    {
+    if( ilen > 0 ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, ilen );
     }
@@ -287,8 +281,7 @@ static const unsigned char sha1_padding[64] =
 /*
  * SHA-1 final digest
  */
-void sha1_finish( sha1_context *ctx, unsigned char output[20] )
-{
+void sha1_finish( sha1_context *ctx, unsigned char output[20] ) {
     unsigned long last, padn;
     unsigned long high, low;
     unsigned char msglen[8];
@@ -316,8 +309,7 @@ void sha1_finish( sha1_context *ctx, unsigned char output[20] )
 /*
  * output = SHA-1( input buffer )
  */
-void sha1( const unsigned char *input, size_t ilen, unsigned char output[20] )
-{
+void sha1( const unsigned char *input, size_t ilen, unsigned char output[20] ) {
     sha1_context ctx;
 
     sha1_starts( &ctx );
@@ -331,8 +323,7 @@ void sha1( const unsigned char *input, size_t ilen, unsigned char output[20] )
 /*
  * output = SHA-1( file contents )
  */
-int sha1_file( const char *path, unsigned char output[20] )
-{
+int sha1_file( const char *path, unsigned char output[20] ) {
     FILE *f;
     size_t n;
     sha1_context ctx;
@@ -350,8 +341,7 @@ int sha1_file( const char *path, unsigned char output[20] )
 
     memset( &ctx, 0, sizeof( sha1_context ) );
 
-    if( ferror( f ) != 0 )
-    {
+    if( ferror( f ) != 0 ) {
         fclose( f );
         return( POLARSSL_ERR_SHA1_FILE_IO_ERROR );
     }
@@ -364,13 +354,11 @@ int sha1_file( const char *path, unsigned char output[20] )
 /*
  * SHA-1 HMAC context setup
  */
-void sha1_hmac_starts( sha1_context *ctx, const unsigned char *key, size_t keylen )
-{
+void sha1_hmac_starts( sha1_context *ctx, const unsigned char *key, size_t keylen ) {
     size_t i;
     unsigned char sum[20];
 
-    if( keylen > 64 )
-    {
+    if( keylen > 64 ) {
         sha1( key, keylen, sum );
         keylen = 20;
         key = sum;
@@ -379,8 +367,7 @@ void sha1_hmac_starts( sha1_context *ctx, const unsigned char *key, size_t keyle
     memset( ctx->ipad, 0x36, 64 );
     memset( ctx->opad, 0x5C, 64 );
 
-    for( i = 0; i < keylen; i++ )
-    {
+    for( i = 0; i < keylen; i++ ) {
         ctx->ipad[i] = (unsigned char)( ctx->ipad[i] ^ key[i] );
         ctx->opad[i] = (unsigned char)( ctx->opad[i] ^ key[i] );
     }
@@ -394,16 +381,14 @@ void sha1_hmac_starts( sha1_context *ctx, const unsigned char *key, size_t keyle
 /*
  * SHA-1 HMAC process buffer
  */
-void sha1_hmac_update( sha1_context *ctx, const unsigned char *input, size_t ilen )
-{
+void sha1_hmac_update( sha1_context *ctx, const unsigned char *input, size_t ilen ) {
     sha1_update( ctx, input, ilen );
 }
 
 /*
  * SHA-1 HMAC final digest
  */
-void sha1_hmac_finish( sha1_context *ctx, unsigned char output[20] )
-{
+void sha1_hmac_finish( sha1_context *ctx, unsigned char output[20] ) {
     unsigned char tmpbuf[20];
 
     sha1_finish( ctx, tmpbuf );
@@ -418,8 +403,7 @@ void sha1_hmac_finish( sha1_context *ctx, unsigned char output[20] )
 /*
  * SHA1 HMAC context reset
  */
-void sha1_hmac_reset( sha1_context *ctx )
-{
+void sha1_hmac_reset( sha1_context *ctx ) {
     sha1_starts( ctx );
     sha1_update( ctx, ctx->ipad, 64 );
 }
@@ -429,8 +413,7 @@ void sha1_hmac_reset( sha1_context *ctx )
  */
 void sha1_hmac( const unsigned char *key, size_t keylen,
                 const unsigned char *input, size_t ilen,
-                unsigned char output[20] )
-{
+                unsigned char output[20] ) {
     sha1_context ctx;
 
     sha1_hmac_starts( &ctx, key, keylen );
@@ -535,8 +518,7 @@ static const unsigned char sha1_hmac_test_sum[7][20] =
 /*
  * Checkup routine
  */
-int sha1_self_test( int verbose )
-{
+int sha1_self_test( int verbose ) {
     int i, j, buflen;
     unsigned char buf[1024];
     unsigned char sha1sum[20];
@@ -545,15 +527,13 @@ int sha1_self_test( int verbose )
     /*
      * SHA-1
      */
-    for( i = 0; i < 3; i++ )
-    {
+    for( i = 0; i < 3; i++ ) {
         if( verbose != 0 )
             printf( "  SHA-1 test #%d: ", i + 1 );
 
         sha1_starts( &ctx );
 
-        if( i == 2 )
-        {
+        if( i == 2 ) {
             memset( buf, 'a', buflen = 1000 );
 
             for( j = 0; j < 1000; j++ )
@@ -565,8 +545,7 @@ int sha1_self_test( int verbose )
 
         sha1_finish( &ctx, sha1sum );
 
-        if( memcmp( sha1sum, sha1_test_sum[i], 20 ) != 0 )
-        {
+        if( memcmp( sha1sum, sha1_test_sum[i], 20 ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 
@@ -580,13 +559,11 @@ int sha1_self_test( int verbose )
     if( verbose != 0 )
         printf( "\n" );
 
-    for( i = 0; i < 7; i++ )
-    {
+    for( i = 0; i < 7; i++ ) {
         if( verbose != 0 )
             printf( "  HMAC-SHA-1 test #%d: ", i + 1 );
 
-        if( i == 5 || i == 6 )
-        {
+        if( i == 5 || i == 6 ) {
             memset( buf, '\xAA', buflen = 80 );
             sha1_hmac_starts( &ctx, buf, buflen );
         }
@@ -601,8 +578,7 @@ int sha1_self_test( int verbose )
 
         buflen = ( i == 4 ) ? 12 : 20;
 
-        if( memcmp( sha1sum, sha1_hmac_test_sum[i], buflen ) != 0 )
-        {
+        if( memcmp( sha1sum, sha1_hmac_test_sum[i], buflen ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 

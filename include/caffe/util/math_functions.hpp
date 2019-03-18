@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <cmath>  // for std::fabs and std::signbit
 
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include "glog/logging.h"
 
 #include "caffe/common.hpp"

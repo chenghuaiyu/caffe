@@ -19,12 +19,10 @@
 
 ChaspMapEntry::ChaspMapEntry()
     : m_ulCount(0),
-      m_pKey(NULL)
-{
+      m_pKey(NULL) {
 }
 
-ChaspMapEntry::~ChaspMapEntry()
-{
+ChaspMapEntry::~ChaspMapEntry() {
 }
 
 
@@ -41,8 +39,7 @@ const hasp_u32_t ChaspMapImpl::m_ulInitCapacity = 0xFFFF;
 ////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 ////////////////////////////////////////////////////////////////////
-ChaspMapImpl::ChaspMapImpl()
-{
+ChaspMapImpl::ChaspMapImpl() {
     DIAG_TRACE("ChaspMapImpl::ChaspMapImpl\n");
 
     DIAG_ASSERT(m_lock.isInit());
@@ -56,14 +53,12 @@ ChaspMapImpl::ChaspMapImpl()
     m_map.push_back(dummy);
 }
 
-ChaspMapImpl::~ChaspMapImpl()
-{
+ChaspMapImpl::~ChaspMapImpl() {
     DIAG_TRACE("ChaspMapImpl::~ChaspMapImpl\n");
 
     for (std::vector<ChaspMapEntry>::iterator it = m_map.begin();
          it != m_map.end(); 
-         it++)
-    {
+         it++) {
         DIAG_ASSERT(it->m_pKey == NULL);
         while (it->m_pKey)
             it->m_pKey->release();
@@ -85,8 +80,7 @@ bool ChaspMapImpl::addRef(ChaspHandle& handle) const
         return false;
 
     bool bResult = false;
-    if (m_map.size() > handle.m_ulIndex)
-    {
+    if (m_map.size() > handle.m_ulIndex) {
         const ChaspMapEntry& entry = m_map[handle.m_ulIndex];
         if ((entry.m_ulCount == handle.m_ulCount) &&
             (NULL != entry.m_pKey))
@@ -101,8 +95,7 @@ bool ChaspMapImpl::addRef(ChaspHandle& handle) const
 //
 ////////////////////////////////////////////////////////////////////
 bool ChaspMapImpl::createKey(hasp_u32_t feature, 
-                             ChaspHandle& handle)
-{
+                             ChaspHandle& handle) {
     handle.clear();
     DIAG_ASSERT(handle.isNull());
 
@@ -111,18 +104,15 @@ bool ChaspMapImpl::createKey(hasp_u32_t feature,
 
     ChaspImpl* pKey = DIAG_NEW ChaspImpl(feature, handle);
 
-    for (hasp_u32_t ulIndex = 1; m_map.size() > ulIndex; ulIndex++)
-    {
-        if (NULL == m_map[ulIndex].m_pKey)  
-        {
+    for (hasp_u32_t ulIndex = 1; m_map.size() > ulIndex; ulIndex++) {
+        if (NULL == m_map[ulIndex].m_pKey) {
             handle.m_ulIndex = ulIndex;
             handle.m_ulCount = m_map[ulIndex].m_ulCount;
             break;
         }
     }
 
-    if (0 == handle.m_ulIndex)
-    {
+    if (0 == handle.m_ulIndex) {
         m_map.push_back(ChaspMapEntry());
         handle.m_ulIndex = static_cast<hasp_u32_t>(m_map.size() - 1);
     }
@@ -136,18 +126,15 @@ bool ChaspMapImpl::createKey(hasp_u32_t feature,
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-hasp_u32_t ChaspMapImpl::findKey(const ChaspImpl* pKey)
-{
+hasp_u32_t ChaspMapImpl::findKey(const ChaspImpl* pKey) {
     hasp_u32_t ulFound = 0;
 
     DIAG_ASSERT(NULL != pKey);
     if ((NULL == pKey) || !lockMap())
         return ulFound;
 
-    for (hasp_u32_t ulIndex = 1; m_map.size() > ulIndex; ulIndex++)
-    {
-        if (m_map[ulIndex].m_pKey == pKey)
-        {
+    for (hasp_u32_t ulIndex = 1; m_map.size() > ulIndex; ulIndex++) {
+        if (m_map[ulIndex].m_pKey == pKey) {
             ulFound = ulIndex;
             break;
         }
@@ -194,12 +181,10 @@ bool ChaspMapImpl::release(ChaspHandle& handle) const
     bool bResult = false;
 
     DIAG_ASSERT(m_map.size() > handle.m_ulIndex);
-    if (m_map.size() > handle.m_ulIndex)
-    {
+    if (m_map.size() > handle.m_ulIndex) {
         const ChaspMapEntry& entry = m_map[handle.m_ulIndex];
 
-        if (entry.m_ulCount == handle.m_ulCount)
-        {
+        if (entry.m_ulCount == handle.m_ulCount) {
             DIAG_ASSERT(NULL != entry.m_pKey);
             bResult = (NULL == entry.m_pKey) ? 
                         true : entry.m_pKey->release();
@@ -216,17 +201,14 @@ bool ChaspMapImpl::release(ChaspHandle& handle) const
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspMapImpl::removeKey(const ChaspImpl* pKey)
-{
+bool ChaspMapImpl::removeKey(const ChaspImpl* pKey) {
     if (NULL == pKey)
         return true;
 
     for (std::vector<ChaspMapEntry>::iterator it = m_map.begin();
          it != m_map.end(); 
-         it++)
-    {
-        if (it->m_pKey == pKey)
-        {
+         it++) {
+        if (it->m_pKey == pKey) {
             it->m_ulCount++;
             it->m_pKey = NULL;
             return true;
@@ -260,14 +242,12 @@ bool ChaspMapImpl::unlockMap() const
 ////////////////////////////////////////////////////////////////////
 
 ChaspMap::ChaspMap()
-    : m_bLocked(false)
-{
+    : m_bLocked(false) {
     m_bLocked = map().lockMap();
     DIAG_ASSERT(m_bLocked);
 }
 
-ChaspMap::~ChaspMap()
-{
+ChaspMap::~ChaspMap() {
     if (m_bLocked)
         DIAG_VERIFY(map().unlockMap());
 }
@@ -279,24 +259,21 @@ ChaspMap::~ChaspMap()
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspMap::addRef(ChaspHandle& handle)
-{
+bool ChaspMap::addRef(ChaspHandle& handle) {
     return map().addRef(handle);
 }
 
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspMap::createKey(hasp_u32_t feature, ChaspHandle& handle)
-{
+bool ChaspMap::createKey(hasp_u32_t feature, ChaspHandle& handle) {
     return map().createKey(feature, handle);
 }
 
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-hasp_u32_t ChaspMap::findKey(const ChaspImpl* pKey)
-{
+hasp_u32_t ChaspMap::findKey(const ChaspImpl* pKey) {
     return map().findKey(pKey);
 }
 
@@ -312,8 +289,7 @@ ChaspImpl* ChaspMap::getKey(const ChaspHandle& handle) const
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-ChaspMapImpl& ChaspMap::map()
-{
+ChaspMapImpl& ChaspMap::map() {
     static ChaspMapImpl _theMap; // It's a Meyer's singleton. The constructor is called at the first call.
     return _theMap;
 }
@@ -321,15 +297,13 @@ ChaspMapImpl& ChaspMap::map()
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspMap::release(ChaspHandle& handle)
-{
+bool ChaspMap::release(ChaspHandle& handle) {
     return map().release(handle);
 }
 
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-bool ChaspMap::removeKey(const ChaspImpl* pKey)
-{
+bool ChaspMap::removeKey(const ChaspImpl* pKey) {
     return map().removeKey(pKey);
 }

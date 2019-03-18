@@ -272,8 +272,7 @@ typedef hasp_status_t haspStatus;
 // Helpers
 ////////////////////////////////////////////////////////////////////
 template<typename _Type>
-__inline bool HASP_SUCCEEDED(_Type status)
-    { return HASP_STATUS_OK == static_cast<haspStatus>(status); }
+__inline bool HASP_SUCCEEDED(_Type status) { return HASP_STATUS_OK == static_cast<haspStatus>(status); }
 
 
 ////////////////////////////////////////////////////////////////////
@@ -390,8 +389,7 @@ public:
 //! Decrypts the provided data
 ////////////////////////////////////////////////////////////////////
 template<typename _Class, typename _Type>
-__inline haspStatus HaspDecrypt(const _Class& hasp, _Type* pData)
-{
+__inline haspStatus HaspDecrypt(const _Class& hasp, _Type* pData) {
     return (NULL == pData) ?
                 HASP_INVALID_PARAMETER :
                 hasp.decrypt(reinterpret_cast<unsigned char*>(pData),
@@ -404,8 +402,7 @@ __inline haspStatus HaspDecrypt(const _Class& hasp, _Type* pData)
 ////////////////////////////////////////////////////////////////////
 template<typename _Class, typename _Type>
 __inline haspStatus HaspDecrypt(const _Class& hasp,
-                                std::vector<_Type>& vector)
-{
+                                std::vector<_Type>& vector) {
     return vector.empty() ?
                 HASP_STATUS_OK :
                 hasp.decrypt(reinterpret_cast<unsigned char*>(&vector[0]),
@@ -416,8 +413,7 @@ __inline haspStatus HaspDecrypt(const _Class& hasp,
 //! Encrypts the provided data
 ////////////////////////////////////////////////////////////////////
 template<typename _Class, typename _Type>
-__inline haspStatus HaspEncrypt(const _Class& hasp, _Type* pData)
-{
+__inline haspStatus HaspEncrypt(const _Class& hasp, _Type* pData) {
     return (NULL == pData) ?
                 HASP_INVALID_PARAMETER :
                 hasp.encrypt(reinterpret_cast<unsigned char*>(pData),
@@ -429,8 +425,7 @@ __inline haspStatus HaspEncrypt(const _Class& hasp, _Type* pData)
 ////////////////////////////////////////////////////////////////////
 template<typename _Class, typename _Type>
 __inline haspStatus HaspEncrypt(const _Class& hasp,
-                                std::vector<_Type>& vector)
-{
+                                std::vector<_Type>& vector) {
     return vector.empty() ?
                 HASP_STATUS_OK :
                 hasp.encrypt(reinterpret_cast<unsigned char*>(&vector[0]),
@@ -510,8 +505,7 @@ protected:
 //! Reads data from the current position.
 ////////////////////////////////////////////////////////////////////
 template<typename _Type>
-__inline haspStatus HaspRead(const ChaspFile& file, _Type& data)
-{
+__inline haspStatus HaspRead(const ChaspFile& file, _Type& data) {
     return file.read(reinterpret_cast<unsigned char*>(&data),
                      sizeof(_Type));
 }
@@ -528,8 +522,7 @@ __inline haspStatus HaspRead(const ChaspFile& file, _Type& data)
 template<typename _Container>
 __inline haspStatus HaspRead(const ChaspFile& file,
                              std::back_insert_iterator<_Container> iter,
-                             hasp_size_t ulCount)
-{
+                             hasp_size_t ulCount) {
     if (0 == ulCount)
         return HASP_STATUS_OK;
 
@@ -552,8 +545,7 @@ __inline haspStatus HaspRead(const ChaspFile& file,
 //! Writes the data into the key.
 ////////////////////////////////////////////////////////////////////
 template<typename _Type>
-__inline haspStatus HaspWrite(const ChaspFile& file, const _Type& data)
-{
+__inline haspStatus HaspWrite(const ChaspFile& file, const _Type& data) {
     return file.write(reinterpret_cast<const unsigned char*>(&data),
                       sizeof(_Type));
 }
@@ -566,8 +558,7 @@ __inline haspStatus HaspWrite(const ChaspFile& file, const _Type& data)
 template<typename _Type, typename _Iter>
 __inline haspStatus HaspWrite(const ChaspFile& file,
                               _Iter first,
-                              _Iter last)
-{
+                              _Iter last) {
     std::vector<_Type> vector;
     std::copy(first, last, std::back_inserter(vector));
 

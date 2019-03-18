@@ -4,6 +4,7 @@ namespace bp = boost::python;
 #endif
 
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 
 #include <cstring>

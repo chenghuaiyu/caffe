@@ -109,15 +109,13 @@
 //! \a ulFeature.
 ////////////////////////////////////////////////////////////////////
 ChaspFeature::ChaspFeature(hasp_u32_t ulFeature)
-    : m_ulFeature(ulFeature)
-{
+    : m_ulFeature(ulFeature) {
 }
 
 ////////////////////////////////////////////////////////////////////
 //! Destroys the object.
 ////////////////////////////////////////////////////////////////////
-ChaspFeature::~ChaspFeature()
-{
+ChaspFeature::~ChaspFeature() {
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -127,8 +125,7 @@ ChaspFeature::~ChaspFeature()
 ////////////////////////////////////////////////////////////////////
 //!
 ////////////////////////////////////////////////////////////////////
-ChaspFeature ChaspFeature::defaultFeature()
-{
+ChaspFeature ChaspFeature::defaultFeature() {
     return ChaspFeature(HASP_DEFAULT_FID);
 }
 
@@ -168,8 +165,7 @@ hasp_u32_t ChaspFeature::featureId() const
 //!                             If the feature is a program number
 //!                             the default feature will be returned
 ////////////////////////////////////////////////////////////////////
-ChaspFeature ChaspFeature::fromFeature(hasp_u32_t ulFeature)
-{
+ChaspFeature ChaspFeature::fromFeature(hasp_u32_t ulFeature) {
     if (HASP_PROGNUM_FEATURETYPE == (ulFeature & HASP_FEATURETYPE_MASK))
         return ChaspFeature::defaultFeature();
     
@@ -185,8 +181,7 @@ ChaspFeature ChaspFeature::fromFeature(hasp_u32_t ulFeature)
 //! \return                     A feature class for a Hasp4 program 
 //!                             number.
 ////////////////////////////////////////////////////////////////////
-ChaspFeature ChaspFeature::fromProgNum(hasp_u32_t ulProgNum)
-{
+ChaspFeature ChaspFeature::fromProgNum(hasp_u32_t ulProgNum) {
     ulProgNum &= HASP_PROGNUM_MASK;
     return ChaspFeature(HASP_PROGNUM_FEATURETYPE|ulProgNum);
 }
@@ -241,8 +236,7 @@ bool ChaspFeature::isProgNum() const
 ////////////////////////////////////////////////////////////////////
 //!
 ////////////////////////////////////////////////////////////////////
-ChaspFeature ChaspFeature::progNumDefault()
-{
+ChaspFeature ChaspFeature::progNumDefault() {
     return ChaspFeature(HASP_PROGNUM_DEFAULT_FID);
 }
 
@@ -258,19 +252,16 @@ ChaspFeature ChaspFeature::progNumDefault()
 //! \note                       The method always returns \a false 
 //!                             if the feature is HASP protection key feature.
 ////////////////////////////////////////////////////////////////////
-bool ChaspFeature::setOptions(hasp_u32_t ulAdd, hasp_u32_t ulRemove)
-{
+bool ChaspFeature::setOptions(hasp_u32_t ulAdd, hasp_u32_t ulRemove) {
     if (!isProgNum())
         return false;
 
-    if (optNotRemote == (ulAdd & optNotRemote))
-    {
+    if (optNotRemote == (ulAdd & optNotRemote)) {
         ulAdd &= ~optNotLocal;
         ulRemove |= optNotLocal;
     }
 
-    if (optNotLocal == (ulAdd & optNotLocal))
-    {
+    if (optNotLocal == (ulAdd & optNotLocal)) {
         ulAdd &= ~optNotRemote;
         ulRemove |= optNotRemote;
     }

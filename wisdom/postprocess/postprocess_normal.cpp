@@ -13,6 +13,7 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h> 
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -43,12 +44,10 @@ using namespace std;
 using namespace cv;
 
 
-vector<DETECT_BOX_S> postprocess_normal(vector<DETECT_BOX_S> retbox)
-{
+vector<DETECT_BOX_S> postprocess_normal(vector<DETECT_BOX_S> retbox) {
     vector<DETECT_BOX_S> savebox;
     
-    for (int i = 0; i < retbox.size(); i++)
-    {
+    for (int i = 0; i < retbox.size(); i++) {
         if (retbox[i].x < 0) retbox[i].x = 0;
         if (retbox[i].y < 0) retbox[i].y = 0;
         if (retbox[i].w < 0) retbox[i].w = 0;

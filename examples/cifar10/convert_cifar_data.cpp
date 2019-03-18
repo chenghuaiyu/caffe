@@ -10,6 +10,7 @@
 #include <string>
 
 #include "boost/scoped_ptr.hpp"
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include "glog/logging.h"
 #include "google/protobuf/text_format.h"
 #include "stdint.h"

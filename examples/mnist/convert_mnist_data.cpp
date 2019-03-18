@@ -7,6 +7,7 @@
 //    http://yann.lecun.com/exdb/mnist/
 
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <google/protobuf/text_format.h>
 

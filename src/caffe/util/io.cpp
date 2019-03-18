@@ -257,8 +257,7 @@ bool MapLabelToName(const LabelMap& map, const bool strict_check,
 				LOG(FATAL) << "There are many duplicates of label: " << label;
 				return false;
 			}
-		}
-		else {
+		} else {
 			(*label_to_name)[label] = name;
 		}
 	}
@@ -279,8 +278,7 @@ bool MapLabelToDisplayName(const LabelMap& map, const bool strict_check,
 				LOG(FATAL) << "There are many duplicates of label: " << label;
 				return false;
 			}
-		}
-		else {
+		} else {
 			(*label_to_display_name)[label] = display_name;
 		}
 	}

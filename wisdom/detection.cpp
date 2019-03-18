@@ -1,5 +1,8 @@
 #ifndef _LINUX_
 #include <io.h>
+//#include <time.h>
+#define NOMINMAX
+#include <windows.h>
 #endif
 #include "boost/algorithm/string.hpp"
 #include "caffe/caffe.hpp"
@@ -15,6 +18,7 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h> 
 #include <gflags/gflags.h>
+//#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -89,51 +93,7 @@ static DETECT_INFO_S g_stInfo;
 #define CONFIG_FILENAME "config/config"
 #define SUBCONFIG_FILENAME "config/subconfig"
 
-#ifdef _WIN32
-	#include <windows.h>
-	#include <tchar.h>
-
-	#ifndef _delayimp_h
-		extern"C"IMAGE_DOS_HEADER __ImageBase;
-	#endif
-
-	char* ConvertLPWSTRToLPSTR(LPWSTR lpwszStrIn)
-	{
-		LPSTR pszOut = NULL;
-		if (lpwszStrIn != NULL)
-		{
-			int nInputStrLen = wcslen(lpwszStrIn);
-
-			// Double NULL Termination
-			int nOutputStrLen = WideCharToMultiByte(CP_ACP, 0, lpwszStrIn, nInputStrLen, NULL, 0, 0, 0) + 2;
-			pszOut = new char[nOutputStrLen];
-
-			if (pszOut)
-			{
-				memset(pszOut, 0x00, nOutputStrLen);
-				WideCharToMultiByte(CP_ACP, 0, lpwszStrIn, nInputStrLen, pszOut, nOutputStrLen, 0, 0);
-			}
-		}
-		return pszOut;
-	}
-	string GetDLLPath()
-	{
-		char *strpath;
-		TCHAR result[MAX_PATH];
-		HMODULE hModule = reinterpret_cast<HMODULE>(&__ImageBase);
-
-		if (GetModuleFileName(hModule, (LPWSTR)result, MAX_PATH))
-		{
-			(_tcsrchr(result, _T('\\')))[1] = 0;
-		}
-		strpath = ConvertLPWSTRToLPSTR(result);
-		return std::string(strpath);
-	}
-#endif
-
-
-int GetConfig(DETECT_INFO_S *pstInfo)
-{
+int GetConfig(DETECT_INFO_S *pstInfo) {
 	int ret;
 	string strDLLPath;
 	string strConfigFilePath;
@@ -152,8 +112,7 @@ int GetConfig(DETECT_INFO_S *pstInfo)
 
 	ret = GetModelInfo(strConfigFilePath, &pstInfo->stMainModel, strDLLPath);
 
-	if (pstInfo->stMainModel.postmode.find("classify") != string::npos)
-	{
+	if (pstInfo->stMainModel.postmode.find("classify") != string::npos) {
 		strSubConfigFilePath.append(SUBCONFIG_FILENAME);
 		ret = GetModelInfo(strSubConfigFilePath, &pstInfo->stSubModel, strDLLPath);
 	}
@@ -164,17 +123,13 @@ int GetConfig(DETECT_INFO_S *pstInfo)
 #if	RSA == RSA_SENTINEL
 
 #elif	RSA == RSA_TENDYRON
-int tendyron(const unsigned char * pucBuf, unsigned long usBufLen, unsigned char ** ppucBufOut)
-{
-	if (NULL == pucBuf || 0 >= usBufLen || NULL == ppucBufOut)
-	{
+int tendyron(const unsigned char * pucBuf, unsigned long usBufLen, unsigned char ** ppucBufOut) {
+	if (NULL == pucBuf || 0 >= usBufLen || NULL == ppucBufOut) {
 		return FAIL;
 	}
 
-	if (NULL == pszReaders)
-	{
-		if (!TDR_GetFirstReaderName(&pszReaders))
-		{
+	if (NULL == pszReaders) {
+		if (!TDR_GetFirstReaderName(&pszReaders)) {
 			return FAIL;
 		}
 	}
@@ -182,8 +137,7 @@ int tendyron(const unsigned char * pucBuf, unsigned long usBufLen, unsigned char
 	unsigned long ulLenOut = 0;
 	unsigned char * pucBufOut = NULL;
 	BOOL bRet = TDR_SendCommand(pszReaders, SCARD_PROTOCOL_T1, ucBuf1, sizeof(ucBuf1), &pucBufOut, &ulLenOut);
-	if (!bRet)
-	{
+	if (!bRet) {
 		return FAIL;
 	}
 	TDR_FreeMemory((void **)&pucBufOut);
@@ -193,15 +147,13 @@ int tendyron(const unsigned char * pucBuf, unsigned long usBufLen, unsigned char
 	memcpy(ucBufIn + sizeof(ucBuf2), pucBuf, usBufLen);
 	//bRet = TDR_SendCommand(pszReaders, SCARD_PROTOCOL_T1, ucBufIn, sizeof(ucBuf2) + usBufLen, &pucBufOut, &ulLenOut);
 	bRet = TDR_SendCommand(pszReaders, SCARD_PROTOCOL_T1, ucBufIn, sizeof(ucBuf2) + 16, &pucBufOut, &ulLenOut);
-	if (!bRet)
-	{
+	if (!bRet) {
 		return FAIL;
 	}
 	TDR_FreeMemory((void **)&pucBufOut);
 
 	bRet = TDR_SendCommand(pszReaders, SCARD_PROTOCOL_T1, ucBuf3, sizeof(ucBuf3), &pucBufOut, &ulLenOut);
-	if (!bRet)
-	{
+	if (!bRet) {
 		return FAIL;
 	}
 	//TDR_FreeMemory((void **)&pucBufOut);
@@ -212,38 +164,29 @@ int tendyron(const unsigned char * pucBuf, unsigned long usBufLen, unsigned char
 #endif
 
 // Parse GPU ids or use all available devices
-static void get_gpus(vector<int>* gpus, string strgpus)
-{
-    if (strgpus == "all") 
-    {
+static void get_gpus(vector<int>* gpus, string strgpus) {
+    if (strgpus == "all") {
         int count = 0;
 #ifndef CPU_ONLY
         CUDA_CHECK(cudaGetDeviceCount(&count));
 #else
         NO_GPU;
 #endif
-        for (int i = 0; i < count; ++i) 
-        {
+        for (int i = 0; i < count; ++i) {
             gpus->push_back(i);
         }
-    } 
-    else if (strgpus.size())
-    {
+    } else if (strgpus.size()) {
         vector<string> strings;
         boost::split(strings, strgpus, boost::is_any_of(","));
-        for (int i = 0; i < strings.size(); ++i) 
-        {
+        for (int i = 0; i < strings.size(); ++i) {
             gpus->push_back(boost::lexical_cast<int>(strings[i]));
         }
-    } 
-    else 
-    {
+    } else {
         CHECK_EQ(gpus->size(), 0);
     }
 }
 
-int InitModel(MODEL_INFO_S *pstInfo)
-{
+int InitModel(MODEL_INFO_S *pstInfo) {
     // Set device id and mode
     vector<int> gpus;
     get_gpus(&gpus, pstInfo->gpus);
@@ -257,29 +200,24 @@ int InitModel(MODEL_INFO_S *pstInfo)
 #endif
         Caffe::SetDevice(gpus[0]);
         Caffe::set_mode(Caffe::GPU);
-    }
-    else {
+    } else {
         LOG(INFO) << "Use CPU.";
         Caffe::set_mode(Caffe::CPU);
     }
 
     // set caffe
-    if (pstInfo->encry == "none")
-    {
+    if (pstInfo->encry == "none") {
         pstInfo->caffe_net = new Net<float>(pstInfo->model, caffe::TEST);
         pstInfo->caffe_net->CopyTrainedLayersFrom(pstInfo->weight);
         return SUCCESS;
-    }
-    else
-    {
+    } else {
         char* modelbuf;
         char* weightbuf;
         int modellen;
         int weightlen;
 		if (SUCCESS != VimDecrypt(pstInfo->weight.c_str(), &modelbuf, &weightbuf,
                 &modellen, &weightlen, 
-                pstInfo->encry.c_str(), pstInfo->key.c_str()))
-        {
+                pstInfo->encry.c_str(), pstInfo->key.c_str())) {
             return FAIL;
         }
         // load model
@@ -298,29 +236,23 @@ int InitModel(MODEL_INFO_S *pstInfo)
         // Instantiate the caffe net.
         pstInfo->caffe_net = new Net<float>(model_param);
         
-        if (weightbuf)
-        {
+        if (weightbuf) {
             free(weightbuf);
         }
-        if (modelbuf)
-        {
+        if (modelbuf) {
             free(modelbuf);
         }
         
-        if (pstInfo->caffe_net)
-        {
+        if (pstInfo->caffe_net) {
             pstInfo->caffe_net->CopyTrainedLayersFrom(weight_param);
             return SUCCESS;
-        }
-        else
-        {
+        } else {
             return FAIL;
         }
     }
 }
 
-int InitDetector(DETECT_INFO_S *pstInfo)
-{
+int InitDetector(DETECT_INFO_S *pstInfo) {
 	LOG(INFO) << "RSA: " << RSA;
 #if		RSA == RSA_SENTINEL
 	hasp_u32_t FeatureID = 1123u;
@@ -388,34 +320,29 @@ int InitDetector(DETECT_INFO_S *pstInfo)
 #endif
 
     int ret = InitModel(&pstInfo->stMainModel);
-    if (pstInfo->stMainModel.postmode.find("classify") != string::npos)
-    {
+    if (pstInfo->stMainModel.postmode.find("classify") != string::npos) {
         ret = InitModel(&pstInfo->stSubModel);
     }
     
     return ret;
 }
 
-int DetectionInit(char *objectName, char *DeviceName)
-{
+int DetectionInit(char *objectName, char *DeviceName) {
     DETECT_INFO_S *pstInfo = &g_stInfo;
     memset(pstInfo, 0, sizeof(DETECT_INFO_S));
 
     // get config
-    if (GetConfig(pstInfo))
-    {
+    if (GetConfig(pstInfo)) {
         return FAIL;
     }
 
-    if (InitDetector(pstInfo))
-    {
+    if (InitDetector(pstInfo)) {
         return FAIL;
     }
 	return SUCCESS;
 } 
 
-char* DetectionMat(cv::Mat& org_img, int missErrorRatio)
-{
+char* DetectionMat(cv::Mat& org_img, int missErrorRatio) {
     MODEL_INFO_S *pstMainInfo = &g_stInfo.stMainModel;
     MODEL_INFO_S *pstSubInfo = &g_stInfo.stSubModel; 
     MODEL_INFO_S *pstPostInfo = NULL;
@@ -423,13 +350,10 @@ char* DetectionMat(cv::Mat& org_img, int missErrorRatio)
 	vector<DETECT_BOX_S> savebox;
 
 	vector<string> labels;
-	if (pstMainInfo->postmode.find("classify") != string::npos)
-	{
+	if (pstMainInfo->postmode.find("classify") != string::npos) {
 		labels = pstSubInfo->labels;
         pstPostInfo = &g_stInfo.stSubModel; 
-	}
-	else
-	{
+	} else {
 		labels = pstMainInfo->labels;
         pstPostInfo = &g_stInfo.stMainModel; 
 	}
@@ -441,13 +365,11 @@ char* DetectionMat(cv::Mat& org_img, int missErrorRatio)
     tmpfile.height = 0;
     tmpfile.boxes.clear();
                 
-    if (org_img.empty())
-    {
+    if (org_img.empty()) {
         goto out; 
     }
     
-    if (org_img.cols == 0 || org_img.rows == 0)
-    { 
+    if (org_img.cols == 0 || org_img.rows == 0) { 
         goto out; 
     }
     
@@ -458,12 +380,9 @@ char* DetectionMat(cv::Mat& org_img, int missErrorRatio)
 
 	savebox = postprocess(retbox, pstMainInfo->postmode, pstPostInfo, org_img);
 
-    if (savebox.size() == 0)
-    {
+    if (savebox.size() == 0) {
         std::cout << "no box:" << endl;
-    }
-    else
-    {
+    } else {
         tmpfile.boxes.insert(tmpfile.boxes.end(), savebox.begin(), savebox.end());
     }
     
@@ -472,31 +391,25 @@ out:
     return Output(totalfiles, pstMainInfo->outmode, labels);
 }
 
-bool DetectionDraw(cv::Mat& org_img, char* pOutput)
-{
+bool DetectionDraw(cv::Mat& org_img, char* pOutput) {
     MODEL_INFO_S *pstMainInfo = &g_stInfo.stMainModel;
     MODEL_INFO_S *pstSubInfo = &g_stInfo.stSubModel; 
 
     vector<string> labels;
     vector<int> colors;
-    if (pstMainInfo->postmode.find("classify") != string::npos)
-    {
+    if (pstMainInfo->postmode.find("classify") != string::npos) {
 		labels = pstSubInfo->labels;
 		colors = pstSubInfo->colors;
-    }
-    else
-    {
+    } else {
 		labels = pstMainInfo->labels;
 		colors = pstMainInfo->colors;
     }
     
 	vector<DETECT_FILE_S> totalfiles = OutputParse(pOutput, pstMainInfo->outmode, labels);
 
-    for (int i = 0; i < totalfiles.size(); i++)
-    {
+    for (int i = 0; i < totalfiles.size(); i++) {
         vector<DETECT_BOX_S> savebox = totalfiles[i].boxes;
-        for (int j = 0; j < savebox.size(); j++)
-        {
+        for (int j = 0; j < savebox.size(); j++) {
             int label = static_cast<int>(savebox[j].label);
             float score = static_cast<float>(savebox[j].score);
             int color = colors[label];
@@ -519,32 +432,25 @@ bool DetectionDraw(cv::Mat& org_img, char* pOutput)
 #else
 			string chineseLabel;
 			y = (std::max)(cvrect.y - 30, 10);
-			if (labels[label] == "none")
-			{
+			if (labels[label] == "none") {
 				chineseLabel = "异常闯入";
 				paDrawString(org_img, chineseLabel.c_str(), cvPoint(x, y), cvScalar(0, 0, 255), 30, false, false);
 //				y = (std::max)(cvrect.y - 35, 10);
 //				cv::putText(org_img, std::to_string((int)(score)),
 //					cvPoint(x, y), cv::FONT_HERSHEY_PLAIN, 1, cvScalar(255, 0, 0), 1, CV_AA);
-			}
-			else if (labels[label] == "clothe")
-			{
+			} else if (labels[label] == "clothe") {
 				chineseLabel = "未戴头盔";
 				paDrawString(org_img, chineseLabel.c_str(), cvPoint(x, y), cvScalar(255, 0, 0), 30, false, false);
 //				y = (std::max)(cvrect.y - 35, 10);
 //				cv::putText(org_img, std::to_string((int)(score)),
 //					cvPoint(x, y), cv::FONT_HERSHEY_PLAIN, 1, cvScalar(255, 0, 0), 1, CV_AA);
-			}
-			else if (labels[label] == "full")
-			{
+			} else if (labels[label] == "full") {
 				chineseLabel = "正常";
 				paDrawString(org_img, chineseLabel.c_str(), cvPoint(x, y), cvScalar(255, 0, 0), 30, false, false);
 //				y = (std::max)(cvrect.y - 35, 10);
 //				cv::putText(org_img, std::to_string((int)(score)),
 //					cvPoint(x, y), cv::FONT_HERSHEY_PLAIN, 1, cvScalar(255, 0, 0), 1, CV_AA);
-			}
-			else
-				cv::putText(org_img, labels[label] + ' ' + std::to_string((int)(score)),
+			} else cv::putText(org_img, labels[label] + ' ' + std::to_string((int)(score)),
 				cvPoint(x, y), cv::FONT_HERSHEY_PLAIN, 1, cvScalar(255, 0, 0), 1, CV_AA);
 #endif
         }
@@ -553,15 +459,13 @@ bool DetectionDraw(cv::Mat& org_img, char* pOutput)
     return true;
 }
 
-void DetectionSave(string src, string dst, string fn, char* pBox, int savenobox)
-{
+void DetectionSave(string src, string dst, string fn, char* pBox, int savenobox) {
 	MODEL_INFO_S *pstMainInfo = &g_stInfo.stMainModel;
 
 	OutputSave(src, dst, fn, pBox, savenobox, pstMainInfo->outmode);
 }
 
-char* Detection(char *imagesPath, int missErrorRatio)
-{
+char* Detection(char *imagesPath, int missErrorRatio) {
     string dstImagePath;
     string dstImageName;
     std::vector<cv::Mat> input_channels;
@@ -572,13 +476,10 @@ char* Detection(char *imagesPath, int missErrorRatio)
     Net<float> *caffe_net = pstMainInfo->caffe_net;
 
     vector<string> labels;
-	if (pstMainInfo->postmode.find("classify") != string::npos)
-	{
+	if (pstMainInfo->postmode.find("classify") != string::npos) {
 		labels = pstSubInfo->labels;
         pstPostInfo = &g_stInfo.stSubModel; 
-	}
-	else
-	{
+	} else {
 		labels = pstMainInfo->labels;
         pstPostInfo = &g_stInfo.stMainModel; 
 	}
@@ -590,8 +491,7 @@ char* Detection(char *imagesPath, int missErrorRatio)
     int height = input_layer->height();
     
     vector<DETECT_FILE_S> totalfiles;
-    for (int j = 0; j < result.size(); j++)
-    {
+    for (int j = 0; j < result.size(); j++) {
         DETECT_FILE_S tmpfile;
         tmpfile.filename = result[j];
         tmpfile.width = 0;
@@ -605,8 +505,7 @@ char* Detection(char *imagesPath, int missErrorRatio)
         }
         
         cv::Mat org_img = imread(result[j].c_str());
-        if (org_img.cols == 0 || org_img.rows == 0)
-        { 
+        if (org_img.cols == 0 || org_img.rows == 0) { 
             totalfiles.push_back(tmpfile);
             continue;
         }
@@ -685,19 +584,16 @@ char* Detection(char *imagesPath, int missErrorRatio)
     return Output(totalfiles, pstMainInfo->outmode, labels);
 } 
 
-void DetectionUnInit(void)
-{   
+void DetectionUnInit(void) {   
     DETECT_INFO_S *pstInfo = &g_stInfo;
     MODEL_INFO_S *pstMainInfo = &g_stInfo.stMainModel;
     MODEL_INFO_S *pstSubInfo = &g_stInfo.stSubModel;
     
-    if (pstMainInfo->caffe_net)
-    {
+    if (pstMainInfo->caffe_net) {
         delete pstMainInfo->caffe_net;
     }
     
-    if (pstSubInfo->caffe_net)
-    {
+    if (pstSubInfo->caffe_net) {
         delete pstSubInfo->caffe_net;
     }
 #if		RSA == RSA_SENTINEL

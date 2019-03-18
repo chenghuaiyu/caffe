@@ -43,23 +43,19 @@
 
 #if defined(POLARSSL_MD2_C)
 
-static void md2_starts_wrap( void *ctx )
-{
+static void md2_starts_wrap( void *ctx ) {
     md2_starts( (md2_context *) ctx );
 }
 
-static void md2_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+static void md2_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     md2_update( (md2_context *) ctx, input, ilen );
 }
 
-static void md2_finish_wrap( void *ctx, unsigned char *output )
-{
+static void md2_finish_wrap( void *ctx, unsigned char *output ) {
     md2_finish( (md2_context *) ctx, output );
 }
 
-int md2_file_wrap( const char *path, unsigned char *output )
-{
+int md2_file_wrap( const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     return md2_file( path, output );
 #else
@@ -69,33 +65,27 @@ int md2_file_wrap( const char *path, unsigned char *output )
 #endif
 }
 
-static void md2_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen )
-{
+static void md2_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen ) {
     md2_hmac_starts( (md2_context *) ctx, key, keylen );
 }
 
-static void md2_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+static void md2_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     md2_hmac_update( (md2_context *) ctx, input, ilen );
 }
 
-static void md2_hmac_finish_wrap( void *ctx, unsigned char *output )
-{
+static void md2_hmac_finish_wrap( void *ctx, unsigned char *output ) {
     md2_hmac_finish( (md2_context *) ctx, output );
 }
 
-static void md2_hmac_reset_wrap( void *ctx )
-{
+static void md2_hmac_reset_wrap( void *ctx ) {
     md2_hmac_reset( (md2_context *) ctx );
 }
 
-static void * md2_ctx_alloc( void )
-{
+static void * md2_ctx_alloc( void ) {
     return malloc( sizeof( md2_context ) );
 }
 
-static void md2_ctx_free( void *ctx )
-{
+static void md2_ctx_free( void *ctx ) {
     free( ctx );
 }
 
@@ -121,23 +111,19 @@ const md_info_t md2_info = {
 
 #if defined(POLARSSL_MD4_C)
 
-void md4_starts_wrap( void *ctx )
-{
+void md4_starts_wrap( void *ctx ) {
     md4_starts( (md4_context *) ctx );
 }
 
-void md4_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void md4_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     md4_update( (md4_context *) ctx, input, ilen );
 }
 
-void md4_finish_wrap( void *ctx, unsigned char *output )
-{
+void md4_finish_wrap( void *ctx, unsigned char *output ) {
     md4_finish( (md4_context *) ctx, output );
 }
 
-int md4_file_wrap( const char *path, unsigned char *output )
-{
+int md4_file_wrap( const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     return md4_file( path, output );
 #else
@@ -147,33 +133,27 @@ int md4_file_wrap( const char *path, unsigned char *output )
 #endif
 }
 
-void md4_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen )
-{
+void md4_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen ) {
     md4_hmac_starts( (md4_context *) ctx, key, keylen );
 }
 
-void md4_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void md4_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     md4_hmac_update( (md4_context *) ctx, input, ilen );
 }
 
-void md4_hmac_finish_wrap( void *ctx, unsigned char *output )
-{
+void md4_hmac_finish_wrap( void *ctx, unsigned char *output ) {
     md4_hmac_finish( (md4_context *) ctx, output );
 }
 
-void md4_hmac_reset_wrap( void *ctx )
-{
+void md4_hmac_reset_wrap( void *ctx ) {
     md4_hmac_reset( (md4_context *) ctx );
 }
 
-void *md4_ctx_alloc( void )
-{
+void *md4_ctx_alloc( void ) {
     return malloc( sizeof( md4_context ) );
 }
 
-void md4_ctx_free( void *ctx )
-{
+void md4_ctx_free( void *ctx ) {
     free( ctx );
 }
 
@@ -199,23 +179,19 @@ const md_info_t md4_info = {
 
 #if defined(POLARSSL_MD5_C)
 
-static void md5_starts_wrap( void *ctx )
-{
+static void md5_starts_wrap( void *ctx ) {
     md5_starts( (md5_context *) ctx );
 }
 
-static void md5_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+static void md5_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     md5_update( (md5_context *) ctx, input, ilen );
 }
 
-static void md5_finish_wrap( void *ctx, unsigned char *output )
-{
+static void md5_finish_wrap( void *ctx, unsigned char *output ) {
     md5_finish( (md5_context *) ctx, output );
 }
 
-int md5_file_wrap( const char *path, unsigned char *output )
-{
+int md5_file_wrap( const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     return md5_file( path, output );
 #else
@@ -225,33 +201,27 @@ int md5_file_wrap( const char *path, unsigned char *output )
 #endif
 }
 
-static void md5_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen )
-{
+static void md5_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen ) {
     md5_hmac_starts( (md5_context *) ctx, key, keylen );
 }
 
-static void md5_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+static void md5_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     md5_hmac_update( (md5_context *) ctx, input, ilen );
 }
 
-static void md5_hmac_finish_wrap( void *ctx, unsigned char *output )
-{
+static void md5_hmac_finish_wrap( void *ctx, unsigned char *output ) {
     md5_hmac_finish( (md5_context *) ctx, output );
 }
 
-static void md5_hmac_reset_wrap( void *ctx )
-{
+static void md5_hmac_reset_wrap( void *ctx ) {
     md5_hmac_reset( (md5_context *) ctx );
 }
 
-static void * md5_ctx_alloc( void )
-{
+static void * md5_ctx_alloc( void ) {
     return malloc( sizeof( md5_context ) );
 }
 
-static void md5_ctx_free( void *ctx )
-{
+static void md5_ctx_free( void *ctx ) {
     free( ctx );
 }
 
@@ -277,23 +247,19 @@ const md_info_t md5_info = {
 
 #if defined(POLARSSL_SHA1_C)
 
-void sha1_starts_wrap( void *ctx )
-{
+void sha1_starts_wrap( void *ctx ) {
     sha1_starts( (sha1_context *) ctx );
 }
 
-void sha1_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha1_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha1_update( (sha1_context *) ctx, input, ilen );
 }
 
-void sha1_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha1_finish_wrap( void *ctx, unsigned char *output ) {
     sha1_finish( (sha1_context *) ctx, output );
 }
 
-int sha1_file_wrap( const char *path, unsigned char *output )
-{
+int sha1_file_wrap( const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     return sha1_file( path, output );
 #else
@@ -303,33 +269,27 @@ int sha1_file_wrap( const char *path, unsigned char *output )
 #endif
 }
 
-void sha1_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen )
-{
+void sha1_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen ) {
     sha1_hmac_starts( (sha1_context *) ctx, key, keylen );
 }
 
-void sha1_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha1_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha1_hmac_update( (sha1_context *) ctx, input, ilen );
 }
 
-void sha1_hmac_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha1_hmac_finish_wrap( void *ctx, unsigned char *output ) {
     sha1_hmac_finish( (sha1_context *) ctx, output );
 }
 
-void sha1_hmac_reset_wrap( void *ctx )
-{
+void sha1_hmac_reset_wrap( void *ctx ) {
     sha1_hmac_reset( (sha1_context *) ctx );
 }
 
-void * sha1_ctx_alloc( void )
-{
+void * sha1_ctx_alloc( void ) {
     return malloc( sizeof( sha1_context ) );
 }
 
-void sha1_ctx_free( void *ctx )
-{
+void sha1_ctx_free( void *ctx ) {
     free( ctx );
 }
 
@@ -358,29 +318,24 @@ const md_info_t sha1_info = {
  */
 #if defined(POLARSSL_SHA2_C)
 
-void sha224_starts_wrap( void *ctx )
-{
+void sha224_starts_wrap( void *ctx ) {
     sha2_starts( (sha2_context *) ctx, 1 );
 }
 
-void sha224_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha224_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha2_update( (sha2_context *) ctx, input, ilen );
 }
 
-void sha224_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha224_finish_wrap( void *ctx, unsigned char *output ) {
     sha2_finish( (sha2_context *) ctx, output );
 }
 
 void sha224_wrap( const unsigned char *input, size_t ilen,
-                    unsigned char *output )
-{
+                    unsigned char *output ) {
     sha2( input, ilen, output, 1 );
 }
 
-int sha224_file_wrap( const char *path, unsigned char *output )
-{
+int sha224_file_wrap( const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     return sha2_file( path, output, 1 );
 #else
@@ -390,40 +345,33 @@ int sha224_file_wrap( const char *path, unsigned char *output )
 #endif
 }
 
-void sha224_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen )
-{
+void sha224_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen ) {
     sha2_hmac_starts( (sha2_context *) ctx, key, keylen, 1 );
 }
 
-void sha224_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha224_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha2_hmac_update( (sha2_context *) ctx, input, ilen );
 }
 
-void sha224_hmac_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha224_hmac_finish_wrap( void *ctx, unsigned char *output ) {
     sha2_hmac_finish( (sha2_context *) ctx, output );
 }
 
-void sha224_hmac_reset_wrap( void *ctx )
-{
+void sha224_hmac_reset_wrap( void *ctx ) {
     sha2_hmac_reset( (sha2_context *) ctx );
 }
 
 void sha224_hmac_wrap( const unsigned char *key, size_t keylen,
         const unsigned char *input, size_t ilen,
-        unsigned char *output )
-{
+        unsigned char *output ) {
     sha2_hmac( key, keylen, input, ilen, output, 1 );
 }
 
-void * sha224_ctx_alloc( void )
-{
+void * sha224_ctx_alloc( void ) {
     return malloc( sizeof( sha2_context ) );
 }
 
-void sha224_ctx_free( void *ctx )
-{
+void sha224_ctx_free( void *ctx ) {
     free( ctx );
 }
 
@@ -445,29 +393,24 @@ const md_info_t sha224_info = {
     sha224_ctx_free,
 };
 
-void sha256_starts_wrap( void *ctx )
-{
+void sha256_starts_wrap( void *ctx ) {
     sha2_starts( (sha2_context *) ctx, 0 );
 }
 
-void sha256_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha256_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha2_update( (sha2_context *) ctx, input, ilen );
 }
 
-void sha256_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha256_finish_wrap( void *ctx, unsigned char *output ) {
     sha2_finish( (sha2_context *) ctx, output );
 }
 
 void sha256_wrap( const unsigned char *input, size_t ilen,
-                    unsigned char *output )
-{
+                    unsigned char *output ) {
     sha2( input, ilen, output, 0 );
 }
 
-int sha256_file_wrap( const char *path, unsigned char *output )
-{
+int sha256_file_wrap( const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     return sha2_file( path, output, 0 );
 #else
@@ -477,40 +420,33 @@ int sha256_file_wrap( const char *path, unsigned char *output )
 #endif
 }
 
-void sha256_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen )
-{
+void sha256_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen ) {
     sha2_hmac_starts( (sha2_context *) ctx, key, keylen, 0 );
 }
 
-void sha256_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha256_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha2_hmac_update( (sha2_context *) ctx, input, ilen );
 }
 
-void sha256_hmac_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha256_hmac_finish_wrap( void *ctx, unsigned char *output ) {
     sha2_hmac_finish( (sha2_context *) ctx, output );
 }
 
-void sha256_hmac_reset_wrap( void *ctx )
-{
+void sha256_hmac_reset_wrap( void *ctx ) {
     sha2_hmac_reset( (sha2_context *) ctx );
 }
 
 void sha256_hmac_wrap( const unsigned char *key, size_t keylen,
         const unsigned char *input, size_t ilen,
-        unsigned char *output )
-{
+        unsigned char *output ) {
     sha2_hmac( key, keylen, input, ilen, output, 0 );
 }
 
-void * sha256_ctx_alloc( void )
-{
+void * sha256_ctx_alloc( void ) {
     return malloc( sizeof( sha2_context ) );
 }
 
-void sha256_ctx_free( void *ctx )
-{
+void sha256_ctx_free( void *ctx ) {
     free( ctx );
 }
 
@@ -536,29 +472,24 @@ const md_info_t sha256_info = {
 
 #if defined(POLARSSL_SHA4_C)
 
-void sha384_starts_wrap( void *ctx )
-{
+void sha384_starts_wrap( void *ctx ) {
     sha4_starts( (sha4_context *) ctx, 1 );
 }
 
-void sha384_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha384_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha4_update( (sha4_context *) ctx, input, ilen );
 }
 
-void sha384_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha384_finish_wrap( void *ctx, unsigned char *output ) {
     sha4_finish( (sha4_context *) ctx, output );
 }
 
 void sha384_wrap( const unsigned char *input, size_t ilen,
-                    unsigned char *output )
-{
+                    unsigned char *output ) {
     sha4( input, ilen, output, 1 );
 }
 
-int sha384_file_wrap( const char *path, unsigned char *output )
-{
+int sha384_file_wrap( const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     return sha4_file( path, output, 1 );
 #else
@@ -568,40 +499,33 @@ int sha384_file_wrap( const char *path, unsigned char *output )
 #endif
 }
 
-void sha384_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen )
-{
+void sha384_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen ) {
     sha4_hmac_starts( (sha4_context *) ctx, key, keylen, 1 );
 }
 
-void sha384_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha384_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha4_hmac_update( (sha4_context *) ctx, input, ilen );
 }
 
-void sha384_hmac_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha384_hmac_finish_wrap( void *ctx, unsigned char *output ) {
     sha4_hmac_finish( (sha4_context *) ctx, output );
 }
 
-void sha384_hmac_reset_wrap( void *ctx )
-{
+void sha384_hmac_reset_wrap( void *ctx ) {
     sha4_hmac_reset( (sha4_context *) ctx );
 }
 
 void sha384_hmac_wrap( const unsigned char *key, size_t keylen,
         const unsigned char *input, size_t ilen,
-        unsigned char *output )
-{
+        unsigned char *output ) {
     sha4_hmac( key, keylen, input, ilen, output, 1 );
 }
 
-void * sha384_ctx_alloc( void )
-{
+void * sha384_ctx_alloc( void ) {
     return malloc( sizeof( sha4_context ) );
 }
 
-void sha384_ctx_free( void *ctx )
-{
+void sha384_ctx_free( void *ctx ) {
     free( ctx );
 }
 
@@ -623,29 +547,24 @@ const md_info_t sha384_info = {
     sha384_ctx_free,
 };
 
-void sha512_starts_wrap( void *ctx )
-{
+void sha512_starts_wrap( void *ctx ) {
     sha4_starts( (sha4_context *) ctx, 0 );
 }
 
-void sha512_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha512_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha4_update( (sha4_context *) ctx, input, ilen );
 }
 
-void sha512_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha512_finish_wrap( void *ctx, unsigned char *output ) {
     sha4_finish( (sha4_context *) ctx, output );
 }
 
 void sha512_wrap( const unsigned char *input, size_t ilen,
-                    unsigned char *output )
-{
+                    unsigned char *output ) {
     sha4( input, ilen, output, 0 );
 }
 
-int sha512_file_wrap( const char *path, unsigned char *output )
-{
+int sha512_file_wrap( const char *path, unsigned char *output ) {
 #if defined(POLARSSL_FS_IO)
     return sha4_file( path, output, 0 );
 #else
@@ -655,40 +574,33 @@ int sha512_file_wrap( const char *path, unsigned char *output )
 #endif
 }
 
-void sha512_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen )
-{
+void sha512_hmac_starts_wrap( void *ctx, const unsigned char *key, size_t keylen ) {
     sha4_hmac_starts( (sha4_context *) ctx, key, keylen, 0 );
 }
 
-void sha512_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen )
-{
+void sha512_hmac_update_wrap( void *ctx, const unsigned char *input, size_t ilen ) {
     sha4_hmac_update( (sha4_context *) ctx, input, ilen );
 }
 
-void sha512_hmac_finish_wrap( void *ctx, unsigned char *output )
-{
+void sha512_hmac_finish_wrap( void *ctx, unsigned char *output ) {
     sha4_hmac_finish( (sha4_context *) ctx, output );
 }
 
-void sha512_hmac_reset_wrap( void *ctx )
-{
+void sha512_hmac_reset_wrap( void *ctx ) {
     sha4_hmac_reset( (sha4_context *) ctx );
 }
 
 void sha512_hmac_wrap( const unsigned char *key, size_t keylen,
         const unsigned char *input, size_t ilen,
-        unsigned char *output )
-{
+        unsigned char *output ) {
     sha4_hmac( key, keylen, input, ilen, output, 0 );
 }
 
-void * sha512_ctx_alloc( void )
-{
+void * sha512_ctx_alloc( void ) {
     return malloc( sizeof( sha4_context ) );
 }
 
-void sha512_ctx_free( void *ctx )
-{
+void sha512_ctx_free( void *ctx ) {
     free( ctx );
 }
 

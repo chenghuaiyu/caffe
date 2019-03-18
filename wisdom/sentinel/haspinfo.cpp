@@ -14,12 +14,10 @@
 ////////////////////////////////////////////////////////////////////
 
 ChaspInfo::ChaspInfo()
-    : m_pszInfo(NULL)
-{
+    : m_pszInfo(NULL) {
 }
 
-ChaspInfo::~ChaspInfo()
-{
+ChaspInfo::~ChaspInfo() {
     clear();
 }
 
@@ -38,10 +36,8 @@ ChaspInfo::operator const char *() const
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-void ChaspInfo::clear()
-{
-    if (NULL != m_pszInfo)
-    {
+void ChaspInfo::clear() {
+    if (NULL != m_pszInfo) {
         hasp_free(m_pszInfo);
         m_pszInfo = NULL;
     }

@@ -43,8 +43,7 @@
  */
 void rsa_init( rsa_context *ctx,
                int padding,
-               int hash_id )
-{
+               int hash_id ) {
     memset( ctx, 0, sizeof( rsa_context ) );
 
     ctx->padding = padding;
@@ -59,8 +58,7 @@ void rsa_init( rsa_context *ctx,
 int rsa_gen_key( rsa_context *ctx,
                  int (*f_rng)(void *, unsigned char *, size_t),
                  void *p_rng,
-                 unsigned int nbits, int exponent )
-{
+                 unsigned int nbits, int exponent ) {
     int ret;
     mpi P1, Q1, H, G;
 
@@ -117,8 +115,7 @@ cleanup:
 
     mpi_free( &P1 ); mpi_free( &Q1 ); mpi_free( &H ); mpi_free( &G );
 
-    if( ret != 0 )
-    {
+    if( ret != 0 ) {
         rsa_free( ctx );
         return( POLARSSL_ERR_RSA_KEY_GEN_FAILED + ret );
     }
@@ -131,8 +128,7 @@ cleanup:
 /*
  * Check a public RSA key
  */
-int rsa_check_pubkey( const rsa_context *ctx )
-{
+int rsa_check_pubkey( const rsa_context *ctx ) {
     if( !ctx->N.p || !ctx->E.p )
         return( POLARSSL_ERR_RSA_KEY_CHECK_FAILED );
 
@@ -154,8 +150,7 @@ int rsa_check_pubkey( const rsa_context *ctx )
 /*
  * Check a private RSA key
  */
-int rsa_check_privkey( const rsa_context *ctx )
-{
+int rsa_check_privkey( const rsa_context *ctx ) {
     int ret;
     mpi PQ, DE, P1, Q1, H, I, G, G2, L1, L2;
 
@@ -186,8 +181,7 @@ int rsa_check_privkey( const rsa_context *ctx )
     if( mpi_cmp_mpi( &PQ, &ctx->N ) != 0 ||
         mpi_cmp_int( &L2, 0 ) != 0 ||
         mpi_cmp_int( &I, 1 ) != 0 ||
-        mpi_cmp_int( &G, 1 ) != 0 )
-    {
+        mpi_cmp_int( &G, 1 ) != 0 ) {
         ret = POLARSSL_ERR_RSA_KEY_CHECK_FAILED;
     }
 
@@ -212,8 +206,7 @@ cleanup:
  */
 int rsa_public( rsa_context *ctx,
                 const unsigned char *input,
-                unsigned char *output )
-{
+                unsigned char *output ) {
     int ret;
     size_t olen;
     mpi T;
@@ -221,8 +214,7 @@ int rsa_public( rsa_context *ctx,
     mpi_init( &T );
 
     MPI_CHK( mpi_read_binary( &T, input, ctx->len ) );
-    if( mpi_cmp_mpi( &T, &ctx->N ) >= 0 )
-    {
+    if( mpi_cmp_mpi( &T, &ctx->N ) >= 0 ) {
         mpi_free( &T );
         return( POLARSSL_ERR_RSA_BAD_INPUT_DATA );
     }
@@ -246,8 +238,7 @@ cleanup:
  */
 int rsa_private( rsa_context *ctx,
                  const unsigned char *input,
-                 unsigned char *output )
-{
+                 unsigned char *output ) {
     int ret;
     size_t olen;
     mpi T, T1, T2;
@@ -256,8 +247,7 @@ int rsa_private( rsa_context *ctx,
 
     MPI_CHK( mpi_read_binary( &T, input, ctx->len ) );
 
-    if( mpi_cmp_mpi( &T, &ctx->N ) >= 0 )
-    {
+    if( mpi_cmp_mpi( &T, &ctx->N ) >= 0 ) {
         mpi_free( &T );
         return( POLARSSL_ERR_RSA_BAD_INPUT_DATA );
     }
@@ -312,8 +302,7 @@ cleanup:
  * \param md_ctx    message digest context to use
  */
 static void mgf_mask( unsigned char *dst, size_t dlen, unsigned char *src, size_t slen,  
-                       md_context_t *md_ctx )
-{
+                       md_context_t *md_ctx ) {
     unsigned char mask[POLARSSL_MD_MAX_SIZE];
     unsigned char counter[4];
     unsigned char *p;
@@ -329,8 +318,7 @@ static void mgf_mask( unsigned char *dst, size_t dlen, unsigned char *src, size_
     //
     p = dst;
 
-    while( dlen > 0 )
-    {
+    while( dlen > 0 ) {
         use_len = hlen;
         if( dlen < hlen )
             use_len = dlen;
@@ -358,8 +346,7 @@ int rsa_pkcs1_encrypt( rsa_context *ctx,
                        void *p_rng,
                        int mode, size_t ilen,
                        const unsigned char *input,
-                       unsigned char *output )
-{
+                       unsigned char *output ) {
     size_t nb_pad, olen;
     int ret;
     unsigned char *p = output;
@@ -374,8 +361,7 @@ int rsa_pkcs1_encrypt( rsa_context *ctx,
     if( f_rng == NULL )
         return( POLARSSL_ERR_RSA_BAD_INPUT_DATA );
 
-    switch( ctx->padding )
-    {
+    switch( ctx->padding ) {
         case RSA_PKCS_V15:
 
             if( olen < ilen + 11 )
@@ -386,8 +372,7 @@ int rsa_pkcs1_encrypt( rsa_context *ctx,
             *p++ = 0;
             *p++ = RSA_CRYPT;
 
-            while( nb_pad-- > 0 )
-            {
+            while( nb_pad-- > 0 ) {
                 int rng_dl = 100;
 
                 do {
@@ -468,8 +453,7 @@ int rsa_pkcs1_decrypt( rsa_context *ctx,
                        int mode, size_t *olen,
                        const unsigned char *input,
                        unsigned char *output,
-                       size_t output_max_len)
-{
+                       size_t output_max_len) {
     int ret;
     size_t ilen;
     unsigned char *p;
@@ -495,15 +479,13 @@ int rsa_pkcs1_decrypt( rsa_context *ctx,
 
     p = buf;
 
-    switch( ctx->padding )
-    {
+    switch( ctx->padding ) {
         case RSA_PKCS_V15:
 
             if( *p++ != 0 || *p++ != RSA_CRYPT )
                 return( POLARSSL_ERR_RSA_INVALID_PADDING );
 
-            while( *p != 0 )
-            {
+            while( *p != 0 ) {
                 if( p >= buf + ilen - 1 )
                     return( POLARSSL_ERR_RSA_INVALID_PADDING );
                 p++;
@@ -585,8 +567,7 @@ int rsa_pkcs1_sign( rsa_context *ctx,
                     int hash_id,
                     unsigned int hashlen,
                     const unsigned char *hash,
-                    unsigned char *sig )
-{
+                    unsigned char *sig ) {
     size_t nb_pad, olen;
     unsigned char *p = sig;
 #if defined(POLARSSL_PKCS1_V21)
@@ -603,12 +584,10 @@ int rsa_pkcs1_sign( rsa_context *ctx,
 
     olen = ctx->len;
 
-    switch( ctx->padding )
-    {
+    switch( ctx->padding ) {
         case RSA_PKCS_V15:
 
-            switch( hash_id )
-            {
+            switch( hash_id ) {
                 case SIG_RSA_RAW:
                     nb_pad = olen - 3 - hashlen;
                     break;
@@ -653,8 +632,7 @@ int rsa_pkcs1_sign( rsa_context *ctx,
             p += nb_pad;
             *p++ = 0;
 
-            switch( hash_id )
-            {
+            switch( hash_id ) {
                 case SIG_RSA_RAW:
                     memcpy( p, hash, hashlen );
                     break;
@@ -711,8 +689,7 @@ int rsa_pkcs1_sign( rsa_context *ctx,
             if( f_rng == NULL )
                 return( POLARSSL_ERR_RSA_BAD_INPUT_DATA );
 
-            switch( hash_id )
-            {
+            switch( hash_id ) {
                 case SIG_RSA_MD2:
                 case SIG_RSA_MD4:
                 case SIG_RSA_MD5:
@@ -813,8 +790,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
                       int hash_id,
                       unsigned int hashlen,
                       const unsigned char *hash,
-                      unsigned char *sig )
-{
+                      unsigned char *sig ) {
     int ret;
     size_t len, siglen;
     unsigned char *p, c;
@@ -841,15 +817,13 @@ int rsa_pkcs1_verify( rsa_context *ctx,
 
     p = buf;
 
-    switch( ctx->padding )
-    {
+    switch( ctx->padding ) {
         case RSA_PKCS_V15:
 
             if( *p++ != 0 || *p++ != RSA_SIGN )
                 return( POLARSSL_ERR_RSA_INVALID_PADDING );
 
-            while( *p != 0 )
-            {
+            while( *p != 0 ) {
                 if( p >= buf + siglen - 1 || *p != 0xFF )
                     return( POLARSSL_ERR_RSA_INVALID_PADDING );
                 p++;
@@ -858,8 +832,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
 
             len = siglen - ( p - buf );
 
-            if( len == 34 )
-            {
+            if( len == 34 ) {
                 c = p[13];
                 p[13] = 0;
 
@@ -868,8 +841,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
 
                 if( ( c == 2 && hash_id == SIG_RSA_MD2 ) ||
                         ( c == 4 && hash_id == SIG_RSA_MD4 ) ||
-                        ( c == 5 && hash_id == SIG_RSA_MD5 ) )
-                {
+                        ( c == 5 && hash_id == SIG_RSA_MD5 ) ) {
                     if( memcmp( p + 18, hash, 16 ) == 0 ) 
                         return( 0 );
                     else
@@ -877,8 +849,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
                 }
             }
 
-            if( len == 35 && hash_id == SIG_RSA_SHA1 )
-            {
+            if( len == 35 && hash_id == SIG_RSA_SHA1 ) {
                 if( memcmp( p, ASN1_HASH_SHA1, 15 ) == 0 &&
                         memcmp( p + 15, hash, 20 ) == 0 )
                     return( 0 );
@@ -888,8 +859,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
             if( ( len == 19 + 28 && p[14] == 4 && hash_id == SIG_RSA_SHA224 ) ||
                     ( len == 19 + 32 && p[14] == 1 && hash_id == SIG_RSA_SHA256 ) ||
                     ( len == 19 + 48 && p[14] == 2 && hash_id == SIG_RSA_SHA384 ) ||
-                    ( len == 19 + 64 && p[14] == 3 && hash_id == SIG_RSA_SHA512 ) )
-            {
+                    ( len == 19 + 64 && p[14] == 3 && hash_id == SIG_RSA_SHA512 ) ) {
                 c = p[1] - 17;
                 p[1] = 17;
                 p[14] = 0;
@@ -902,8 +872,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
                     return( POLARSSL_ERR_RSA_VERIFY_FAILED );
             }
 
-            if( len == hashlen && hash_id == SIG_RSA_RAW )
-            {
+            if( len == hashlen && hash_id == SIG_RSA_RAW ) {
                 if( memcmp( p, hash, hashlen ) == 0 )
                     return( 0 );
                 else
@@ -918,8 +887,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
             if( buf[siglen - 1] != 0xBC )
                 return( POLARSSL_ERR_RSA_INVALID_PADDING );
 
-            switch( hash_id )
-            {
+            switch( hash_id ) {
                 case SIG_RSA_MD2:
                 case SIG_RSA_MD4:
                 case SIG_RSA_MD5:
@@ -968,8 +936,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
 
             // Compensate for boundary condition when applying mask
             //
-            if( msb % 8 == 0 )
-            {
+            if( msb % 8 == 0 ) {
                 p++;
                 siglen -= 1;
             }
@@ -1016,8 +983,7 @@ int rsa_pkcs1_verify( rsa_context *ctx,
 /*
  * Free the components of an RSA key
  */
-void rsa_free( rsa_context *ctx )
-{
+void rsa_free( rsa_context *ctx ) {
     mpi_free( &ctx->RQ ); mpi_free( &ctx->RP ); mpi_free( &ctx->RN );
     mpi_free( &ctx->QP ); mpi_free( &ctx->DQ ); mpi_free( &ctx->DP );
     mpi_free( &ctx->Q  ); mpi_free( &ctx->P  ); mpi_free( &ctx->D );
@@ -1082,8 +1048,7 @@ void rsa_free( rsa_context *ctx )
 #define RSA_PT  "\xAA\xBB\xCC\x03\x02\x01\x00\xFF\xFF\xFF\xFF\xFF" \
                 "\x11\x22\x33\x0A\x0B\x0C\xCC\xDD\xDD\xDD\xDD\xDD"
 
-static int myrand( void *rng_state, unsigned char *output, size_t len )
-{
+static int myrand( void *rng_state, unsigned char *output, size_t len ) {
     size_t i;
 
     if( rng_state != NULL )
@@ -1098,8 +1063,7 @@ static int myrand( void *rng_state, unsigned char *output, size_t len )
 /*
  * Checkup routine
  */
-int rsa_self_test( int verbose )
-{
+int rsa_self_test( int verbose ) {
     size_t len;
     rsa_context rsa;
     unsigned char rsa_plaintext[PT_LEN];
@@ -1125,8 +1089,7 @@ int rsa_self_test( int verbose )
         printf( "  RSA key validation: " );
 
     if( rsa_check_pubkey(  &rsa ) != 0 ||
-        rsa_check_privkey( &rsa ) != 0 )
-    {
+        rsa_check_privkey( &rsa ) != 0 ) {
         if( verbose != 0 )
             printf( "failed\n" );
 
@@ -1139,8 +1102,7 @@ int rsa_self_test( int verbose )
     memcpy( rsa_plaintext, RSA_PT, PT_LEN );
 
     if( rsa_pkcs1_encrypt( &rsa, &myrand, NULL, RSA_PUBLIC, PT_LEN,
-                           rsa_plaintext, rsa_ciphertext ) != 0 )
-    {
+                           rsa_plaintext, rsa_ciphertext ) != 0 ) {
         if( verbose != 0 )
             printf( "failed\n" );
 
@@ -1152,16 +1114,14 @@ int rsa_self_test( int verbose )
 
     if( rsa_pkcs1_decrypt( &rsa, RSA_PRIVATE, &len,
                            rsa_ciphertext, rsa_decrypted,
-                           sizeof(rsa_decrypted) ) != 0 )
-    {
+                           sizeof(rsa_decrypted) ) != 0 ) {
         if( verbose != 0 )
             printf( "failed\n" );
 
         return( 1 );
     }
 
-    if( memcmp( rsa_decrypted, rsa_plaintext, len ) != 0 )
-    {
+    if( memcmp( rsa_decrypted, rsa_plaintext, len ) != 0 ) {
         if( verbose != 0 )
             printf( "failed\n" );
 
@@ -1175,8 +1135,7 @@ int rsa_self_test( int verbose )
     sha1( rsa_plaintext, PT_LEN, sha1sum );
 
     if( rsa_pkcs1_sign( &rsa, NULL, NULL, RSA_PRIVATE, SIG_RSA_SHA1, 20,
-                        sha1sum, rsa_ciphertext ) != 0 )
-    {
+                        sha1sum, rsa_ciphertext ) != 0 ) {
         if( verbose != 0 )
             printf( "failed\n" );
 
@@ -1187,8 +1146,7 @@ int rsa_self_test( int verbose )
         printf( "passed\n  PKCS#1 sig. verify: " );
 
     if( rsa_pkcs1_verify( &rsa, RSA_PUBLIC, SIG_RSA_SHA1, 20,
-                          sha1sum, rsa_ciphertext ) != 0 )
-    {
+                          sha1sum, rsa_ciphertext ) != 0 ) {
         if( verbose != 0 )
             printf( "failed\n" );
 

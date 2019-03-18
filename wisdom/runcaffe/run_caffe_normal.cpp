@@ -12,6 +12,7 @@
 #include "google/protobuf/text_format.h"
 #include <google/protobuf/io/coded_stream.h>
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -43,8 +44,7 @@ using ::google::protobuf::Message;
 using namespace std;
 using namespace cv;
 
-vector<DETECT_BOX_S> run_caffe_once_normal(Net<float> *caffe_net, cv::Mat& org_img, cv::Rect& padrect, vector<float> scorethr)
-{
+vector<DETECT_BOX_S> run_caffe_once_normal(Net<float> *caffe_net, cv::Mat& org_img, cv::Rect& padrect, vector<float> scorethr) {
     vector<DETECT_BOX_S> retbox;
     /* run caffe */
     caffe_net->Forward();
@@ -54,17 +54,14 @@ vector<DETECT_BOX_S> run_caffe_once_normal(Net<float> *caffe_net, cv::Mat& org_i
     int num_det = rect->height();
     std::cout << "num_det:" << num_det << endl;
     const float* result_vec = rect->cpu_data();
-    for (int i = 0; i < num_det; i++)
-    {
+    for (int i = 0; i < num_det; i++) {
         DETECT_BOX_S tmpbox;
         int label = result_vec[i * 7 + 1]; 
         float score = result_vec[i * 7 + 2];
-        if (label < 0)
-        {
+        if (label < 0) {
             continue;
         }
-        if (score < scorethr[label])
-        {
+        if (score < scorethr[label]) {
             continue;
         }
 
@@ -93,8 +90,7 @@ vector<DETECT_BOX_S> run_caffe_once_normal(Net<float> *caffe_net, cv::Mat& org_i
     return retbox;
 }
 
-vector<DETECT_BOX_S> run_caffe_normal(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_normal(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
     vector<DETECT_BOX_S> retbox;
     std::cout << "run_caffe_others" << endl;
     cv::Mat img = Preprocess(org_img);

@@ -22,8 +22,7 @@
 ////////////////////////////////////////////////////////////////////
 //! Initializes the object.
 ////////////////////////////////////////////////////////////////////
-ChaspFile::ChaspFile()
-{
+ChaspFile::ChaspFile() {
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -31,8 +30,7 @@ ChaspFile::ChaspFile()
 //! protection key specified by \a other.
 ////////////////////////////////////////////////////////////////////
 ChaspFile::ChaspFile(hasp_fileid_t fileId, const Chasp& other)
-    : ChaspBase(other)
-{
+    : ChaspBase(other) {
     init(fileId);
 }
 
@@ -40,13 +38,11 @@ ChaspFile::ChaspFile(hasp_fileid_t fileId, const Chasp& other)
 //! Copy constructor.
 ////////////////////////////////////////////////////////////////////
 ChaspFile::ChaspFile(const ChaspFile& other)
-    : ChaspBase(other)
-{
+    : ChaspBase(other) {
     init(other.getFileId());
 }
 
-ChaspFile::~ChaspFile()
-{
+ChaspFile::~ChaspFile() {
     DIAG_VERIFY(release());
 }
 
@@ -57,10 +53,8 @@ ChaspFile::~ChaspFile()
 ////////////////////////////////////////////////////////////////////
 //! Assignment operator.
 ////////////////////////////////////////////////////////////////////
-ChaspFile& ChaspFile::operator=(const ChaspFile& other)
-{
-    if (this != &other)
-    {
+ChaspFile& ChaspFile::operator=(const ChaspFile& other) {
+    if (this != &other) {
         dynamic_cast<ChaspBase&>(*this) =
             dynamic_cast<const ChaspBase&>(other);
     
@@ -73,8 +67,7 @@ ChaspFile& ChaspFile::operator=(const ChaspFile& other)
 ////////////////////////////////////////////////////////////////////
 //! Determines whether the string \a szString can be written
 ////////////////////////////////////////////////////////////////////
-bool ChaspFile::canWriteString(const char* szString)
-{
+bool ChaspFile::canWriteString(const char* szString) {
     return (NULL == szString) ? true : 
                                 canWriteString(std::string(szString));
 }
@@ -82,8 +75,7 @@ bool ChaspFile::canWriteString(const char* szString)
 ////////////////////////////////////////////////////////////////////
 //! Determines whether the string \a string can be written
 ////////////////////////////////////////////////////////////////////
-bool ChaspFile::canWriteString(const std::string& string)
-{
+bool ChaspFile::canWriteString(const std::string& string) {
     return maxStringLength() >= string.length();
 }
 
@@ -113,8 +105,7 @@ hasp_size_t ChaspFile::getFilePos() const
 //!
 //! \sa                         setFilePos
 ////////////////////////////////////////////////////////////////////
-hasp_size_t ChaspFile::getFilePosFromString(const char* szString)
-{
+hasp_size_t ChaspFile::getFilePosFromString(const char* szString) {
     return getFilePosFromString(std::string((NULL == szString) ? 
                                                 "" : szString));
 }
@@ -124,8 +115,7 @@ hasp_size_t ChaspFile::getFilePosFromString(const char* szString)
 //!
 //! \sa                         setFilePos
 ////////////////////////////////////////////////////////////////////
-hasp_size_t ChaspFile::getFilePosFromString(const std::string& string)
-{
+hasp_size_t ChaspFile::getFilePosFromString(const std::string& string) {
     return canWriteString(string) ? 
                 static_cast<hasp_size_t>(string.length() + sizeof(unsigned char)) : 
                 0;
@@ -150,8 +140,7 @@ haspStatus ChaspFile::getFileSize(hasp_size_t& ulSize) const
 hasp_u32_t ChaspFile::hashCode() const
 {
     hasp_u32_t code = ChaspBase::hashCode();
-    if (static_cast<hasp_u32_t>(-1) != code)
-    {
+    if (static_cast<hasp_u32_t>(-1) != code) {
         code &= 0xFFFF;
         code |= m_fileId << 0x10;
     }
@@ -162,8 +151,7 @@ hasp_u32_t ChaspFile::hashCode() const
 ////////////////////////////////////////////////////////////////////
 //! Initializes the object.
 ////////////////////////////////////////////////////////////////////
-void ChaspFile::init(hasp_fileid_t fileId /* = fileReadWrite */)
-{
+void ChaspFile::init(hasp_fileid_t fileId /* = fileReadWrite */) {
     m_fileId = fileId;
     m_ulFilePos = 0;
 }
@@ -171,8 +159,7 @@ void ChaspFile::init(hasp_fileid_t fileId /* = fileReadWrite */)
 ////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////
-unsigned char ChaspFile::maxStringLength()
-{
+unsigned char ChaspFile::maxStringLength() {
     return 0xFF;
 }
 
@@ -212,8 +199,7 @@ haspStatus ChaspFile::read(std::string& string) const
     if (!HASP_SUCCEEDED(status))
         return status;
 
-    if (0 < length)
-    {
+    if (0 < length) {
     
         std::vector<unsigned char> vector(length+1);
     
@@ -243,8 +229,7 @@ haspStatus ChaspFile::read(std::string& string) const
 //!
 //! \sa                         ChaspBase::release
 ////////////////////////////////////////////////////////////////////
-bool ChaspFile::release()
-{
+bool ChaspFile::release() {
     if (!ChaspBase::release())
         return false;
 
@@ -265,8 +250,7 @@ bool ChaspFile::release()
 //! \sa                         getFilePos
 //!                             getFileSize
 ////////////////////////////////////////////////////////////////////
-bool ChaspFile::setFilePos(hasp_size_t ulPos)
-{
+bool ChaspFile::setFilePos(hasp_size_t ulPos) {
     hasp_size_t ulSize = 0;
     if (!HASP_SUCCEEDED(getFileSize(ulSize)) || (ulSize <= ulPos))
         return false;

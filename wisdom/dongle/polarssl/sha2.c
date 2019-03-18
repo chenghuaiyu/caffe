@@ -64,13 +64,11 @@
 /*
  * SHA-256 context setup
  */
-void sha2_starts( sha2_context *ctx, int is224 )
-{
+void sha2_starts( sha2_context *ctx, int is224 ) {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
 
-    if( is224 == 0 )
-    {
+    if( is224 == 0 ) {
         /* SHA-256 */
         ctx->state[0] = 0x6A09E667;
         ctx->state[1] = 0xBB67AE85;
@@ -80,9 +78,7 @@ void sha2_starts( sha2_context *ctx, int is224 )
         ctx->state[5] = 0x9B05688C;
         ctx->state[6] = 0x1F83D9AB;
         ctx->state[7] = 0x5BE0CD19;
-    }
-    else
-    {
+    } else {
         /* SHA-224 */
         ctx->state[0] = 0xC1059ED8;
         ctx->state[1] = 0x367CD507;
@@ -97,8 +93,7 @@ void sha2_starts( sha2_context *ctx, int is224 )
     ctx->is224 = is224;
 }
 
-static void sha2_process( sha2_context *ctx, const unsigned char data[64] )
-{
+static void sha2_process( sha2_context *ctx, const unsigned char data[64] ) {
     unsigned long temp1, temp2, W[64];
     unsigned long A, B, C, D, E, F, G, H;
 
@@ -231,8 +226,7 @@ static void sha2_process( sha2_context *ctx, const unsigned char data[64] )
 /*
  * SHA-256 process buffer
  */
-void sha2_update( sha2_context *ctx, const unsigned char *input, size_t ilen )
-{
+void sha2_update( sha2_context *ctx, const unsigned char *input, size_t ilen ) {
     size_t fill;
     unsigned long left;
 
@@ -248,8 +242,7 @@ void sha2_update( sha2_context *ctx, const unsigned char *input, size_t ilen )
     if( ctx->total[0] < (unsigned long) ilen )
         ctx->total[1]++;
 
-    if( left && ilen >= fill )
-    {
+    if( left && ilen >= fill ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, fill );
         sha2_process( ctx, ctx->buffer );
@@ -258,15 +251,13 @@ void sha2_update( sha2_context *ctx, const unsigned char *input, size_t ilen )
         left = 0;
     }
 
-    while( ilen >= 64 )
-    {
+    while( ilen >= 64 ) {
         sha2_process( ctx, input );
         input += 64;
         ilen  -= 64;
     }
 
-    if( ilen > 0 )
-    {
+    if( ilen > 0 ) {
         memcpy( (void *) (ctx->buffer + left),
                 (void *) input, ilen );
     }
@@ -283,8 +274,7 @@ static const unsigned char sha2_padding[64] =
 /*
  * SHA-256 final digest
  */
-void sha2_finish( sha2_context *ctx, unsigned char output[32] )
-{
+void sha2_finish( sha2_context *ctx, unsigned char output[32] ) {
     unsigned long last, padn;
     unsigned long high, low;
     unsigned char msglen[8];
@@ -318,8 +308,7 @@ void sha2_finish( sha2_context *ctx, unsigned char output[32] )
  * output = SHA-256( input buffer )
  */
 void sha2( const unsigned char *input, size_t ilen,
-           unsigned char output[32], int is224 )
-{
+           unsigned char output[32], int is224 ) {
     sha2_context ctx;
 
     sha2_starts( &ctx, is224 );
@@ -333,8 +322,7 @@ void sha2( const unsigned char *input, size_t ilen,
 /*
  * output = SHA-256( file contents )
  */
-int sha2_file( const char *path, unsigned char output[32], int is224 )
-{
+int sha2_file( const char *path, unsigned char output[32], int is224 ) {
     FILE *f;
     size_t n;
     sha2_context ctx;
@@ -352,8 +340,7 @@ int sha2_file( const char *path, unsigned char output[32], int is224 )
 
     memset( &ctx, 0, sizeof( sha2_context ) );
 
-    if( ferror( f ) != 0 )
-    {
+    if( ferror( f ) != 0 ) {
         fclose( f );
         return( POLARSSL_ERR_SHA2_FILE_IO_ERROR );
     }
@@ -367,13 +354,11 @@ int sha2_file( const char *path, unsigned char output[32], int is224 )
  * SHA-256 HMAC context setup
  */
 void sha2_hmac_starts( sha2_context *ctx, const unsigned char *key, size_t keylen,
-                       int is224 )
-{
+                       int is224 ) {
     size_t i;
     unsigned char sum[32];
 
-    if( keylen > 64 )
-    {
+    if( keylen > 64 ) {
         sha2( key, keylen, sum, is224 );
         keylen = ( is224 ) ? 28 : 32;
         key = sum;
@@ -382,8 +367,7 @@ void sha2_hmac_starts( sha2_context *ctx, const unsigned char *key, size_t keyle
     memset( ctx->ipad, 0x36, 64 );
     memset( ctx->opad, 0x5C, 64 );
 
-    for( i = 0; i < keylen; i++ )
-    {
+    for( i = 0; i < keylen; i++ ) {
         ctx->ipad[i] = (unsigned char)( ctx->ipad[i] ^ key[i] );
         ctx->opad[i] = (unsigned char)( ctx->opad[i] ^ key[i] );
     }
@@ -397,16 +381,14 @@ void sha2_hmac_starts( sha2_context *ctx, const unsigned char *key, size_t keyle
 /*
  * SHA-256 HMAC process buffer
  */
-void sha2_hmac_update( sha2_context *ctx, const unsigned char *input, size_t ilen )
-{
+void sha2_hmac_update( sha2_context *ctx, const unsigned char *input, size_t ilen ) {
     sha2_update( ctx, input, ilen );
 }
 
 /*
  * SHA-256 HMAC final digest
  */
-void sha2_hmac_finish( sha2_context *ctx, unsigned char output[32] )
-{
+void sha2_hmac_finish( sha2_context *ctx, unsigned char output[32] ) {
     int is224, hlen;
     unsigned char tmpbuf[32];
 
@@ -425,8 +407,7 @@ void sha2_hmac_finish( sha2_context *ctx, unsigned char output[32] )
 /*
  * SHA-256 HMAC context reset
  */
-void sha2_hmac_reset( sha2_context *ctx )
-{
+void sha2_hmac_reset( sha2_context *ctx ) {
     sha2_starts( ctx, ctx->is224 );
     sha2_update( ctx, ctx->ipad, 64 );
 }
@@ -436,8 +417,7 @@ void sha2_hmac_reset( sha2_context *ctx )
  */
 void sha2_hmac( const unsigned char *key, size_t keylen,
                 const unsigned char *input, size_t ilen,
-                unsigned char output[32], int is224 )
-{
+                unsigned char output[32], int is224 ) {
     sha2_context ctx;
 
     sha2_hmac_starts( &ctx, key, keylen, is224 );
@@ -613,15 +593,13 @@ static const unsigned char sha2_hmac_test_sum[14][32] =
 /*
  * Checkup routine
  */
-int sha2_self_test( int verbose )
-{
+int sha2_self_test( int verbose ) {
     int i, j, k, buflen;
     unsigned char buf[1024];
     unsigned char sha2sum[32];
     sha2_context ctx;
 
-    for( i = 0; i < 6; i++ )
-    {
+    for( i = 0; i < 6; i++ ) {
         j = i % 3;
         k = i < 3;
 
@@ -630,8 +608,7 @@ int sha2_self_test( int verbose )
 
         sha2_starts( &ctx, k );
 
-        if( j == 2 )
-        {
+        if( j == 2 ) {
             memset( buf, 'a', buflen = 1000 );
 
             for( j = 0; j < 1000; j++ )
@@ -643,8 +620,7 @@ int sha2_self_test( int verbose )
 
         sha2_finish( &ctx, sha2sum );
 
-        if( memcmp( sha2sum, sha2_test_sum[i], 32 - k * 4 ) != 0 )
-        {
+        if( memcmp( sha2sum, sha2_test_sum[i], 32 - k * 4 ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 
@@ -658,16 +634,14 @@ int sha2_self_test( int verbose )
     if( verbose != 0 )
         printf( "\n" );
 
-    for( i = 0; i < 14; i++ )
-    {
+    for( i = 0; i < 14; i++ ) {
         j = i % 7;
         k = i < 7;
 
         if( verbose != 0 )
             printf( "  HMAC-SHA-%d test #%d: ", 256 - k * 32, j + 1 );
 
-        if( j == 5 || j == 6 )
-        {
+        if( j == 5 || j == 6 ) {
             memset( buf, '\xAA', buflen = 131 );
             sha2_hmac_starts( &ctx, buf, buflen, k );
         }
@@ -682,8 +656,7 @@ int sha2_self_test( int verbose )
 
         buflen = ( j == 4 ) ? 16 : 32 - k * 4;
 
-        if( memcmp( sha2sum, sha2_hmac_test_sum[i], buflen ) != 0 )
-        {
+        if( memcmp( sha2sum, sha2_hmac_test_sum[i], buflen ) != 0 ) {
             if( verbose != 0 )
                 printf( "failed\n" );
 

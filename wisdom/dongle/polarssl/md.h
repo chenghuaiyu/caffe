@@ -196,8 +196,7 @@ int md_free_ctx( md_context_t *ctx );
  *
  * \return          size of the message digest output.
  */
-static inline unsigned char md_get_size( const md_info_t *md_info )
-{
+static inline unsigned char md_get_size( const md_info_t *md_info ) {
     return md_info->size;
 }
 
@@ -208,8 +207,7 @@ static inline unsigned char md_get_size( const md_info_t *md_info )
  *
  * \return          type of the message digest output.
  */
-static inline md_type_t md_get_type( const md_info_t *md_info )
-{
+static inline md_type_t md_get_type( const md_info_t *md_info ) {
     return md_info->type;
 }
 
@@ -220,8 +218,7 @@ static inline md_type_t md_get_type( const md_info_t *md_info )
  *
  * \return          name of the message digest output.
  */
-static inline const char *md_get_name( const md_info_t *md_info )
-{
+static inline const char *md_get_name( const md_info_t *md_info ) {
     return md_info->name;
 }
 

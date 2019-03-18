@@ -12,6 +12,7 @@
 #include "google/protobuf/text_format.h"
 #include <google/protobuf/io/coded_stream.h>
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -51,23 +52,17 @@ using namespace cv;
 #define MIN_SIZE (32)
 #define BOTTOM_RATIO (1.0/2)
 
-int getsize(int posw, int posh, float sratio)
-{
+int getsize(int posw, int posh, float sratio) {
     int size = max(posw, posh);
 	printf("size:%d\n", size);
     float sratio_top = sratio;
     float sratio_bottom = sratio * BOTTOM_RATIO;
     float sratio_new = sratio;
-    if (size < MIN_SIZE)
-    {
+    if (size < MIN_SIZE) {
         sratio_new = sratio_top;
-    }
-    else if (size >= MAX_SIZE)
-    {
+    } else if (size >= MAX_SIZE) {
         sratio_new = sratio_bottom;
-    }
-    else
-    {
+    } else {
         sratio_new = sratio_bottom + ((sratio_top - sratio_bottom)/(MAX_SIZE-MIN_SIZE)*(MAX_SIZE-size));
     }
 	printf("sratio_new:%f\n", sratio_new);
@@ -76,8 +71,7 @@ int getsize(int posw, int posh, float sratio)
     return size;
 }
 
-cv::Mat getimage(int x, int y, int w, int h, float sratio, cv::Mat& org_img)
-{
+cv::Mat getimage(int x, int y, int w, int h, float sratio, cv::Mat& org_img) {
     int xmin,xmax,ymin,ymax;
     int xmin_src,xmax_src,ymin_src,ymax_src;
     int xmin_dst,xmax_dst,ymin_dst,ymax_dst;
@@ -94,45 +88,33 @@ cv::Mat getimage(int x, int y, int w, int h, float sratio, cv::Mat& org_img)
     ymax = int(ycenter + size/2);
     printf("x1:%d,x2:%d,y1:%d,yw:%d\n",xmin,xmax,ymin,ymax);
     
-    if (xmin < 0)
-    {
+    if (xmin < 0) {
       xmin_src = 0;
       xmin_dst = 0-xmin;
-    }
-    else
-    {
+    } else {
       xmin_src = xmin;
       xmin_dst = 0;
     }
     
-    if (xmax > org_img.cols)
-    {
+    if (xmax > org_img.cols) {
       xmax_src = org_img.cols;
-    }
-    else
-    {
+    } else {
       xmax_src = xmax;
     }
     
     xmax_dst = xmax_src-xmin_src+xmin_dst;
     
-    if (ymin < 0)
-    {
+    if (ymin < 0) {
       ymin_src = 0;
       ymin_dst = 0-ymin;
-    }
-    else
-    {
+    } else {
       ymin_src = ymin;
       ymin_dst = 0;
     }
     
-    if (ymax > org_img.rows)
-    {
+    if (ymax > org_img.rows) {
       ymax_src = org_img.rows;
-    }
-    else
-    {
+    } else {
       ymax_src = ymax;
     }
     
@@ -157,32 +139,27 @@ cv::Mat getimage(int x, int y, int w, int h, float sratio, cv::Mat& org_img)
     return imageROI;
 }
 
-vector<DETECT_BOX_S> postprocess_classify(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pstInfo, cv::Mat& org_img)
-{
+vector<DETECT_BOX_S> postprocess_classify(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pstInfo, cv::Mat& org_img) {
     int j;
     vector<DETECT_BOX_S> savebox;
     Net<float> *caffe_net = pstInfo->caffe_net;
     map<int, int> cnt;
 
-    for(int i = 0; i < pstInfo->labels.size(); i++)
-    {
+    for(int i = 0; i < pstInfo->labels.size(); i++) {
         cnt[i] = 0;
     }
     
-    for (int i = 0; i < retbox.size(); i++)
-    {
+    for (int i = 0; i < retbox.size(); i++) {
         float score = retbox[i].score;
         int label = retbox[i].label;
-        if (cnt[label]>= pstInfo->maxcnts[label])
-        {
+        if (cnt[label]>= pstInfo->maxcnts[label]) {
             continue;
         }
         
         float scorelow = pstInfo->scoreslow[label];
         float scorehigh = pstInfo->scoreshigh[label];
 		printf("score:%f, scorelow:%f, scorehigh:%f, cropscale:%f\n", score, scorelow, scorehigh, pstInfo->cropscale);
-        if ((score > scorelow) && (score < scorehigh))
-        {
+        if ((score > scorelow) && (score < scorehigh)) {
             float x = retbox[i].x;
             float y = retbox[i].y;
             float width = retbox[i].w;
@@ -198,21 +175,16 @@ vector<DETECT_BOX_S> postprocess_classify(vector<DETECT_BOX_S> retbox, MODEL_INF
             caffe_net->Forward();
             Blob<float>* outblob = caffe_net->output_blobs()[0];
             const float* outdata = outblob->cpu_data();
-            for (j = 0; j < outblob->count(); j++)
-            {
-                if (outdata[j] > outdata[label])
-                {
+            for (j = 0; j < outblob->count(); j++) {
+                if (outdata[j] > outdata[label]) {
                     break;
                 }
             }
             
-            if (j != outblob->count())
-            {
+            if (j != outblob->count()) {
                 continue;
             }
-        }
-        else if (score < scorelow)
-        {
+        } else if (score < scorelow) {
             continue;
         }
 

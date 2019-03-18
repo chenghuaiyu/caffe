@@ -13,6 +13,7 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h> 
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -71,14 +72,10 @@ static float JaccardOverlap(const DETECT_BOX_S bbox1, const DETECT_BOX_S bbox2) 
   }
 }
 
-static vector<DETECT_BOX_S> SortBox(vector<DETECT_BOX_S> box) 
-{
-    for (int i = 0; i < box.size(); i++)
-    {
-        for (int j = i; j < box.size(); j++)
-        {
-            if (box[i].score < box[j].score)
-            {
+static vector<DETECT_BOX_S> SortBox(vector<DETECT_BOX_S> box) {
+    for (int i = 0; i < box.size(); i++) {
+        for (int j = i; j < box.size(); j++) {
+            if (box[i].score < box[j].score) {
                 DETECT_BOX_S temp = box[i];
                 box[i] = box[j];
                 box[j] = temp;
@@ -89,16 +86,12 @@ static vector<DETECT_BOX_S> SortBox(vector<DETECT_BOX_S> box)
     return box;
 }
 
-static vector<DETECT_BOX_S> GetLabelBox(vector<DETECT_BOX_S> retbox, const vector<float> label) 
-{
+static vector<DETECT_BOX_S> GetLabelBox(vector<DETECT_BOX_S> retbox, const vector<float> label) {
     vector<DETECT_BOX_S> labelBox;
 
-    for (int i = 0; i < retbox.size(); ++i) 
-    {
-        for (int j = 0; j < label.size(); ++j)
-        {
-            if (retbox[i].label == label[j])
-            {
+    for (int i = 0; i < retbox.size(); ++i) {
+        for (int j = 0; j < label.size(); ++j) {
+            if (retbox[i].label == label[j]) {
                 labelBox.push_back(retbox[i]);
             }
         }
@@ -109,16 +102,14 @@ static vector<DETECT_BOX_S> GetLabelBox(vector<DETECT_BOX_S> retbox, const vecto
     return labelBox;
 }
 
-static vector<DETECT_BOX_S> ApplyNMSFast(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pstInfo) 
-{
+static vector<DETECT_BOX_S> ApplyNMSFast(vector<DETECT_BOX_S> retbox, MODEL_INFO_S *pstInfo) {
     float adaptive_threshold = 0.30;
     vector<DETECT_BOX_S> newretbox;
     map<string, vector<float> > mainlabel;
 
     //"_"之前的字符表示大的类别
     mainlabel.clear();
-    for (int i = 0; i < pstInfo->labels.size(); i++)
-    {
+    for (int i = 0; i < pstInfo->labels.size(); i++) {
         string labelname = pstInfo->labels[i];
         vector<string> result;
         result = Split(labelname, "_");
@@ -128,8 +119,7 @@ static vector<DETECT_BOX_S> ApplyNMSFast(vector<DETECT_BOX_S> retbox, MODEL_INFO
     }
     
     for (map<string, vector<float> >::iterator it = mainlabel.begin();
-         it != mainlabel.end(); ++it) 
-    {
+         it != mainlabel.end(); ++it) {
         const string labelname = it->first;
         //printf("labelname:%s\n", labelname.c_str());
         vector<DETECT_BOX_S> labelboxesold;
@@ -138,23 +128,18 @@ static vector<DETECT_BOX_S> ApplyNMSFast(vector<DETECT_BOX_S> retbox, MODEL_INFO
         labelboxesnew.clear();
 
         // Do nms.
-        while(labelboxesold.size())
-        {
+        while(labelboxesold.size()) {
             DETECT_BOX_S tmpbox = labelboxesold[0];
             bool keep = true;
-            for (int k = 0; k < labelboxesnew.size(); ++k) 
-            {
-                if (keep) 
-                {
+            for (int k = 0; k < labelboxesnew.size(); ++k) {
+                if (keep) {
                     float overlap = JaccardOverlap(tmpbox, labelboxesnew[k]);
                     keep = overlap <= adaptive_threshold;
-                } else 
-                {
+                } else {
                     break;
                 }
             }
-            if (keep) 
-            {
+            if (keep) {
                 labelboxesnew.push_back(tmpbox);
             }
             labelboxesold.erase(labelboxesold.begin());
@@ -168,16 +153,14 @@ static vector<DETECT_BOX_S> ApplyNMSFast(vector<DETECT_BOX_S> retbox, MODEL_INFO
     return newretbox;
 }
 
-vector<DETECT_BOX_S> postprocess_case1(vector<DETECT_BOX_S> inbox, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> postprocess_case1(vector<DETECT_BOX_S> inbox, MODEL_INFO_S *pstInfo) {
     vector<DETECT_BOX_S> savebox;
     vector<DETECT_BOX_S> retbox;
 
     retbox = ApplyNMSFast(inbox,pstInfo);
     //retbox = inbox;
         
-    for (int i = 0; i < retbox.size(); i++)
-    {
+    for (int i = 0; i < retbox.size(); i++) {
         if (retbox[i].x < 0) retbox[i].x = 0;
         if (retbox[i].y < 0) retbox[i].y = 0;
         if (retbox[i].w < 0) retbox[i].w = 0;
@@ -190,17 +173,14 @@ vector<DETECT_BOX_S> postprocess_case1(vector<DETECT_BOX_S> inbox, MODEL_INFO_S 
 
         int deleteflag = 0;
         vector<SIZE_LIMIT_S> sizelimits = pstInfo->sizelimits[label];
-        for (int j = 0; j < sizelimits.size(); j++)
-        {
+        for (int j = 0; j < sizelimits.size(); j++) {
             if ((min(retbox[i].w, retbox[i].h) < sizelimits[j].min)
-                && (max(retbox[i].w, retbox[i].h) < sizelimits[j].max))
-            {
+                && (max(retbox[i].w, retbox[i].h) < sizelimits[j].max)) {
                 deleteflag = 1;
                 break;
             }
         }
-        if (deleteflag)
-        {
+        if (deleteflag) {
             continue;
         }
         

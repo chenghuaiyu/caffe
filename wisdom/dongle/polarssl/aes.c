@@ -358,8 +358,7 @@ static unsigned long RCON[10];
 
 static int aes_init_done = 0;
 
-static void aes_gen_tables( void )
-{
+static void aes_gen_tables( void ) {
     int i, x, y, z;
     int pow[256];
     int log[256];
@@ -367,8 +366,7 @@ static void aes_gen_tables( void )
     /*
      * compute pow and log tables over GF(2^8)
      */
-    for( i = 0, x = 1; i < 256; i++ )
-    {
+    for( i = 0, x = 1; i < 256; i++ ) {
         pow[i] = x;
         log[x] = i;
         x = ( x ^ XTIME( x ) ) & 0xFF;
@@ -377,8 +375,7 @@ static void aes_gen_tables( void )
     /*
      * calculate the round constants
      */
-    for( i = 0, x = 1; i < 10; i++ )
-    {
+    for( i = 0, x = 1; i < 10; i++ ) {
         RCON[i] = (unsigned long) x;
         x = XTIME( x ) & 0xFF;
     }
@@ -389,8 +386,7 @@ static void aes_gen_tables( void )
     FSb[0x00] = 0x63;
     RSb[0x63] = 0x00;
 
-    for( i = 1; i < 256; i++ )
-    {
+    for( i = 1; i < 256; i++ ) {
         x = pow[255 - log[i]];
 
         y  = x; y = ( (y << 1) | (y >> 7) ) & 0xFF;
@@ -406,8 +402,7 @@ static void aes_gen_tables( void )
     /*
      * generate the forward and reverse tables
      */
-    for( i = 0; i < 256; i++ )
-    {
+    for( i = 0; i < 256; i++ ) {
         x = FSb[i];
         y = XTIME( x ) & 0xFF;
         z =  ( y ^ x ) & 0xFF;
@@ -439,21 +434,18 @@ static void aes_gen_tables( void )
 /*
  * AES key schedule (encryption)
  */
-int aes_setkey_enc( aes_context *ctx, const unsigned char *key, unsigned int keysize )
-{
+int aes_setkey_enc( aes_context *ctx, const unsigned char *key, unsigned int keysize ) {
     unsigned int i;
     unsigned long *RK;
 
 #if !defined(POLARSSL_AES_ROM_TABLES)
-    if( aes_init_done == 0 )
-    {
+    if( aes_init_done == 0 ) {
         aes_gen_tables();
         aes_init_done = 1;
     }
 #endif
 
-    switch( keysize )
-    {
+    switch( keysize ) {
         case 128: ctx->nr = 10; break;
         case 192: ctx->nr = 12; break;
         case 256: ctx->nr = 14; break;
@@ -466,17 +458,14 @@ int aes_setkey_enc( aes_context *ctx, const unsigned char *key, unsigned int key
     ctx->rk = RK = ctx->buf;
 #endif
 
-    for( i = 0; i < (keysize >> 5); i++ )
-    {
+    for( i = 0; i < (keysize >> 5); i++ ) {
         GET_ULONG_LE( RK[i], key, i << 2 );
     }
 
-    switch( ctx->nr )
-    {
+    switch( ctx->nr ) {
         case 10:
 
-            for( i = 0; i < 10; i++, RK += 4 )
-            {
+            for( i = 0; i < 10; i++, RK += 4 ) {
                 RK[4]  = RK[0] ^ RCON[i] ^
                 ( (unsigned long) FSb[ ( RK[3] >>  8 ) & 0xFF ]       ) ^
                 ( (unsigned long) FSb[ ( RK[3] >> 16 ) & 0xFF ] <<  8 ) ^
@@ -491,8 +480,7 @@ int aes_setkey_enc( aes_context *ctx, const unsigned char *key, unsigned int key
 
         case 12:
 
-            for( i = 0; i < 8; i++, RK += 6 )
-            {
+            for( i = 0; i < 8; i++, RK += 6 ) {
                 RK[6]  = RK[0] ^ RCON[i] ^
                 ( (unsigned long) FSb[ ( RK[5] >>  8 ) & 0xFF ]       ) ^
                 ( (unsigned long) FSb[ ( RK[5] >> 16 ) & 0xFF ] <<  8 ) ^
@@ -509,8 +497,7 @@ int aes_setkey_enc( aes_context *ctx, const unsigned char *key, unsigned int key
 
         case 14:
 
-            for( i = 0; i < 7; i++, RK += 8 )
-            {
+            for( i = 0; i < 7; i++, RK += 8 ) {
                 RK[8]  = RK[0] ^ RCON[i] ^
                 ( (unsigned long) FSb[ ( RK[7] >>  8 ) & 0xFF ]       ) ^
                 ( (unsigned long) FSb[ ( RK[7] >> 16 ) & 0xFF ] <<  8 ) ^
@@ -544,16 +531,14 @@ int aes_setkey_enc( aes_context *ctx, const unsigned char *key, unsigned int key
 /*
  * AES key schedule (decryption)
  */
-int aes_setkey_dec( aes_context *ctx, const unsigned char *key, unsigned int keysize )
-{
+int aes_setkey_dec( aes_context *ctx, const unsigned char *key, unsigned int keysize ) {
     int i, j;
     aes_context cty;
     unsigned long *RK;
     unsigned long *SK;
     int ret;
 
-    switch( keysize )
-    {
+    switch( keysize ) {
         case 128: ctx->nr = 10; break;
         case 192: ctx->nr = 12; break;
         case 256: ctx->nr = 14; break;
@@ -577,10 +562,8 @@ int aes_setkey_dec( aes_context *ctx, const unsigned char *key, unsigned int key
     *RK++ = *SK++;
     *RK++ = *SK++;
 
-    for( i = ctx->nr - 1, SK -= 8; i > 0; i--, SK -= 8 )
-    {
-        for( j = 0; j < 4; j++, SK++ )
-        {
+    for( i = ctx->nr - 1, SK -= 8; i > 0; i--, SK -= 8 ) {
+        for( j = 0; j < 4; j++, SK++ ) {
             *RK++ = RT0[ FSb[ ( *SK       ) & 0xFF ] ] ^
                     RT1[ FSb[ ( *SK >>  8 ) & 0xFF ] ] ^
                     RT2[ FSb[ ( *SK >> 16 ) & 0xFF ] ] ^
@@ -650,14 +633,12 @@ int aes_setkey_dec( aes_context *ctx, const unsigned char *key, unsigned int key
 int aes_crypt_ecb( aes_context *ctx,
                     int mode,
                     const unsigned char input[16],
-                    unsigned char output[16] )
-{
+                    unsigned char output[16] ) {
     int i;
     unsigned long *RK, X0, X1, X2, X3, Y0, Y1, Y2, Y3;
 
 #if defined(POLARSSL_PADLOCK_C) && defined(POLARSSL_HAVE_X86)
-    if( padlock_supports( PADLOCK_ACE ) )
-    {
+    if( padlock_supports( PADLOCK_ACE ) ) {
         if( padlock_xcryptecb( ctx, mode, input, output ) == 0 )
             return( 0 );
 
@@ -674,10 +655,8 @@ int aes_crypt_ecb( aes_context *ctx,
     GET_ULONG_LE( X2, input,  8 ); X2 ^= *RK++;
     GET_ULONG_LE( X3, input, 12 ); X3 ^= *RK++;
 
-    if( mode == AES_DECRYPT )
-    {
-        for( i = (ctx->nr >> 1) - 1; i > 0; i-- )
-        {
+    if( mode == AES_DECRYPT ) {
+        for( i = (ctx->nr >> 1) - 1; i > 0; i-- ) {
             AES_RROUND( Y0, Y1, Y2, Y3, X0, X1, X2, X3 );
             AES_RROUND( X0, X1, X2, X3, Y0, Y1, Y2, Y3 );
         }
@@ -710,8 +689,7 @@ int aes_crypt_ecb( aes_context *ctx,
     }
     else /* AES_ENCRYPT */
     {
-        for( i = (ctx->nr >> 1) - 1; i > 0; i-- )
-        {
+        for( i = (ctx->nr >> 1) - 1; i > 0; i-- ) {
             AES_FROUND( Y0, Y1, Y2, Y3, X0, X1, X2, X3 );
             AES_FROUND( X0, X1, X2, X3, Y0, Y1, Y2, Y3 );
         }
@@ -759,8 +737,7 @@ int aes_crypt_cbc( aes_context *ctx,
                     size_t length,
                     unsigned char iv[16],
                     const unsigned char *input,
-                    unsigned char *output )
-{
+                    unsigned char *output ) {
     int i;
     unsigned char temp[16];
 
@@ -768,8 +745,7 @@ int aes_crypt_cbc( aes_context *ctx,
         return( POLARSSL_ERR_AES_INVALID_INPUT_LENGTH );
 
 #if defined(POLARSSL_PADLOCK_C) && defined(POLARSSL_HAVE_X86)
-    if( padlock_supports( PADLOCK_ACE ) )
-    {
+    if( padlock_supports( PADLOCK_ACE ) ) {
         if( padlock_xcryptcbc( ctx, mode, length, iv, input, output ) == 0 )
             return( 0 );
         
@@ -779,10 +755,8 @@ int aes_crypt_cbc( aes_context *ctx,
     }
 #endif
 
-    if( mode == AES_DECRYPT )
-    {
-        while( length > 0 )
-        {
+    if( mode == AES_DECRYPT ) {
+        while( length > 0 ) {
             memcpy( temp, input, 16 );
             aes_crypt_ecb( ctx, mode, input, output );
 
@@ -795,11 +769,8 @@ int aes_crypt_cbc( aes_context *ctx,
             output += 16;
             length -= 16;
         }
-    }
-    else
-    {
-        while( length > 0 )
-        {
+    } else {
+        while( length > 0 ) {
             for( i = 0; i < 16; i++ )
                 output[i] = (unsigned char)( input[i] ^ iv[i] );
 
@@ -825,15 +796,12 @@ int aes_crypt_cfb128( aes_context *ctx,
                        size_t *iv_off,
                        unsigned char iv[16],
                        const unsigned char *input,
-                       unsigned char *output )
-{
+                       unsigned char *output ) {
     int c;
     size_t n = *iv_off;
 
-    if( mode == AES_DECRYPT )
-    {
-        while( length-- )
-        {
+    if( mode == AES_DECRYPT ) {
+        while( length-- ) {
             if( n == 0 )
                 aes_crypt_ecb( ctx, AES_ENCRYPT, iv, iv );
 
@@ -843,11 +811,8 @@ int aes_crypt_cfb128( aes_context *ctx,
 
             n = (n + 1) & 0x0F;
         }
-    }
-    else
-    {
-        while( length-- )
-        {
+    } else {
+        while( length-- ) {
             if( n == 0 )
                 aes_crypt_ecb( ctx, AES_ENCRYPT, iv, iv );
 
@@ -873,13 +838,11 @@ int aes_crypt_ctr( aes_context *ctx,
                        unsigned char nonce_counter[16],
                        unsigned char stream_block[16],
                        const unsigned char *input,
-                       unsigned char *output )
-{
+                       unsigned char *output ) {
     int c, i, cb;
     size_t n = *nc_off;
 
-    while( length-- )
-    {
+    while( length-- ) {
         if( n == 0 ) {
             aes_crypt_ecb( ctx, AES_ENCRYPT, nonce_counter, stream_block );
 
@@ -1083,8 +1046,7 @@ static const int aes_test_ctr_len[3] =
 /*
  * Checkup routine
  */
-int aes_self_test( int verbose )
-{
+int aes_self_test( int verbose ) {
     int i, j, u, v;
     unsigned char key[32];
     unsigned char buf[64];
@@ -1105,8 +1067,7 @@ int aes_self_test( int verbose )
     /*
      * ECB mode
      */
-    for( i = 0; i < 6; i++ )
-    {
+    for( i = 0; i < 6; i++ ) {
         u = i >> 1;
         v = i  & 1;
 
@@ -1116,30 +1077,25 @@ int aes_self_test( int verbose )
 
         memset( buf, 0, 16 );
 
-        if( v == AES_DECRYPT )
-        {
+        if( v == AES_DECRYPT ) {
             aes_setkey_dec( &ctx, key, 128 + u * 64 );
 
             for( j = 0; j < 10000; j++ )
                 aes_crypt_ecb( &ctx, v, buf, buf );
 
-            if( memcmp( buf, aes_test_ecb_dec[u], 16 ) != 0 )
-            {
+            if( memcmp( buf, aes_test_ecb_dec[u], 16 ) != 0 ) {
                 if( verbose != 0 )
                     printf( "failed\n" );
 
                 return( 1 );
             }
-        }
-        else
-        {
+        } else {
             aes_setkey_enc( &ctx, key, 128 + u * 64 );
 
             for( j = 0; j < 10000; j++ )
                 aes_crypt_ecb( &ctx, v, buf, buf );
 
-            if( memcmp( buf, aes_test_ecb_enc[u], 16 ) != 0 )
-            {
+            if( memcmp( buf, aes_test_ecb_enc[u], 16 ) != 0 ) {
                 if( verbose != 0 )
                     printf( "failed\n" );
 
@@ -1157,8 +1113,7 @@ int aes_self_test( int verbose )
     /*
      * CBC mode
      */
-    for( i = 0; i < 6; i++ )
-    {
+    for( i = 0; i < 6; i++ ) {
         u = i >> 1;
         v = i  & 1;
 
@@ -1170,27 +1125,22 @@ int aes_self_test( int verbose )
         memset( prv, 0, 16 );
         memset( buf, 0, 16 );
 
-        if( v == AES_DECRYPT )
-        {
+        if( v == AES_DECRYPT ) {
             aes_setkey_dec( &ctx, key, 128 + u * 64 );
 
             for( j = 0; j < 10000; j++ )
                 aes_crypt_cbc( &ctx, v, 16, iv, buf, buf );
 
-            if( memcmp( buf, aes_test_cbc_dec[u], 16 ) != 0 )
-            {
+            if( memcmp( buf, aes_test_cbc_dec[u], 16 ) != 0 ) {
                 if( verbose != 0 )
                     printf( "failed\n" );
 
                 return( 1 );
             }
-        }
-        else
-        {
+        } else {
             aes_setkey_enc( &ctx, key, 128 + u * 64 );
 
-            for( j = 0; j < 10000; j++ )
-            {
+            for( j = 0; j < 10000; j++ ) {
                 unsigned char tmp[16];
 
                 aes_crypt_cbc( &ctx, v, 16, iv, buf, buf );
@@ -1200,8 +1150,7 @@ int aes_self_test( int verbose )
                 memcpy( buf, tmp, 16 );
             }
 
-            if( memcmp( prv, aes_test_cbc_enc[u], 16 ) != 0 )
-            {
+            if( memcmp( prv, aes_test_cbc_enc[u], 16 ) != 0 ) {
                 if( verbose != 0 )
                     printf( "failed\n" );
 
@@ -1220,8 +1169,7 @@ int aes_self_test( int verbose )
     /*
      * CFB128 mode
      */
-    for( i = 0; i < 6; i++ )
-    {
+    for( i = 0; i < 6; i++ ) {
         u = i >> 1;
         v = i  & 1;
 
@@ -1235,26 +1183,21 @@ int aes_self_test( int verbose )
         offset = 0;
         aes_setkey_enc( &ctx, key, 128 + u * 64 );
 
-        if( v == AES_DECRYPT )
-        {
+        if( v == AES_DECRYPT ) {
             memcpy( buf, aes_test_cfb128_ct[u], 64 );
             aes_crypt_cfb128( &ctx, v, 64, &offset, iv, buf, buf );
 
-            if( memcmp( buf, aes_test_cfb128_pt, 64 ) != 0 )
-            {
+            if( memcmp( buf, aes_test_cfb128_pt, 64 ) != 0 ) {
                 if( verbose != 0 )
                     printf( "failed\n" );
 
                 return( 1 );
             }
-        }
-        else
-        {
+        } else {
             memcpy( buf, aes_test_cfb128_pt, 64 );
             aes_crypt_cfb128( &ctx, v, 64, &offset, iv, buf, buf );
 
-            if( memcmp( buf, aes_test_cfb128_ct[u], 64 ) != 0 )
-            {
+            if( memcmp( buf, aes_test_cfb128_ct[u], 64 ) != 0 ) {
                 if( verbose != 0 )
                     printf( "failed\n" );
 
@@ -1274,8 +1217,7 @@ int aes_self_test( int verbose )
     /*
      * CTR mode
      */
-    for( i = 0; i < 6; i++ )
-    {
+    for( i = 0; i < 6; i++ ) {
         u = i >> 1;
         v = i  & 1;
 
@@ -1289,30 +1231,25 @@ int aes_self_test( int verbose )
         offset = 0;
         aes_setkey_enc( &ctx, key, 128 );
 
-        if( v == AES_DECRYPT )
-        {
+        if( v == AES_DECRYPT ) {
             len = aes_test_ctr_len[u];
             memcpy( buf, aes_test_ctr_ct[u], len );
 
             aes_crypt_ctr( &ctx, len, &offset, nonce_counter, stream_block, buf, buf );
 
-            if( memcmp( buf, aes_test_ctr_pt[u], len ) != 0 )
-            {
+            if( memcmp( buf, aes_test_ctr_pt[u], len ) != 0 ) {
                 if( verbose != 0 )
                     printf( "failed\n" );
 
                 return( 1 );
             }
-        }
-        else
-        {
+        } else {
             len = aes_test_ctr_len[u];
             memcpy( buf, aes_test_ctr_pt[u], len );
 
             aes_crypt_ctr( &ctx, len, &offset, nonce_counter, stream_block, buf, buf );
 
-            if( memcmp( buf, aes_test_ctr_ct[u], len ) != 0 )
-            {
+            if( memcmp( buf, aes_test_ctr_ct[u], len ) != 0 ) {
                 if( verbose != 0 )
                     printf( "failed\n" );
 

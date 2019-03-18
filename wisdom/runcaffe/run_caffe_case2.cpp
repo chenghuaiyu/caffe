@@ -12,6 +12,7 @@
 #include "google/protobuf/text_format.h"
 #include <google/protobuf/io/coded_stream.h>
 #include <gflags/gflags.h>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
 #include <glog/logging.h>
 #include <utility>
 #include <map>
@@ -44,8 +45,7 @@ using ::google::protobuf::Message;
 using namespace std;
 using namespace cv;
 
-vector<DETECT_BOX_S> run_caffe_once_case2(cv::Mat& org_img, cv::Rect& padrect, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_once_case2(cv::Mat& org_img, cv::Rect& padrect, MODEL_INFO_S *pstInfo) {
     Net<float> *caffe_net = pstInfo->caffe_net;
     vector<DETECT_BOX_S> retbox;
     /* run caffe */
@@ -56,17 +56,14 @@ vector<DETECT_BOX_S> run_caffe_once_case2(cv::Mat& org_img, cv::Rect& padrect, M
     int num_det = rect->height();
     std::cout << "num_det:" << num_det << endl;
     const float* result_vec = rect->cpu_data();
-    for (int i = 0; i < num_det; i++)
-    {
+    for (int i = 0; i < num_det; i++) {
         DETECT_BOX_S tmpbox;
         int label = result_vec[i * 7 + 1]; 
         float score = result_vec[i * 7 + 2];
-        if (label < 0)
-        {
+        if (label < 0) {
             continue;
         }
-		if (score < pstInfo->scores[label])
-        {
+		if (score < pstInfo->scores[label]) {
             continue;
         }
         cv::Rect cvrect;
@@ -94,8 +91,7 @@ vector<DETECT_BOX_S> run_caffe_once_case2(cv::Mat& org_img, cv::Rect& padrect, M
     return retbox;
 }
 
-vector<DETECT_BOX_S> run_caffe_pad_case2(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_pad_case2(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
     Blob<float>* input_layer = pstInfo->caffe_net->input_blobs()[0];
     int width = input_layer->width();
     int height = input_layer->height();
@@ -137,8 +133,7 @@ vector<DETECT_BOX_S> run_caffe_pad_case2(cv::Mat& org_img, MODEL_INFO_S *pstInfo
     return retbox;
 }
 
-vector<DETECT_BOX_S> run_caffe_other_case2(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_other_case2(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
     Blob<float>* input_layer = pstInfo->caffe_net->input_blobs()[0];
     int width = input_layer->width();
     int height = input_layer->height();
@@ -181,19 +176,15 @@ vector<DETECT_BOX_S> run_caffe_other_case2(cv::Mat& org_img, MODEL_INFO_S *pstIn
     return retbox;
 }
 
-vector<DETECT_BOX_S> run_caffe_case2(cv::Mat& org_img, MODEL_INFO_S *pstInfo)
-{
+vector<DETECT_BOX_S> run_caffe_case2(cv::Mat& org_img, MODEL_INFO_S *pstInfo) {
     vector<DETECT_BOX_S> retbox;
     Blob<float>* input_layer = pstInfo->caffe_net->input_blobs()[0];
     int width = input_layer->width();
     int height = input_layer->height();
     
-    if ((org_img.rows < height) && (org_img.cols < width))
-    {
+    if ((org_img.rows < height) && (org_img.cols < width)) {
         retbox = run_caffe_pad_case2(org_img, pstInfo);
-    }
-    else
-    {
+    } else {
         retbox = run_caffe_other_case2(org_img, pstInfo);
     }
 
