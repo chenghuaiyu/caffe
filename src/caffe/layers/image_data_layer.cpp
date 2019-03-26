@@ -35,7 +35,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       "new_height and new_width to be set at the same time.";
   // Read the file with filenames and labels
   const string& source = this->layer_param_.image_data_param().source();
-  LOG(INFO) << "Opening file " << source;
+  DLOG(INFO) << "Opening file " << source;
   std::ifstream infile(source.c_str());
   string line;
   size_t pos;
@@ -50,12 +50,12 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
   if (this->layer_param_.image_data_param().shuffle()) {
     // randomly shuffle data
-    LOG(INFO) << "Shuffling data";
+    DLOG(INFO) << "Shuffling data";
     const unsigned int prefetch_rng_seed = caffe_rng_rand();
     prefetch_rng_.reset(new Caffe::RNG(prefetch_rng_seed));
     ShuffleImages();
   }
-  LOG(INFO) << "A total of " << lines_.size() << " images.";
+  DLOG(INFO) << "A total of " << lines_.size() << " images.";
 
   lines_id_ = 0;
   // Check if we would need to randomly skip a few data points
@@ -82,7 +82,7 @@ void ImageDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
   top[0]->Reshape(top_shape);
 
-  LOG(INFO) << "output data size: " << top[0]->num() << ","
+  DLOG(INFO) << "output data size: " << top[0]->num() << ","
       << top[0]->channels() << "," << top[0]->height() << ","
       << top[0]->width();
   // label

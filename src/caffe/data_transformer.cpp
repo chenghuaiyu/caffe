@@ -23,7 +23,7 @@ DataTransformer<Dtype>::DataTransformer(const TransformationParameter& param,
       "Cannot specify mean_file and mean_value at the same time";
     const string& mean_file = param.mean_file();
     if (Caffe::root_solver()) {
-      LOG(INFO) << "Loading mean file from: " << mean_file;
+      DLOG(INFO) << "Loading mean file from: " << mean_file;
     }
     BlobProto blob_proto;
     ReadProtoFromBinaryFileOrDie(mean_file.c_str(), &blob_proto);

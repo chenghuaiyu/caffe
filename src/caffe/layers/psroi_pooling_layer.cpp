@@ -23,7 +23,7 @@ namespace caffe {
     PSROIPoolingParameter psroi_pooling_param =
       this->layer_param_.psroi_pooling_param();
     spatial_scale_ = psroi_pooling_param.spatial_scale();
-    LOG(INFO) << "Spatial scale: " << spatial_scale_;
+    DLOG(INFO) << "Spatial scale: " << spatial_scale_;
 
     CHECK_GT(psroi_pooling_param.output_dim(), 0)
       << "output_dim must be > 0";

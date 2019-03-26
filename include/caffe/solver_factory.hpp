@@ -113,7 +113,7 @@ class SolverRegisterer {
  public:
   SolverRegisterer(const string& type,
       Solver<Dtype>* (*creator)(const SolverParameter&)) {
-    // LOG(INFO) << "Registering solver type: " << type;
+    DLOG(INFO) << "Registering solver type: " << type;
     SolverRegistry<Dtype>::AddCreator(type, creator);
   }
 };

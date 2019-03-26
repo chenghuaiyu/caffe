@@ -37,7 +37,7 @@ void LMDB::Open(const string& source, Mode mode) {
     MDB_CHECK(rc);
   }
 #endif
-  LOG(INFO) << "Opened lmdb " << source;
+  DLOG(INFO) << "Opened lmdb " << source;
 }
 
 LMDBCursor* LMDB::NewCursor() {

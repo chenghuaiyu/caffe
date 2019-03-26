@@ -34,7 +34,7 @@ int64_t cluster_seedgen(void) {
     return seed;
   }
 
-  LOG(INFO) << "System entropy source not available, "
+  DLOG(INFO) << "System entropy source not available, "
               "using fallback algorithm to generate seed instead.";
   if (f)
     fclose(f);
@@ -184,29 +184,29 @@ void Caffe::DeviceQuery() {
     return;
   }
   CUDA_CHECK(cudaGetDeviceProperties(&prop, device));
-  LOG(INFO) << "Device id:                     " << device;
-  LOG(INFO) << "Major revision number:         " << prop.major;
-  LOG(INFO) << "Minor revision number:         " << prop.minor;
-  LOG(INFO) << "Name:                          " << prop.name;
-  LOG(INFO) << "Total global memory:           " << prop.totalGlobalMem;
-  LOG(INFO) << "Total shared memory per block: " << prop.sharedMemPerBlock;
-  LOG(INFO) << "Total registers per block:     " << prop.regsPerBlock;
-  LOG(INFO) << "Warp size:                     " << prop.warpSize;
-  LOG(INFO) << "Maximum memory pitch:          " << prop.memPitch;
-  LOG(INFO) << "Maximum threads per block:     " << prop.maxThreadsPerBlock;
-  LOG(INFO) << "Maximum dimension of block:    "
+  DLOG(INFO) << "Device id:                     " << device;
+  DLOG(INFO) << "Major revision number:         " << prop.major;
+  DLOG(INFO) << "Minor revision number:         " << prop.minor;
+  DLOG(INFO) << "Name:                          " << prop.name;
+  DLOG(INFO) << "Total global memory:           " << prop.totalGlobalMem;
+  DLOG(INFO) << "Total shared memory per block: " << prop.sharedMemPerBlock;
+  DLOG(INFO) << "Total registers per block:     " << prop.regsPerBlock;
+  DLOG(INFO) << "Warp size:                     " << prop.warpSize;
+  DLOG(INFO) << "Maximum memory pitch:          " << prop.memPitch;
+  DLOG(INFO) << "Maximum threads per block:     " << prop.maxThreadsPerBlock;
+  DLOG(INFO) << "Maximum dimension of block:    "
       << prop.maxThreadsDim[0] << ", " << prop.maxThreadsDim[1] << ", "
       << prop.maxThreadsDim[2];
-  LOG(INFO) << "Maximum dimension of grid:     "
+  DLOG(INFO) << "Maximum dimension of grid:     "
       << prop.maxGridSize[0] << ", " << prop.maxGridSize[1] << ", "
       << prop.maxGridSize[2];
-  LOG(INFO) << "Clock rate:                    " << prop.clockRate;
-  LOG(INFO) << "Total constant memory:         " << prop.totalConstMem;
-  LOG(INFO) << "Texture alignment:             " << prop.textureAlignment;
-  LOG(INFO) << "Concurrent copy and execution: "
+  DLOG(INFO) << "Clock rate:                    " << prop.clockRate;
+  DLOG(INFO) << "Total constant memory:         " << prop.totalConstMem;
+  DLOG(INFO) << "Texture alignment:             " << prop.textureAlignment;
+  DLOG(INFO) << "Concurrent copy and execution: "
       << (prop.deviceOverlap ? "Yes" : "No");
-  LOG(INFO) << "Number of multiprocessors:     " << prop.multiProcessorCount;
-  LOG(INFO) << "Kernel execution timeout:      "
+  DLOG(INFO) << "Number of multiprocessors:     " << prop.multiProcessorCount;
+  DLOG(INFO) << "Kernel execution timeout:      "
       << (prop.kernelExecTimeoutEnabled ? "Yes" : "No");
   return;
 }
