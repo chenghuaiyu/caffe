@@ -21,11 +21,11 @@
 using namespace std;
 using namespace cv;
 
-bool IsImageFileExt(const char * pszExt) {
-	if (_stricmp(pszExt, "jpg") == 0 ||
-		_stricmp(pszExt, "jpeg") == 0 ||
-		_stricmp(pszExt, "png") == 0 ||
-		_stricmp(pszExt, "bmp") == 0) {
+bool wIsImageFileExt(const wchar_t * pwszExt) {
+	if (_wcsicmp(pwszExt, L"jpg") == 0 ||
+		_wcsicmp(pwszExt, L"jpeg") == 0 ||
+		_wcsicmp(pwszExt, L"png") == 0 ||
+		_wcsicmp(pwszExt, L"bmp") == 0) {
 		return true;
 	}
 	else {
@@ -34,60 +34,53 @@ bool IsImageFileExt(const char * pszExt) {
 }
 
 #ifdef _WIN32
-
-void SearchImageFiles(vector<string> & fileList, const char * pszImagePath, bool bFullPath) {
+void wSearchImageFiles(vector<wstring> & fileList, const wchar_t * pwszImagePath, bool bFullPath) {
 	//LOG_FUNCTION;
-	if (NULL == pszImagePath)
-	{
+	if (NULL == pwszImagePath) {
 		return;
 	}
-	char szSearchPath[_MAX_PATH];
-	strcpy_s(szSearchPath, pszImagePath);
+	wchar_t szSearchPath[_MAX_PATH];
+	wcscpy_s(szSearchPath, pwszImagePath);
 
-	strcat_s(szSearchPath, "/*.*");
+	wcscat_s(szSearchPath, L"/*.*");
 
 	HANDLE hFind;
-	WIN32_FIND_DATAA ffd;
+	WIN32_FIND_DATAW ffd;
 
-	hFind = FindFirstFileA(szSearchPath, &ffd);
+	hFind = FindFirstFileW(szSearchPath, &ffd);
 	DWORD errorcode = 0;
 	if (hFind == INVALID_HANDLE_VALUE) {
 		printf("Can not find any file\n");
 		return;
 	}
 
-	while (true)
-	{
-		if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
-		{
-			int nLen = (int)strlen(ffd.cFileName);
-			if (nLen >= 5)
-			{
-				char * pszExt = strrchr(ffd.cFileName, '.');
+	while (true) {
+		if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+			int nLen = (int)wcslen(ffd.cFileName);
+			if (nLen >= 2) {
+				wchar_t * pszExt = wcsrchr(ffd.cFileName, L'.');
 
-				if (pszExt != NULL && IsImageFileExt(pszExt + 1))
-				{
-					if (bFullPath)
-					{
-						string strFile = pszImagePath;
-						strFile += "/";
+				if (pszExt != NULL && wIsImageFileExt(pszExt + 1)) {
+					if (bFullPath) {
+						wstring strFile = pwszImagePath;
+						strFile += L"/";
 						strFile += ffd.cFileName;
 						fileList.push_back(strFile);
 					}
-					else
-					{
-						fileList.push_back(string(ffd.cFileName));
+					else {
+						fileList.push_back(wstring(ffd.cFileName));
 					}
 				}
 			}
 		}
 
-		if (FindNextFileA(hFind, &ffd) == FALSE)
+		if (FindNextFileW(hFind, &ffd) == FALSE)
 			break;
 	}
 
 	FindClose(hFind);
 }
+
 #else
 void SearchImageFiles(vector<string> & fileList, const char * pszImagePath, bool bFullPath = false)
 {
@@ -145,88 +138,39 @@ void SearchImageFiles(vector<string> & fileList, const char * pszImagePath, bool
 }
 #endif
 
-bool DoesFileExist(const char * pszFileName) {
-	if (-1 != GetFileAttributesA(pszFileName))
-		return true;
-	else
-		return false;
-}
-
-std::wstring MultiByte2Wide(const char * pszMultiByte, int cp) {
-	int nLen = MultiByteToWideChar(cp, 0, pszMultiByte, -1, NULL, 0);
-	if (0 == nLen) {
-		return L"";
+void string_replace(std::wstring&str, const std::wstring&strMark, const std::wstring&strReplace)
+{
+	std::wstring::size_type pos = 0;
+	std::wstring::size_type a = strMark.size();
+	std::wstring::size_type b = strReplace.size();
+	while ((pos = str.find(strMark, pos)) != std::wstring::npos)
+	{
+		str.replace(pos, a, strReplace);
+		pos += b;
 	}
-	wchar_t* pwszBuf = new wchar_t[nLen + 1]();
-	MultiByteToWideChar(cp, 0, pszMultiByte, (int)strlen(pszMultiByte), pwszBuf, nLen);
-
-	std::wstring wstr(pwszBuf);
-	delete[] pwszBuf;
-
-	return wstr;
 }
 
-std::string Wide2MultiByte(const wchar_t * pwszBuf, int cp) {
-	int nLen = WideCharToMultiByte(cp, 0, pwszBuf, -1, NULL, NULL, NULL, NULL);
-	if (0 == nLen) {
-		return "";
-	}
+std::wstring wConvertPath2Name(const wchar_t * pszImgName) {
+	wchar_t szFullPath[_MAX_PATH];
+	GetFullPathNameW(pszImgName, _MAX_PATH, szFullPath, NULL);
+	std::wstring strFile = szFullPath;
 
-	char* pszMultiByte = new char[nLen + 1]();
-	WideCharToMultiByte(cp, 0, pwszBuf, (int)wcslen(pwszBuf), pszMultiByte, nLen, NULL, NULL);
-
-	std::string str(pszMultiByte);
-	delete[] pszMultiByte;
-
-	return str;
+	string_replace(strFile, L"/", L"_");
+	string_replace(strFile, L"\\", L"_");
+	string_replace(strFile, L":", L"__");
+	return strFile;
 }
 
-std::string MultiByte2UTF8(const char * pszMultiByte, int cp) {
-	int nLen = MultiByteToWideChar(cp, 0, pszMultiByte, -1, NULL, 0);
-	if (0 == nLen) {
-		return "";
-	}
-	wchar_t* pwszBuf = new wchar_t[nLen + 1]();
-	MultiByteToWideChar(cp, 0, pszMultiByte, (int)strlen(pszMultiByte), pwszBuf, nLen);
-	nLen = WideCharToMultiByte(CP_UTF8, 0, pwszBuf, -1, NULL, NULL, NULL, NULL);
-	char* pszUTF8 = new char[nLen + 1]();
-	WideCharToMultiByte(CP_UTF8, 0, pwszBuf, (int)wcslen(pwszBuf), pszUTF8, nLen, NULL, NULL);
-	delete[] pwszBuf;
-
-	std::string strUTF8(pszUTF8);
-	delete[] pszUTF8;
-
-	return strUTF8;
-}
-
-std::string UTF82MultiByte(const char * pszUTF8, int cp) {
-	int nLen = MultiByteToWideChar(CP_UTF8, 0, pszUTF8, -1, NULL, 0);
-	if (0 == nLen) {
-		return "";
-	}
-	wchar_t* pwszBuf = new wchar_t[nLen + 1]();
-	MultiByteToWideChar(CP_UTF8, 0, pszUTF8, (int)strlen(pszUTF8), pwszBuf, nLen);
-	nLen = WideCharToMultiByte(cp, 0, pwszBuf, -1, NULL, NULL, NULL, NULL);
-	char* pszMultiByte = new char[nLen + 1]();
-	WideCharToMultiByte(cp, 0, pwszBuf, (int)wcslen(pwszBuf), pszMultiByte, nLen, NULL, NULL);
-	delete[] pwszBuf;
-
-	std::string str(pszMultiByte);
-	delete[] pszMultiByte;
-	return str;
-}
-
-void BatchProcess(void * hAlg, string strImageDirS8, int missErrorRatio) {
-	LOG(INFO) << "proceed image dir: " << strImageDirS8;
-	string strImageDir = UTF82MultiByte(strImageDirS8.c_str(), CP_ACP);
-	std::cout << "proceed image dir: " << strImageDir << endl;
-	if (!DoesFileExist(strImageDir.c_str())) {
-		std::cout << "src file directory doesn't exist: " << strImageDir << endl;
+void BatchProcess(void * hAlg, wstring wstrDstDir, wstring wstrImageDir, int missErrorRatio) {
+	LOG(INFO) << "proceed image dir: " << Wide2MultiByte(wstrImageDir.c_str(), CP_UTF8);
+	std::cout << "proceed image dir: " << Wide2MultiByte(wstrImageDir.c_str(), CP_UTF8) << endl;
+	if (!wDoesFileExist(wstrImageDir.c_str())) {
+		std::cout << "directory doesn't exist." << endl;
 		return;
 	}
 
-	vector<string> fileList;
-	SearchImageFiles(fileList, strImageDir.c_str(), true);
+	vector<wstring> fileList;
+	wSearchImageFiles(fileList, wstrImageDir.c_str(), true);
 	if (0 == fileList.size()) {
 		std::cout << "image file doesn't exist" << endl;
 		return;
@@ -234,9 +178,9 @@ void BatchProcess(void * hAlg, string strImageDirS8, int missErrorRatio) {
 	LOG(INFO) << "image file count: " << fileList.size();
 	std::cout << "image file count: " << fileList.size() << endl;
 
-	for (vector<string>::iterator it = fileList.begin(); it != fileList.end(); ++it) {
-		printf(">>> proceed: %s\n", it->c_str());
-		string strUtf8 = MultiByte2UTF8(it->c_str(), CP_ACP);
+	for (vector<wstring>::iterator it = fileList.begin(); it != fileList.end(); ++it) {
+		string strUtf8 = Wide2MultiByte(it->c_str(), CP_UTF8);
+		printf(">>> proceed file: %s\n", strUtf8.c_str());
 		LOG(INFO) << ">>> proceed: " << strUtf8;
 		char* pszRes = NULL;
 		int nRet = SCWDetectObjectByFile(&pszRes, hAlg, strUtf8.c_str(), missErrorRatio);
@@ -244,16 +188,23 @@ void BatchProcess(void * hAlg, string strImageDirS8, int missErrorRatio) {
 			LOG(INFO) << "detection return: " << nRet;
 			continue;
 		}
-		printf("--->proceed result:\n %s\n<---\n", UTF82MultiByte(pszRes, CP_ACP).c_str());
+		printf("--->alg result:\n %s\n<---\n", pszRes);
+		wstring filePathName = wstrDstDir + L"/";
+		filePathName+=wConvertPath2Name(it->c_str()) + L".txt";
+		std::ofstream ofs(filePathName, std::ofstream::binary);
+		ofs << pszRes;
+		ofs.close();
+
 		SCWRelease(&pszRes);
 	}
 }
 
 //int main(int argc, char** argv) {
 int wmain(int argc, wchar_t *argv[], wchar_t *envp[]) {
+	system("chcp 65001");
 	string strArgv0 = Wide2MultiByte(argv[0], CP_ACP);
 	::google::InitGoogleLogging(strArgv0.c_str());
-	std::cout << "argc: " << argc << endl;
+	std::cout << "[Test]argc: " << argc << endl;
 	if (5 > argc) {
 		std::cout << "format: objectTypes\t configFile\t dstDir imgDir [imgDir2 ...]\n"
 			<< "for example:\n\t\"knife;scissor\" \"d:/SCWObjectDetectionConf.ini\" \"D:\\SCWObjectDetectionResult\" \"D:\\imagesA\" \"D:\\imagesB\"" << endl;
@@ -262,7 +213,9 @@ int wmain(int argc, wchar_t *argv[], wchar_t *envp[]) {
 
 	//wchar_t wszObjectType[] = L" knife : 刀  ;   scissors=scissor :   剪刀;liquid:液体;battery:锂电池 ";
 	//string strObjectType = Wide2MultiByte(wszObjectType, CP_UTF8);
+	//std::wcout << L"[Test]objectTypes: " << argv[1] << endl;
 	string strObjectType = Wide2MultiByte(argv[1], CP_UTF8);
+	std::cout << "[Test]objectTypes: " << strObjectType << endl;
 	LOG(INFO) << "objectTypes: \"" << strObjectType.c_str() << "\"";
 	string strConfigFile = Wide2MultiByte(argv[2], CP_UTF8);
 	LOG(INFO) << "configFile: \"" << strConfigFile << "\"";
@@ -274,12 +227,17 @@ int wmain(int argc, wchar_t *argv[], wchar_t *envp[]) {
 		printf("exit due to failure invoking DetectionInit: %d", nRet);
 		return nRet;
 	} else {
-		//std::wcout << L"object types result: " << MultiByte2Wide(pszObjects, CP_UTF8) << L"\n";
+		std::cout << "[Test]object types result: " << pszObjects << endl;
 		SCWRelease(&pszObjects);
 	}
 
-	string strDstDir = Wide2MultiByte(argv[3], CP_UTF8);
-	LOG(INFO) << "dstDir: " << strDstDir << endl;
+	wstring strDstDir = argv[3];
+	LOG(INFO) << "dstDir: " << Wide2MultiByte(argv[3], CP_UTF8) << endl;
+	nRet = _wmkdir(strDstDir.c_str());
+	if (0 != nRet) {
+		printf("fail to invoke _mkdir(): %s.", Wide2MultiByte(strDstDir.c_str(), CP_UTF8).c_str());
+		LOG(ERROR) << "return: " << nRet << " invoking _wmkdir() ";
+	}
 
 	//char* pszRes = NULL;
 	//const char szImagePath[] = "D:/images/xRayImg/images/01.jpg; D:/images/xRayImg/images/02.jpg";
@@ -292,9 +250,9 @@ int wmain(int argc, wchar_t *argv[], wchar_t *envp[]) {
 	//}
 
 	for (int i = 4; i < argc; ++i) {
-		string strImgDir = Wide2MultiByte(argv[i], CP_UTF8);
-		LOG(INFO) << "imgDir: " << strImgDir;
-		BatchProcess(hAlg, strImgDir, 0);
+		LOG(INFO) << "imgDir: " << Wide2MultiByte(argv[i], CP_UTF8).c_str();
+		wstring strImgDir = argv[i];
+		BatchProcess(hAlg, strDstDir, strImgDir, 0);
 	}
 
 	nRet = SCWUninitObjectDetection(&hAlg);

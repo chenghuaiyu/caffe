@@ -107,10 +107,10 @@ void IntersectBBox(const BBox& bbox1, const BBox& bbox2,
 		intersect_bbox->xmax = 0;
 		intersect_bbox->ymax = 0;
 	} else {
-		intersect_bbox->xmin = std::max(bbox1.xmin, bbox2.xmin);
-		intersect_bbox->ymin = std::max(bbox1.ymin, bbox2.ymin);
-		intersect_bbox->xmax = std::min(bbox1.xmax, bbox2.xmax);
-		intersect_bbox->ymax = std::min(bbox1.ymax, bbox2.ymax);
+		intersect_bbox->xmin = (std::max)(bbox1.xmin, bbox2.xmin);
+		intersect_bbox->ymin = (std::max)(bbox1.ymin, bbox2.ymin);
+		intersect_bbox->xmax = (std::min)(bbox1.xmax, bbox2.xmax);
+		intersect_bbox->ymax = (std::min)(bbox1.ymax, bbox2.ymax);
 	}
 }
 

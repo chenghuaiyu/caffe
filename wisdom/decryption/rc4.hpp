@@ -22,7 +22,9 @@ private:
 };
 
 bool VimDecrypt2BufRc4(const char* infile, const char *pwd, char** out1, 
-                            char** out2, int *len1, int *len2);
+	char** out2, int *len1, int *len2);
+bool VimDecrypt2BufRc4(const wchar_t* infile, const char *pwd, char** out1,
+	char** out2, int *len1, int *len2);
 
 #endif  // __RC4_HPP__
 

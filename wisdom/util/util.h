@@ -11,13 +11,26 @@ using namespace cv;
 using namespace std;
 
 #ifdef _WIN32
+#include <winnls.h>
+
 char* ConvertLPWSTRToLPSTR(wchar_t * lpwszStrIn);
+
+wstring wGetDLLPath();
 string GetDLLPath();
+
+std::wstring MultiByte2Wide(const char * pszMultiByte, int cp);
+std::string Wide2MultiByte(const wchar_t * pwszBuf, int cp);
+
+std::string MultiByte2UTF8(const char * pszMultiByte, int cp);
+std::string UTF82MultiByte(const char * pszUTF8, int cp);
+
 #endif
 
 string GetAppPath();
 bool IsDirExist(string strDirName);
 bool IsFileExist(string strFileName);
+bool DoesFileExist(const char * pszFileName);
+bool wDoesFileExist(const wchar_t * pwszFileName);
 void GetFiles(string path, vector<string>& files);
 void GetFiles(string path, vector<string>& files, vector<string>& pathfiles);
 

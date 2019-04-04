@@ -352,7 +352,7 @@ int GetModelInfoXml(string configfile, MODEL_INFO_S *pstInfo, string strpath) {
     return SUCCESS;
 }
 
-int LoadFile2ModelInfoXml(string configfile, MODEL_INFO_S *pstInfo) {
+int LoadXmlFile2ModelInfo(string configfile, MODEL_INFO_S *pstInfo) {
 	string strpath = "";
 	size_t found = configfile.find_last_of("/\\");
 	if (-1 == found) {

@@ -24,4 +24,4 @@ int GetModelInfo(string configfile, MODEL_INFO_S *pstInfo, string strpath) {
     }
     
     return ret;
-} 
+}

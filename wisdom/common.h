@@ -46,6 +46,7 @@ struct MyImgRes {
  
 typedef struct {
   string filename;
+  wstring wfilename;
   int width;
   int height;
   vector<DETECT_BOX_S> boxes;
@@ -80,5 +81,30 @@ typedef struct {
   float outputexpandratio;
   vector<float> minarea;
 } MODEL_INFO_S;
+
+typedef struct {
+  Net<float> *caffe_net;
+  wstring gpus;
+  wstring encry;
+  wstring key;
+  wstring model;
+  wstring weight;
+  wstring labelmapfile;
+  LabelMap *labelmap;
+  vector<float> scores;
+  vector<float> scoreslow;
+  vector<float> scoreshigh;
+  vector<float> maxcnts;
+  vector<int> colors;
+  vector<wstring> labels;
+  vector<float> means;
+  vector<vector<SIZE_LIMIT_S>> sizelimits;
+  wstring postmode;
+  wstring runmode;
+  wstring outmode;
+  float cropscale;
+  float outputexpandratio;
+  vector<float> minarea;
+} wMODEL_INFO_S;
 
 #endif

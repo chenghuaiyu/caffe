@@ -1,5 +1,5 @@
 
-#include "boost/algorithm/string.hpp"
+#include <boost/algorithm/string.hpp>
 #include "caffe/caffe.hpp"
 #include "caffe/util/signal_handler.h"
 #include "caffe/util/bbox_util.hpp"
@@ -9,13 +9,12 @@
 #include "caffe/util/db.hpp"
 #include "caffe/util/io.hpp"
 #include "caffe/util/upgrade_proto.hpp"
-#include "google/protobuf/text_format.h"
+#include <google/protobuf/text_format.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h> 
 #include <gflags/gflags.h>
-#define GLOG_NO_ABBREVIATED_SEVERITIES
-#include <glog/logging.h>
 #include <utility>
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
@@ -25,6 +24,8 @@
 
 #include <vector>
 #include <string>
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+#include <glog/logging.h>
 
 #include "../common.h"
 #include "../util/util.h"
@@ -56,10 +57,10 @@ static float JaccardOverlap(const DETECT_BOX_S bbox1, const DETECT_BOX_S bbox2) 
       bbox2.y > (bbox1.h+bbox1.y) || (bbox2.h+bbox2.y) < bbox1.y) {
     return float(0.);
   } else {
-    const float inter_xmin = std::max(bbox1.x, bbox2.x);
-    const float inter_ymin = std::max(bbox1.y, bbox2.y);
-    const float inter_xmax = std::min(bbox1.w+bbox1.x, bbox2.w+bbox2.x);
-    const float inter_ymax = std::min(bbox1.h+bbox1.y, bbox2.h+bbox2.y);
+    const float inter_xmin = (std::max)(bbox1.x, bbox2.x);
+    const float inter_ymin = (std::max)(bbox1.y, bbox2.y);
+    const float inter_xmax = (std::min)(bbox1.w+bbox1.x, bbox2.w+bbox2.x);
+    const float inter_ymax = (std::min)(bbox1.h+bbox1.y, bbox2.h+bbox2.y);
 
     const float inter_width = inter_xmax - inter_xmin;
     const float inter_height = inter_ymax - inter_ymin;

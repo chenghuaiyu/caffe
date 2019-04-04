@@ -132,3 +132,64 @@ bool VimDecrypt2BufRc4(const char* infile, const char *pwd, char** out1,
     return true;
 }
 
+bool VimDecrypt2BufRc4(const wchar_t* infile, const char *pwd, char** out1, 
+                            char** out2, int *len1, int *len2) {
+    rc4 rc4_cona((unsigned char *)pwd, strlen(pwd));
+    char buf[BUF_SIZE];
+    int uLen;
+    int modelLength = 0;
+    int weightLength = 0;
+    char* modelBuf;
+    char* weightBuf;
+    FILE * fsrc = _wfopen(infile, L"rb");
+    fseek(fsrc, 0, SEEK_SET);
+    uLen = fread(&modelLength, 1, sizeof(int), fsrc);
+    uLen = fread(&weightLength, 1, sizeof(int), fsrc);
+
+    if (modelLength > MAX_MODEL_LENGTH || weightLength > MAX_WEIGHT_LENGTH) {
+        fclose(fsrc);
+        return false;
+    }
+    modelBuf = (char *)malloc(modelLength);
+    weightBuf = (char *)malloc(weightLength);
+    *out1 = modelBuf;
+    *out2 = weightBuf;
+    *len1 = modelLength;
+    *len2 = weightLength;
+    printf("modelLength:%d, weightLength:%d\n", modelLength, weightLength);
+
+    int tmp = modelLength;
+    while (tmp  > 0) {
+        if (tmp  > BUF_SIZE) {
+            uLen = fread(buf, 1, BUF_SIZE, fsrc);
+        } else {
+            uLen = fread(buf, 1, tmp, fsrc);
+        }
+        if (uLen <= 0) {
+            break;
+        }
+        rc4_cona.rc4_encode((unsigned char*)buf, uLen);
+        memcpy(modelBuf, buf, uLen);
+        modelBuf += uLen;
+        tmp -= uLen;
+    }
+
+    tmp = weightLength;
+    while (tmp > 0) {
+        if (tmp > BUF_SIZE) {
+            uLen = fread(buf, 1, BUF_SIZE, fsrc);
+        } else {
+            uLen = fread(buf, 1, tmp, fsrc);
+        }
+        if (uLen <= 0) {
+            break;
+        }
+        rc4_cona.rc4_encode((unsigned char*)buf, uLen);
+        memcpy(weightBuf, buf, uLen);
+        weightBuf += uLen;
+        tmp -= uLen;
+    }
+    fclose(fsrc); 
+    return true;
+}
+

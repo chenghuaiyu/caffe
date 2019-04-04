@@ -48,6 +48,21 @@ bool IsFileExist(string strFileName) {
     }
     return true;
 }
+
+bool DoesFileExist(const char * pszFileName) {
+	if (-1 != GetFileAttributesA(pszFileName))
+		return true;
+	else
+		return false;
+}
+
+bool wDoesFileExist(const wchar_t * pwszFileName) {
+	if (-1 != GetFileAttributesW(pwszFileName))
+		return true;
+	else
+		return false;
+}
+
 #ifdef _LINUX_
 void GetFiles(string path, vector<string>& files) {
     string tmp;
@@ -171,6 +186,7 @@ char* ConvertLPWSTRToLPSTR(LPWSTR lpwszStrIn) {
 	}
 	return pszOut;
 }
+
 string GetDLLPath() {
 	char *strpath;
 	TCHAR result[MAX_PATH];
@@ -179,11 +195,84 @@ string GetDLLPath() {
 	if (GetModuleFileName(hModule, (LPWSTR)result, MAX_PATH)) {
 		(_tcsrchr(result, _T('\\')))[1] = 0;
 	}
-	strpath = ConvertLPWSTRToLPSTR(result);
-	return std::string(strpath);
+	return Wide2MultiByte(result, CP_ACP);
 }
-#endif
 
+wstring wGetDLLPath() {
+	wchar_t result[MAX_PATH];
+	HMODULE hModule = reinterpret_cast<HMODULE>(&__ImageBase);
+
+	if (GetModuleFileNameW(hModule, (LPWSTR)result, MAX_PATH)) {
+		(_tcsrchr(result, _T('\\')))[1] = 0;
+	}
+	return std::wstring(result);
+}
+
+std::string UTF82MultiByte(const char * pszUTF8, int cp) {
+	int nLen = MultiByteToWideChar(CP_UTF8, 0, pszUTF8, -1, NULL, 0);
+	if (0 == nLen) {
+		return "";
+	}
+	wchar_t* pwszBuf = new wchar_t[nLen + 1]();
+	MultiByteToWideChar(CP_UTF8, 0, pszUTF8, (int)strlen(pszUTF8), pwszBuf, nLen);
+	nLen = WideCharToMultiByte(cp, 0, pwszBuf, -1, NULL, NULL, NULL, NULL);
+	char* pszMultiByte = new char[nLen + 1]();
+	WideCharToMultiByte(cp, 0, pwszBuf, (int)wcslen(pwszBuf), pszMultiByte, nLen, NULL, NULL);
+	delete[] pwszBuf;
+
+	std::string str(pszMultiByte);
+	delete[] pszMultiByte;
+	return str;
+}
+
+std::string MultiByte2UTF8(const char * pszMultiByte, int cp) {
+	int nLen = MultiByteToWideChar(cp, 0, pszMultiByte, -1, NULL, 0);
+	if (0 == nLen) {
+		return "";
+	}
+	wchar_t* pwszBuf = new wchar_t[nLen + 1]();
+	MultiByteToWideChar(cp, 0, pszMultiByte, (int)strlen(pszMultiByte), pwszBuf, nLen);
+	nLen = WideCharToMultiByte(CP_UTF8, 0, pwszBuf, -1, NULL, NULL, NULL, NULL);
+	char* pszUTF8 = new char[nLen + 1]();
+	WideCharToMultiByte(CP_UTF8, 0, pwszBuf, (int)wcslen(pwszBuf), pszUTF8, nLen, NULL, NULL);
+	delete[] pwszBuf;
+
+	std::string strUTF8(pszUTF8);
+	delete[] pszUTF8;
+
+	return strUTF8;
+}
+
+std::wstring MultiByte2Wide(const char * pszMultiByte, int cp) {
+	int nLen = MultiByteToWideChar(cp, 0, pszMultiByte, -1, NULL, 0);
+	if (0 == nLen) {
+		return L"";
+	}
+	wchar_t* pwszBuf = new wchar_t[nLen + 1]();
+	MultiByteToWideChar(cp, 0, pszMultiByte, (int)strlen(pszMultiByte), pwszBuf, nLen);
+
+	std::wstring wstr(pwszBuf);
+	delete[] pwszBuf;
+
+	return wstr;
+}
+
+std::string Wide2MultiByte(const wchar_t * pwszBuf, int cp) {
+	int nLen = WideCharToMultiByte(cp, 0, pwszBuf, -1, NULL, NULL, NULL, NULL);
+	if (0 == nLen) {
+		return "";
+	}
+
+	char* pszMultiByte = new char[nLen + 1]();
+	WideCharToMultiByte(cp, 0, pwszBuf, (int)wcslen(pwszBuf), pszMultiByte, nLen, NULL, NULL);
+
+	std::string str(pszMultiByte);
+	delete[] pszMultiByte;
+
+	return str;
+}
+
+#endif
 
 
 string GetFileNameWithNoSuffix(const string filePathName) {

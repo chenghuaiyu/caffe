@@ -46,7 +46,9 @@
 #include "output/outputxml.h"
 #include "SCWObjectDetectionV2.h"
 
+#ifdef _DEBUG
 #define SHOW_MESSAGE
+#endif
 
 enum {
 	RSA_NONE = 0,
@@ -143,39 +145,21 @@ typedef struct {
     MODEL_INFO_S stSubModel;
 }DETECT_INFO_S;
 
-std::string UTF82MultiByte(const char * pszUTF8, int cp) {
-	int nLen = MultiByteToWideChar(CP_UTF8, 0, pszUTF8, -1, NULL, 0);
-	if (0 == nLen) {
-		return "";
+cv::Mat imReadImage(const wchar_t* pwszImgFile) {
+	FILE* fp = _wfopen(pwszImgFile, L"rb");
+	if (!fp) {
+		return Mat::zeros(1, 1, CV_8U);
 	}
-	wchar_t* pwszBuf = new wchar_t[nLen + 1]();
-	MultiByteToWideChar(CP_UTF8, 0, pszUTF8, (int)strlen(pszUTF8), pwszBuf, nLen);
-	nLen = WideCharToMultiByte(cp, 0, pwszBuf, -1, NULL, NULL, NULL, NULL);
-	char* pszMultiByte = new char[nLen + 1]();
-	WideCharToMultiByte(cp, 0, pwszBuf, (int)wcslen(pwszBuf), pszMultiByte, nLen, NULL, NULL);
-	delete[] pwszBuf;
-
-	std::string str(pszMultiByte);
-	delete[] pszMultiByte;
-	return str;
-}
-
-std::string MultiByte2UTF8(const char * pszMultiByte, int cp) {
-	int nLen = MultiByteToWideChar(cp, 0, pszMultiByte, -1, NULL, 0);
-	if (0 == nLen) {
-		return "";
-	}
-	wchar_t* pwszBuf = new wchar_t[nLen + 1]();
-	MultiByteToWideChar(cp, 0, pszMultiByte, (int)strlen(pszMultiByte), pwszBuf, nLen);
-	nLen = WideCharToMultiByte(CP_UTF8, 0, pwszBuf, -1, NULL, NULL, NULL, NULL);
-	char* pszUTF8 = new char[nLen + 1]();
-	WideCharToMultiByte(CP_UTF8, 0, pwszBuf, (int)wcslen(pwszBuf), pszUTF8, nLen, NULL, NULL);
-	delete[] pwszBuf;
-
-	std::string strUTF8(pszUTF8);
-	delete[] pszUTF8;
-
-	return strUTF8;
+	fseek(fp, 0, SEEK_END);
+	long sz = ftell(fp);
+	char* buf = new char[sz];
+	fseek(fp, 0, SEEK_SET);
+	long n = fread(buf, 1, sz, fp);
+	_InputArray arr(buf, sz);
+	Mat img = imdecode(arr, CV_LOAD_IMAGE_COLOR);
+	delete[] buf;
+	fclose(fp);
+	return img;
 }
 
 // Parse GPU ids or use all available devices
@@ -201,41 +185,42 @@ static void get_gpus(vector<int>* gpus, string strgpus) {
     }
 }
 
-int GetConfig(DETECT_INFO_S *pstInfo, const char* pszConfigFile) {
-	const char * pEnd4 = pszConfigFile + strlen(pszConfigFile) - 4;
+int GetConfig(DETECT_INFO_S *pstInfo, const char* ps8szConfigFile) {
+	const char * pEnd4 = ps8szConfigFile + strlen(ps8szConfigFile) - 4;
 	int nRet = 0;
 	if (0 == strcmp(pEnd4, ".cfg")) {
-		LOG(INFO) << "LoadFile2ModelInfo: " << pszConfigFile;
-		nRet = LoadFile2ModelInfo(pszConfigFile, & pstInfo->stMainModel);
+		LOG(INFO) << "LoadFile2ModelInfo: " << ps8szConfigFile;
+		wstring wstrConfigFile = MultiByte2Wide(ps8szConfigFile, CP_UTF8);
+		nRet = wLoadCfgFile2ModelInfo(wstrConfigFile, & pstInfo->stMainModel);
 		LOG(INFO) << "LoadFile2ModelInfo: " << nRet;
 		if (SUCCESS != nRet) {
 			return SCWERR_CONFIG;
 		}
 		if (pstInfo->stMainModel.postmode.find("classify") != string::npos) {
 			LOG(INFO) << "LoadFile2ModelInfo: " << pstInfo->stMainModel.labelmapfile;
-			nRet = LoadFile2ModelInfo(pstInfo->stMainModel.labelmapfile, &pstInfo->stSubModel);
+			nRet = wLoadCfgFile2ModelInfo(MultiByte2Wide(pstInfo->stMainModel.labelmapfile.c_str(), CP_UTF8), &pstInfo->stSubModel);
 			LOG(INFO) << "LoadFile2ModelInfo: " << nRet;
 			if (SUCCESS != nRet) {
 				return SCWERR_CONFIG;
 			}
 		}
 	} else if (0 == strcmp(pEnd4, ".xml")) {
-		LOG(INFO) << "LoadFile2ModelInfoXml: " << pszConfigFile;
-		nRet = LoadFile2ModelInfoXml(pszConfigFile, & pstInfo->stSubModel);
+		LOG(INFO) << "LoadFile2ModelInfoXml: " << ps8szConfigFile;
+		nRet = LoadXmlFile2ModelInfo(ps8szConfigFile, & pstInfo->stSubModel);
 		LOG(INFO) << "LoadFile2ModelInfoXml: " << nRet;
 		if (SUCCESS != nRet) {
 			return SCWERR_CONFIG;
 		}
 		if (pstInfo->stMainModel.postmode.find("classify") != string::npos) {
 			LOG(INFO) << "LoadFile2ModelInfoXml: " << pstInfo->stMainModel.labelmapfile;
-			nRet = LoadFile2ModelInfoXml(pstInfo->stMainModel.labelmapfile, &pstInfo->stSubModel);
+			nRet = LoadXmlFile2ModelInfo(pstInfo->stMainModel.labelmapfile, &pstInfo->stSubModel);
 			LOG(INFO) << "LoadFile2ModelInfoXml: " << nRet;
 			if (SUCCESS != nRet) {
 				return SCWERR_CONFIG;
 			}
 		}
 	} else {
-		LOG(ERROR) << "not .cfg or .xml file: " << pszConfigFile;
+		LOG(ERROR) << "not .cfg or .xml file: " << ps8szConfigFile;
 		nRet = SCWERR_CONFIG;
 	}
 
@@ -273,7 +258,8 @@ int InitModel(MODEL_INFO_S *pstInfo) {
         char* weightbuf = NULL;
         int modellen;
         int weightlen;
-		if (SUCCESS != VimDecrypt(pstInfo->weight.c_str(), &modelbuf, &weightbuf,
+		wstring weight = MultiByte2Wide(pstInfo->weight.c_str(), CP_UTF8);
+		if (SUCCESS != VimDecrypt(weight.c_str(), &modelbuf, &weightbuf,
                 &modellen, &weightlen, 
                 pstInfo->encry.c_str(), pstInfo->key.c_str())) {
             return SCWERR_MODEL;
@@ -369,13 +355,6 @@ vector<string> SplitBySeps(const char* pszWithSep, const char* pszSep) {
 		token = strtok_s(NULL, pszSep, &next_token);
 	}
 	return vec;
-}
-
-bool DoesFileExist(const char * pszFileName) {
-	if (-1 != GetFileAttributesA(pszFileName))
-		return true;
-	else
-		return false;
 }
 
 int generateMap(std::map<std::string, std::string> & mapObjAlias, std::string strObjectTypes, const char * pszObjectSep = g_szObjectSep, const char * pszAliasSep = g_szAliasSep, const char * pszSynonymSep = g_szSynonymSep) {
@@ -484,7 +463,7 @@ string CreateJsonV2(vector<MyImgRes>& vecImgRes, std::map<std::string, std::stri
 	for (vector<MyImgRes>::iterator it = vecImgRes.begin(); it != vecImgRes.end(); ++it) {
 		cJSON *image = cJSON_CreateObject();
 		cJSON_AddItemToObject(images, "", image);
-		cJSON_AddStringToObject(image, "name", MultiByte2UTF8(it->strImgname.c_str(), CP_ACP).c_str());
+		cJSON_AddStringToObject(image, "name", it->strImgname.c_str());
 		cJSON_AddNumberToObject(image, "w", it->width);
 		cJSON_AddNumberToObject(image, "h", it->height);
 		cJSON_AddItemToObject(image, "objs", objs = cJSON_CreateArray());
@@ -494,7 +473,7 @@ string CreateJsonV2(vector<MyImgRes>& vecImgRes, std::map<std::string, std::stri
 			cJSON_AddItemToObject(objs, "", obj);
 			string strObj = it2->first.c_str();
 			if (mapObjAlias.end() != mapObjAlias.find(strObj)) {
-				strObj = mapObjAlias[strObj];
+				strObj += g_szAliasSep + mapObjAlias[strObj];
 			}
 			cJSON_AddStringToObject(obj, "obj", strObj.c_str());
 			cJSON_AddItemToObject(obj, "locations", coords = cJSON_CreateArray());
@@ -584,8 +563,7 @@ int SCWInitObjectDetection(
 		return SCWERR_NOTIMPLEMENT;
 	}
 	else {
-		string strConfigFile = UTF82MultiByte(pszConfig, CP_ACP);
-		nRet = GetConfig(pstInfo, strConfigFile.c_str());
+		nRet = GetConfig(pstInfo, pszConfig);
 		if (SCWERR_NOERROR != nRet) {
 			delete pstInfo;
 			return nRet;
@@ -864,11 +842,11 @@ int SCWDetectObjectByFile(
 		}
 	}
 
-	// encoding utf8 to local, and check image path existence
-	std::vector<std::string> vecImgPath;
+	// path encoding utf8 to Unicode, and check image path existence
+	std::vector<std::wstring> vecImgPath;
 	for (vector<string>::iterator it  = vecImgPathS8.begin(); it != vecImgPathS8.end(); ++it) {
-		string strImgFile = UTF82MultiByte(it->c_str(), CP_ACP);
-		if (! DoesFileExist(strImgFile.c_str())) {
+		wstring strImgFile = MultiByte2Wide(it->c_str(), CP_UTF8);
+		if (! wDoesFileExist(strImgFile.c_str())) {
 			LOG(ERROR) << "image file not found: " << *it;
 			return SCWERR_FILENOTFOUND;
 		}
@@ -884,17 +862,18 @@ int SCWDetectObjectByFile(
     vector<DETECT_FILE_S> totalfiles;
     for (int i = 0; i < vecImgPath.size(); ++i) {
 		DETECT_FILE_S tmpfile = {};
-        tmpfile.filename = vecImgPath[i];
+        tmpfile.filename = Wide2MultiByte(vecImgPath[i].c_str(), CP_ACP);
+		tmpfile.wfilename = vecImgPath[i];
         tmpfile.width = 0;
         tmpfile.height = 0;
         tmpfile.boxes.clear();
-        
-        if (! DoesFileExist(vecImgPath[i].c_str())) {
+        if (! wDoesFileExist(vecImgPath[i].c_str())) {
             totalfiles.push_back(tmpfile);
             continue;  
         }
         
-        cv::Mat org_img = imread(vecImgPath[i].c_str());
+        //cv::Mat org_img = imread(vecImgPath[i].c_str());
+		cv::Mat org_img = imReadImage(vecImgPath[i].c_str());
         if (org_img.empty() || org_img.cols == 0 || org_img.rows == 0) { 
             totalfiles.push_back(tmpfile);
             continue;
@@ -988,7 +967,7 @@ int SCWDetectObjectByFile(
 		str = JsonOutput(totalfiles, labels);
 	}
 #ifdef SHOW_MESSAGE
-	printf("\n------>\n\n%s\n\n<------\n", UTF82MultiByte(str.c_str(), CP_ACP).c_str());
+	printf("\n------>\n%s\n<------\n", str.c_str());
 #endif
 
 	*ppszDetectionResult = new char[str.length() + 1]();
