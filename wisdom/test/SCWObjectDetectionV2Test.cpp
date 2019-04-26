@@ -211,9 +211,6 @@ int wmain(int argc, wchar_t *argv[], wchar_t *envp[]) {
 		return -1;
 	}
 
-	//wchar_t wszObjectType[] = L" knife : 刀  ;   scissors=scissor :   剪刀;liquid:液体;battery:锂电池 ";
-	//string strObjectType = Wide2MultiByte(wszObjectType, CP_UTF8);
-	//std::wcout << L"[Test]objectTypes: " << argv[1] << endl;
 	string strObjectType = Wide2MultiByte(argv[1], CP_UTF8);
 	std::cout << "[Test]objectTypes: " << strObjectType << endl;
 	LOG(INFO) << "objectTypes: \"" << strObjectType.c_str() << "\"";

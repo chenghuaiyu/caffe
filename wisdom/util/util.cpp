@@ -170,22 +170,6 @@ void GetFiles(string path, vector<string>& files, vector<string>& pathfiles) {
 extern"C"IMAGE_DOS_HEADER __ImageBase;
 #endif
 
-char* ConvertLPWSTRToLPSTR(LPWSTR lpwszStrIn) {
-	LPSTR pszOut = NULL;
-	if (lpwszStrIn != NULL) {
-		int nInputStrLen = wcslen(lpwszStrIn);
-
-		// Double NULL Termination
-		int nOutputStrLen = WideCharToMultiByte(CP_ACP, 0, lpwszStrIn, nInputStrLen, NULL, 0, 0, 0) + 2;
-		pszOut = new char[nOutputStrLen];
-
-		if (pszOut) {
-			memset(pszOut, 0x00, nOutputStrLen);
-			WideCharToMultiByte(CP_ACP, 0, lpwszStrIn, nInputStrLen, pszOut, nOutputStrLen, 0, 0);
-		}
-	}
-	return pszOut;
-}
 
 string GetDLLPath() {
 	char *strpath;

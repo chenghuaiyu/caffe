@@ -652,6 +652,3 @@ int LoadXmlFile2ModelInfo(string configfile, MODEL_INFO_S *pstInfo) {
 
     return SUCCESS;
 }
-
-
-

@@ -561,8 +561,7 @@ int SCWInitObjectDetection(
 		LOG(ERROR) << "pszConfig is not file, not implemented yet.";
 		delete pstInfo;
 		return SCWERR_NOTIMPLEMENT;
-	}
-	else {
+	} else {
 		nRet = GetConfig(pstInfo, pszConfig);
 		if (SCWERR_NOERROR != nRet) {
 			delete pstInfo;
@@ -787,6 +786,7 @@ int SCWDetectObjectByFile(
 	const char*	pszImagePath,
 	const int	nConfidentialThreshold
 ) {
+	LOG(INFO) << "Detection image: " << pszImagePath << ", missErrorRatio:" << nConfidentialThreshold;
 	if (NULL == ppszDetectionResult) {
 		LOG(ERROR) << "NULL param 1.";
 		return SCWERR_PARAMETER;
@@ -845,12 +845,12 @@ int SCWDetectObjectByFile(
 	// path encoding utf8 to Unicode, and check image path existence
 	std::vector<std::wstring> vecImgPath;
 	for (vector<string>::iterator it  = vecImgPathS8.begin(); it != vecImgPathS8.end(); ++it) {
-		wstring strImgFile = MultiByte2Wide(it->c_str(), CP_UTF8);
-		if (! wDoesFileExist(strImgFile.c_str())) {
+		wstring wstrImgFile = MultiByte2Wide(it->c_str(), CP_UTF8);
+		if (! wDoesFileExist(wstrImgFile.c_str())) {
 			LOG(ERROR) << "image file not found: " << *it;
 			return SCWERR_FILENOTFOUND;
 		}
-		vecImgPath.push_back(strImgFile);
+		vecImgPath.push_back(wstrImgFile);
 	}
  
     Net<float> *caffe_net = pstInfo->stMainModel.caffe_net;
@@ -862,7 +862,7 @@ int SCWDetectObjectByFile(
     vector<DETECT_FILE_S> totalfiles;
     for (int i = 0; i < vecImgPath.size(); ++i) {
 		DETECT_FILE_S tmpfile = {};
-        tmpfile.filename = Wide2MultiByte(vecImgPath[i].c_str(), CP_ACP);
+        tmpfile.filename = Wide2MultiByte(vecImgPath[i].c_str(), CP_UTF8);
 		tmpfile.wfilename = vecImgPath[i];
         tmpfile.width = 0;
         tmpfile.height = 0;
@@ -872,7 +872,6 @@ int SCWDetectObjectByFile(
             continue;  
         }
         
-        //cv::Mat org_img = imread(vecImgPath[i].c_str());
 		cv::Mat org_img = imReadImage(vecImgPath[i].c_str());
         if (org_img.empty() || org_img.cols == 0 || org_img.rows == 0) { 
             totalfiles.push_back(tmpfile);
@@ -946,10 +945,8 @@ int SCWDetectObjectByFile(
         totalfiles.push_back(tmpfile);
     }
     
-    //Output(totalfiles, pstMainInfo->outmode, labels);
 	string str;
 	if (pstMainInfo->outmode == "json") {
-		//JsonOutput(totalfiles, labels);
 		vector<MyImgRes> vecImgRes;
 		for (vector<DETECT_FILE_S>::iterator it = totalfiles.begin(); it != totalfiles.end(); ++it) {
 			MyImgRes myImgRes = {};
