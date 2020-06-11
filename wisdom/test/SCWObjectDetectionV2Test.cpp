@@ -161,6 +161,35 @@ std::wstring wConvertPath2Name(const wchar_t * pszImgName) {
 	return strFile;
 }
 
+SCWImgTypeEnum GetSCWImgType(const char* pszImageFile) {
+	const char* pszExt = strrchr(pszImageFile, '.');
+	if (0 == _stricmp(pszExt, ".jpg") ||
+		0 == _stricmp(pszExt, ".jpeg") ||
+		0 == _stricmp(pszExt, ".jpe") ||
+		0 == _stricmp(pszExt, ".jfif")) {
+		return SCWImgType_JPG;
+	}
+	else if (0 == _stricmp(pszExt, ".png")) {
+		return SCWImgType_PNG;
+	}
+	else if (0 == _stricmp(pszExt, ".bmp")) {
+		return SCWImgType_BMP;
+	}
+	else if (0 == _stricmp(pszExt, ".tif") ||
+		0 == _stricmp(pszExt, ".tiff")) {
+		return SCWImgType_TIF;
+	}
+	else if (0 == _stricmp(pszExt, ".gif")) {
+		return SCWImgType_GIF;
+	}
+	else if (0 == _stricmp(pszExt, ".webp")) {
+		return SCWIMGTYPE_WEBP;
+	}
+	else {
+	}
+	return SCWImgType_NONE;
+}
+
 void BatchProcess(void * hAlg, wstring wstrDstDir, wstring wstrImageDir, int missErrorRatio) {
 	LOG(INFO) << "proceed image dir: " << Wide2MultiByte(wstrImageDir.c_str(), CP_UTF8);
 	std::cout << "proceed image dir: " << Wide2MultiByte(wstrImageDir.c_str(), CP_UTF8) << endl;
@@ -183,7 +212,23 @@ void BatchProcess(void * hAlg, wstring wstrDstDir, wstring wstrImageDir, int mis
 		printf(">>> proceed file: %s\n", strUtf8.c_str());
 		LOG(INFO) << ">>> proceed: " << strUtf8;
 		char* pszRes = NULL;
+#if 0
 		int nRet = SCWDetectObjectByFile(&pszRes, hAlg, strUtf8.c_str(), missErrorRatio);
+#else
+		SCWImgBufStruct ibs;
+		size_t nLen = strUtf8.length();
+		ibs.pszImagePath = new char[nLen + 1]();
+		memcpy_s(ibs.pszImagePath, nLen, strUtf8.c_str(), nLen);
+		if (!ReadFileLenAndDataA(ibs.nImageBufLen, &ibs.pImageBuf, ibs.pszImagePath)) {
+			delete[] ibs.pszImagePath;
+			continue;
+		}
+		ibs.nImgType = (int)GetSCWImgType(ibs.pszImagePath);
+		ibs.nConfidentialThreshold = 0;
+		int nRet = SCWDetectObjectByFileBuf(&pszRes, hAlg, &ibs, 1);
+		delete[] ibs.pszImagePath;
+		delete[] ibs.pImageBuf;
+#endif
 		if (SCWERR_NOERROR != nRet) {
 			LOG(INFO) << "detection return: " << nRet;
 			continue;
@@ -206,8 +251,12 @@ int wmain(int argc, wchar_t *argv[], wchar_t *envp[]) {
 	::google::InitGoogleLogging(strArgv0.c_str());
 	std::cout << "[Test]argc: " << argc << endl;
 	if (5 > argc) {
-		std::cout << "format: objectTypes\t configFile\t dstDir imgDir [imgDir2 ...]\n"
-			<< "for example:\n\t\"knife;scissor\" \"d:/SCWObjectDetectionConf.ini\" \"D:\\SCWObjectDetectionResult\" \"D:\\imagesA\" \"D:\\imagesB\"" << endl;
+		std::cout << "format: objectTypes configFile dstDir imgDir [imgDir ...]\n"
+			"\t objectTypes: specify which object type can be used. if empty, then all of the supported objects are used.\n"
+			"\t configFile:  the model configure file path.\n"
+			"\t dstDir:      the result saving directory.\n"
+			"\t imgDir:      the directory of image to be detected.\n\n"
+			"sample:\n\t\"knife_folding;knife_straight;knife_blade;knife_kitchen;scissors_metal;scissors_plastic;scissors_barber\" \"D:/scwAlg/caffe/models/knife_20181208.cfg\" \"D:/SCWObjectDetectionResult\" \"D:/scwAlg/images/\" \"D:/images\"" << endl;
 		return -1;
 	}
 

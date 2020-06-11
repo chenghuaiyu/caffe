@@ -133,9 +133,9 @@ using caffe::LabelMap;
 using namespace std;
 using namespace cv;
 
-const char g_szObjectSep[] = ";";
-const char g_szAliasSep[] = ":";
-const char g_szSynonymSep[] = "=";
+const char g_szObjectSep[] = { cObjectSep, '\0' };
+const char g_szAliasSep[] = { cAliasSep, '\0' };
+const char g_szSynonymSep[] = { cSynonymSep, '\0' };
 
 vector<HScwAlg> g_vecScwAlgHandle;
 std::map<HScwAlg, std::map<std::string, std::string>> g_mapAlgObjAlias;
@@ -361,8 +361,8 @@ int generateMap(std::map<std::string, std::string> & mapObjAlias, std::string st
 	vector<string> vecObj = SplitBySeps(strObjectTypes.c_str(), pszObjectSep);
 	LOG(INFO) << "object type count: " << vecObj.size();
 	if (0 == vecObj.size()) {
-		LOG(ERROR) << "none object type found.";
-		return SCWERR_PARAMETER;
+		LOG(WARNING) << "none object type found.";
+		return SCWERR_NOERROR;
 	}
 	for (vector<string>::const_iterator citObj = vecObj.cbegin(); citObj < vecObj.cend(); ++citObj) {
 		vector<string> vecAlias = SplitBySeps(citObj->c_str(), pszAliasSep);
@@ -514,7 +514,7 @@ int SCWInitObjectDetection(
 	if (NULL != *phAlg && 0 < g_vecScwAlgHandle.size()) {
 		if (std::find(g_vecScwAlgHandle.begin(), g_vecScwAlgHandle.end(), *phAlg) != g_vecScwAlgHandle.end()) {
 			LOG(ERROR) << "This function should be invoked only once.";
-			return SCWERR_INITIALED;
+			return SCWERR_INITIALIZED;
 		}
 	}
 
@@ -526,10 +526,10 @@ int SCWInitObjectDetection(
 	}
 
 	if (NULL == pszObjectTypes) {
-		LOG(ERROR) << "NULL param 3.";
-		return SCWERR_PARAMETER;
+		LOG(WARNING) << "NULL param 3.";
+	} else {
+		LOG(INFO) << "SCWInitObjectDetection param 3: \"" << pszObjectTypes << "\"";
 	}
-	LOG(INFO) << "SCWInitObjectDetection param 3: \"" << pszObjectTypes << "\"";
 
 	if (NULL == pszConfig) {
 		LOG(INFO) << "SCWInitObjectDetection param 4: NULL";
@@ -537,24 +537,28 @@ int SCWInitObjectDetection(
 		LOG(INFO) << "SCWInitObjectDetection param 4: \"" << pszConfig << "\"";
 	}
 
-	int nRet = SCWERR_NOERROR;
 	int n1 = nKind & 1;
 	int n2 = (nKind >> 4) & 1;
 	LOG(INFO) << "SCWInitObjectDetection param 5: " << (int)nKind << ", so param 3 is utf8 string or file: " << n1 << ", and param 4 is utf8 file or string:" << n2;
 
-	string s8ObjectTypes = pszObjectTypes;
+	string s8ObjectTypes = NULL == pszObjectTypes ? "" : pszObjectTypes;
 	std::map<std::string, std::string> g_mapObjAlias;
-	if (1 == n1) {
-		// TODO: 
-		LOG(ERROR) << "pszObjectTypes is utf8 string denoting the file name, not implemented yet.";
-		return SCWERR_NOTIMPLEMENT;
-	} else {
-		LOG(INFO) << "Split Objects with 3 symbols: " << g_szObjectSep << ", " << g_szAliasSep << ", " << g_szSynonymSep;
-		nRet = generateMap(g_mapObjAlias, s8ObjectTypes);
-		if (SCWERR_NOERROR != nRet) {
-			return nRet;
+	if (1 == n1 && s8ObjectTypes.length() > 0) {
+		// pszObjectTypes utf8 string denoting the file name, so read file content first;
+		unsigned long nFileBinLen;
+		unsigned char* pFileBins;
+		if (!ReadFileLenAndDataA(nFileBinLen, &pFileBins, s8ObjectTypes.c_str())) {
+			return SCWERR_FILE;
 		}
+		s8ObjectTypes = string((char*)pFileBins, nFileBinLen);
+		delete[] pFileBins;
 	}
+	LOG(INFO) << "Split Objects with 3 symbols: " << g_szObjectSep << ", " << g_szAliasSep << ", " << g_szSynonymSep;
+	int nRet = generateMap(g_mapObjAlias, s8ObjectTypes);
+	if (SCWERR_NOERROR != nRet) {
+		return nRet;
+	}
+
 	DETECT_INFO_S* pstInfo = new DETECT_INFO_S(){};
 	if (0 == n2) {
 		// TODO: pszConfig is not file, not implemented yet. 
@@ -658,15 +662,20 @@ int SCWInitObjectDetection(
 
 	string strObjUsed = "";
 	string strObjUnused = "";
-
 	std::vector<std::string> vecObjIn;
+	vector<string> vecObj = pstInfo->stMainModel.labels;
+	vector<string>::iterator iter = vecObj.begin();
+	++iter;
+	if (g_mapObjAlias.size() == 0) {
+		for (; iter != vecObj.end(); ++iter) {
+			strObjUsed += *iter;
+			strObjUsed += g_szObjectSep;
+		}
+	} else {
 	for (map<string, string>::iterator it = g_mapObjAlias.begin(); it != g_mapObjAlias.end(); ++it) {
 		vecObjIn.push_back(it->first);
 	}
 
-	vector<string> vecObj = pstInfo->stMainModel.labels;
-	vector<string>::iterator iter = vecObj.begin();
-	++iter;
 	for (; iter != vecObj.end(); ++iter) {
 		if (g_mapObjAlias.find(*iter) == g_mapObjAlias.end()) {
 			strObjUnused += *iter;
@@ -681,6 +690,7 @@ int SCWInitObjectDetection(
 				vecObjIn.erase(std::remove(vecObjIn.begin(), vecObjIn.end(), *iter), vecObjIn.end());
 			}
 		}
+	}
 	}
 
 	if (0 == strObjUsed.size()) {
@@ -780,13 +790,86 @@ void SCWRelease(
 	*ppszBuf = NULL;
 }
 
+int Detect(cv::Mat& org_img, std::wstring wstrImgPath, vector<DETECT_FILE_S>& totalfiles, MODEL_INFO_S* pstMainInfo, MODEL_INFO_S* pstPostInfo) {
+#if	RSA == RSA_SENTINEL
+	hasp_u32_t FeatureID = 1123u;
+	ErrorPrinter errorPrinter;
+	haspStatus status;
+
+	//Demonstrates the login to the default feature of a key
+	//Searches both locally and remotely for it
+	cout << "login to default feature: " << FeatureID;
+	Chasp hasp1(ChaspFeature::ChaspFeature(FeatureID));
+	status = hasp1.login(vendorCode);
+	errorPrinter.printError(status);
+	if (!HASP_SUCCEEDED(status)) {
+		LOG(ERROR) << "login error: " << status;
+		return SCWERR_DONGLE;
+	}
+
+	SYSTEMTIME	curr_tm = {};
+	GetLocalTime(&curr_tm);
+	char szBuf[_MAX_PATH] = {};
+	sprintf_s(szBuf, _MAX_PATH, "%03d%02d%03d%02d%02d%04d", curr_tm.wMilliseconds, curr_tm.wHour, rand(), curr_tm.wSecond, curr_tm.wMinute, clock());
+	string str = string(szBuf);
+	status = hasp1.encrypt(str);
+	if (!HASP_SUCCEEDED(status)) {
+		LOG(ERROR) << "hasp  encrypt: " << status;
+		return SCWERR_DONGLE;
+	}
+	status = hasp1.decrypt(str);
+	if (!HASP_SUCCEEDED(status)) {
+		LOG(ERROR) << "hasp decrypt: " << status;
+		return SCWERR_DONGLE;
+	}
+	if (str != string(szBuf)) {
+		LOG(ERROR) << "hasp : " << status;
+		return SCWERR_DONGLE;
+	}
+
+	hasp1.logout();
+
+#elif	RSA == RSA_TENDYRON
+	SYSTEMTIME	curr_tm = {};
+	GetLocalTime(&curr_tm);
+	char szBuf[_MAX_PATH] = {};
+	sprintf_s(szBuf, _MAX_PATH, "%03d%02d%03d%02d%02d%04d", curr_tm.wMilliseconds, curr_tm.wHour, rand(), curr_tm.wSecond, curr_tm.wMinute, clock());
+
+	unsigned char* pucBufOut = NULL;
+	if (FAIL == tendyron((unsigned char*)szBuf, strlen(szBuf), &pucBufOut)) {
+		return SCWERR_DONGLE;
+	}
+	unsigned char* pucBufOut2 = NULL;
+	tendyronRsa(pucBufOut, &pucBufOut2);
+	TDR_FreeMemory((void**)&pucBufOut);
+	int n = memcmp(szBuf, pucBufOut2 + 112, 16);
+	TDR_FreeMemory((void**)&pucBufOut2);
+	if (0 != n) {
+		return SCWERR_DONGLE;
+	}
+#endif
+
+	vector<DETECT_BOX_S> retbox = run_caffe(org_img, pstMainInfo);
+	vector<DETECT_BOX_S> savebox = postprocess(retbox, pstMainInfo->postmode, pstPostInfo, org_img);
+	DETECT_FILE_S tmpfile = {};
+	tmpfile.filename = Wide2MultiByte(wstrImgPath.c_str(), CP_UTF8);
+	tmpfile.wfilename = wstrImgPath;
+	tmpfile.boxes.clear();
+	tmpfile.boxes.insert(tmpfile.boxes.end(), savebox.begin(), savebox.end());
+	tmpfile.width = org_img.cols;
+	tmpfile.height = org_img.rows;
+
+	totalfiles.push_back(tmpfile);
+	return SCWERR_NOERROR;
+}
+
 int SCWDetectObjectByFile(
 	char** const ppszDetectionResult,
 	HScwAlg hAlg,
 	const char*	pszImagePath,
 	const int	nConfidentialThreshold
 ) {
-	LOG(INFO) << "Detection image: " << pszImagePath << ", missErrorRatio:" << nConfidentialThreshold;
+	LOG(INFO) << "SCWDetectObjectByFile(): " << pszImagePath << ", missErrorRatio:" << nConfidentialThreshold;
 	if (NULL == ppszDetectionResult) {
 		LOG(ERROR) << "NULL param 1.";
 		return SCWERR_PARAMETER;
@@ -861,89 +944,34 @@ int SCWDetectObjectByFile(
     MODEL_INFO_S *pstMainInfo = &pstInfo->stMainModel;
     vector<DETECT_FILE_S> totalfiles;
     for (int i = 0; i < vecImgPath.size(); ++i) {
-		DETECT_FILE_S tmpfile = {};
-        tmpfile.filename = Wide2MultiByte(vecImgPath[i].c_str(), CP_UTF8);
-		tmpfile.wfilename = vecImgPath[i];
-        tmpfile.width = 0;
-        tmpfile.height = 0;
-        tmpfile.boxes.clear();
-        if (! wDoesFileExist(vecImgPath[i].c_str())) {
-            totalfiles.push_back(tmpfile);
-            continue;  
-        }
+		if (!wDoesFileExist(vecImgPath[i].c_str())) {
+			DETECT_FILE_S tmpfile = {};
+			tmpfile.filename = Wide2MultiByte(vecImgPath[i].c_str(), CP_UTF8);
+			tmpfile.wfilename = vecImgPath[i];
+			tmpfile.width = 0;
+			tmpfile.height = 0;
+			tmpfile.boxes.clear();
+			totalfiles.push_back(tmpfile);
+			continue;
+		}
         
 		cv::Mat org_img = imReadImage(vecImgPath[i].c_str());
-        if (org_img.empty() || org_img.cols == 0 || org_img.rows == 0) { 
-            totalfiles.push_back(tmpfile);
-            continue;
-        }
-
-#if		RSA == RSA_SENTINEL
-		hasp_u32_t FeatureID = 1123u;
-		ErrorPrinter errorPrinter;
-		haspStatus status;
-
-		//Demonstrates the login to the default feature of a key
-		//Searches both locally and remotely for it
-		cout << "login to default feature: " << FeatureID;
-		Chasp hasp1(ChaspFeature::ChaspFeature(FeatureID));
-		status = hasp1.login(vendorCode);
-		errorPrinter.printError(status);
-		if (!HASP_SUCCEEDED(status)) {
-			LOG(ERROR) << "login error: " << status;
-			return SCWERR_DONGLE;
+		if (org_img.empty() || org_img.cols == 0 || org_img.rows == 0) {
+			DETECT_FILE_S tmpfile = {};
+			tmpfile.filename = Wide2MultiByte(vecImgPath[i].c_str(), CP_UTF8);
+			tmpfile.wfilename = vecImgPath[i];
+			tmpfile.width = 0;
+			tmpfile.height = 0;
+			tmpfile.boxes.clear();
+			totalfiles.push_back(tmpfile);
+			continue;
 		}
 
-		SYSTEMTIME	curr_tm = {};
-		GetLocalTime(&curr_tm);
-		char szBuf[_MAX_PATH] = {};
-		sprintf_s(szBuf, _MAX_PATH, "%03d%02d%03d%02d%02d%04d", curr_tm.wMilliseconds, curr_tm.wHour, rand(), curr_tm.wSecond, curr_tm.wMinute, clock());
-		string str = string(szBuf);
-		status = hasp1.encrypt(str);
-		if (!HASP_SUCCEEDED(status)) {
-			LOG(ERROR) << "hasp  encrypt: " << status;
-			return SCWERR_DONGLE;
+		int nRet = Detect(org_img, vecImgPath[i], totalfiles, pstMainInfo, pstPostInfo);
+		if (SCWERR_NOERROR != nRet) {
+			return nRet;
 		}
-		status = hasp1.decrypt(str);
-		if (!HASP_SUCCEEDED(status)) {
-			LOG(ERROR) << "hasp decrypt: " << status;
-			return SCWERR_DONGLE;
-		}
-		if (str != string(szBuf)) {
-			LOG(ERROR) << "hasp : " << status;
-			return SCWERR_DONGLE;
-		}
-
-		hasp1.logout();
-
-#elif	RSA == RSA_TENDYRON
-		SYSTEMTIME	curr_tm = {};
-		GetLocalTime(&curr_tm);
-		char szBuf[_MAX_PATH] = {};
-		sprintf_s(szBuf, _MAX_PATH, "%03d%02d%03d%02d%02d%04d", curr_tm.wMilliseconds, curr_tm.wHour, rand(), curr_tm.wSecond, curr_tm.wMinute, clock());
-
-		unsigned char * pucBufOut = NULL;
-		if (FAIL == tendyron((unsigned char *)szBuf, strlen(szBuf), &pucBufOut)) {
-			return SCWERR_DONGLE;
-		}
-		unsigned char * pucBufOut2 = NULL;
-		tendyronRsa(pucBufOut, &pucBufOut2);
-		TDR_FreeMemory((void **)&pucBufOut);
-		int n = memcmp(szBuf, pucBufOut2 + 112, 16);
-		TDR_FreeMemory((void **)&pucBufOut2);
-		if (0 != n) {
-			return SCWERR_DONGLE;
-		}
-#endif
-
-        vector<DETECT_BOX_S> retbox = run_caffe(org_img, pstMainInfo);
-        vector<DETECT_BOX_S> savebox = postprocess(retbox, pstMainInfo->postmode, pstPostInfo, org_img);
-		tmpfile.boxes.insert(tmpfile.boxes.end(), savebox.begin(), savebox.end());
- 		tmpfile.width = org_img.cols;
-        tmpfile.height = org_img.rows;
-
-        totalfiles.push_back(tmpfile);
-    }
+	}
     
 	string str;
 	if (pstMainInfo->outmode == "json") {
@@ -982,5 +1010,132 @@ int SCWDetectObjectByFileBuf(
 	const struct SCWImgBufStruct * pScwImgStruct,
 	const int		nScwImgStructCount
 ) {
-	return SCWERR_NOTIMPLEMENT;
+	LOG(INFO) << "SCWDetectObjectByFileBuf(): ";
+	if (NULL == ppszDetectionResult) {
+		LOG(ERROR) << "NULL param 1.";
+		return SCWERR_PARAMETER;
+	}
+
+	if (NULL == hAlg) {
+		LOG(ERROR) << "NULL param 2.";
+		return SCWERR_NOINIT;
+	}
+	if (0 == g_vecScwAlgHandle.size()) {
+		LOG(ERROR) << "no invoke SCWInitObjectDetection function before.";
+		return SCWERR_NOINIT;
+	}
+	if (std::find(g_vecScwAlgHandle.begin(), g_vecScwAlgHandle.end(), hAlg) == g_vecScwAlgHandle.end()) {
+		LOG(ERROR) << "no invoke SCWInitObjectDetection function before.";
+		return SCWERR_NOINIT;
+	}
+	if (NULL == pScwImgStruct) {
+		LOG(ERROR) << "NULL param 3.";
+		return SCWERR_PARAMETER;
+	}
+	if (0 >= nScwImgStructCount) {
+		LOG(ERROR) << "param 4 should be positive.";
+		return SCWERR_PARAMETER;
+	}
+	for (int i = 0; i < nScwImgStructCount; ++i) {
+		if (NULL == pScwImgStruct[i].pImageBuf) {
+			LOG(ERROR) << "NULL image file buffer in No. " << i;
+			return SCWERR_PARAMETER;
+		}
+		if (0 >= pScwImgStruct[i].nImageBufLen) {
+			LOG(ERROR) << "image file buffer size error in No. " << i;
+			return SCWERR_PARAMETER;
+		}
+		if (0 >= pScwImgStruct[i].nImgType) {
+			LOG(ERROR) << "image type error in No. " << i;
+			return SCWERR_PARAMETER;
+		}
+		if (0 > pScwImgStruct[i].nConfidentialThreshold || 100 < pScwImgStruct[i].nConfidentialThreshold) {
+			LOG(ERROR) << "nConfidentialThreshold not in the range [0, 100] in No. " << i;
+			return SCWERR_PARAMETER;
+		}
+	}
+	if (1 < nScwImgStructCount) {
+		std::vector<std::string> vecImgPathS8;
+		for (int i = 0; i < nScwImgStructCount; ++i) {
+			vecImgPathS8.push_back(pScwImgStruct[i].pszImagePath);
+		}
+		sort(vecImgPathS8.begin(), vecImgPathS8.end());
+		vecImgPathS8.erase(unique(vecImgPathS8.begin(), vecImgPathS8.end()), vecImgPathS8.end());
+		if (nScwImgStructCount > vecImgPathS8.size()) {
+			LOG(ERROR) << "duplicate image path found.";
+			return SCWERR_PARAMETER;
+		}
+	}
+
+	DETECT_INFO_S *pstInfo = (DETECT_INFO_S *)hAlg;
+
+	MODEL_INFO_S *pstPostInfo = NULL;
+    vector<string> labels;
+	if (pstInfo->stMainModel.postmode.find("classify") != string::npos) {
+		labels = pstInfo->stSubModel.labels;
+        pstPostInfo = &pstInfo->stSubModel;
+	} else {
+		labels = pstInfo->stMainModel.labels;
+        pstPostInfo = &pstInfo->stMainModel;
+	}
+
+    Net<float> *caffe_net = pstInfo->stMainModel.caffe_net;
+    Blob<float>* input_layer = caffe_net->input_blobs()[0];
+    int width = input_layer->width();
+    int height = input_layer->height();
+    
+    MODEL_INFO_S *pstMainInfo = &pstInfo->stMainModel;
+    vector<DETECT_FILE_S> totalfiles;
+    for (int i = 0; i < nScwImgStructCount; ++i) {
+		vector<uchar> vecImg;
+		for (int i = 0; i < pScwImgStruct->nImageBufLen; ++i) {
+			vecImg.push_back(pScwImgStruct->pImageBuf[i]);
+		}
+		cv::Mat org_img = cv::imdecode(vecImg, cv::IMREAD_COLOR);
+		if (org_img.empty() || org_img.cols == 0 || org_img.rows == 0) {
+			DETECT_FILE_S tmpfile = {};
+			tmpfile.filename = pScwImgStruct->pszImagePath;
+			tmpfile.wfilename = MultiByte2Wide(pScwImgStruct->pszImagePath, CP_UTF8);
+			tmpfile.width = 0;
+			tmpfile.height = 0;
+			tmpfile.boxes.clear();
+			totalfiles.push_back(tmpfile);
+			continue;
+		}
+
+		int nRet = Detect(org_img, MultiByte2Wide(pScwImgStruct->pszImagePath, CP_UTF8), totalfiles, pstMainInfo, pstPostInfo);
+		if (SCWERR_NOERROR != nRet) {
+			return nRet;
+		}
+	}
+    
+	string str;
+	if (pstMainInfo->outmode == "json") {
+		vector<MyImgRes> vecImgRes;
+		for (vector<DETECT_FILE_S>::iterator it = totalfiles.begin(); it != totalfiles.end(); ++it) {
+			MyImgRes myImgRes = {};
+			int n = convert2MyImgRes(myImgRes, *it, labels);
+			if (n == 0) {
+				vecImgRes.push_back(myImgRes);
+			}
+		}
+		str = CreateJsonV2(vecImgRes, g_mapAlgObjAlias[hAlg]); // str utf8 encoding
+	} else if (pstMainInfo->outmode == "jsonspec") {
+		str = JsonOutputSpec(totalfiles, labels);
+	} else if (pstMainInfo->outmode == "xml") {
+		str = XmlOutput(totalfiles, labels);
+	} else {
+		str = JsonOutput(totalfiles, labels);
+	}
+#ifdef SHOW_MESSAGE
+	printf("\n------>\n%s\n<------\n", str.c_str());
+#endif
+
+	*ppszDetectionResult = new char[str.length() + 1]();
+	memcpy_s(*ppszDetectionResult, str.length(), str.c_str(), str.length());
+	LOG(INFO) << "detection result:------>\n" << *ppszDetectionResult << "\n<------";
+	LOG(INFO);
+
+	::google::FlushLogFiles(0);
+	return SCWERR_NOERROR;
 }

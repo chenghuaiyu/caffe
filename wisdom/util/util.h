@@ -46,6 +46,8 @@ void MkDstDir(const char * dstdir);
 
 void paDrawString(Mat& dst, const char* str, Point org, Scalar color, int fontSize, bool italic, bool underline);
 
+bool ReadFileLenAndDataA(unsigned long& nFileBinLen, unsigned char** ppFileBins, char const* ps8zFilename);
+
 class PingPangBuffer
 {
 private:

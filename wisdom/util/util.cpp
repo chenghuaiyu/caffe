@@ -16,6 +16,9 @@
 #include <direct.h> //mkdir
 #include <windows.h>
 #endif
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+#include "glog/logging.h"
+
 #include "util.h"
 
 #ifdef _LINUX_
@@ -519,3 +522,39 @@ void paDrawString(Mat& dst, const char* str, Point org, Scalar color, int fontSi
 	DeleteDC(hDC);
 }
 #endif
+
+bool ReadFileLenAndDataA(unsigned long& nFileBinLen, unsigned char** ppFileBins, char const* ps8zFilename) {
+	LOG(INFO) << "into ReadFileLenAndDataA(): " << ps8zFilename;
+	std::wstring wstrFile = MultiByte2Wide(ps8zFilename, CP_UTF8);
+	std::string strFile = Wide2MultiByte(wstrFile.c_str(), CP_ACP);
+	//std::ifstream ifs(pszFilename, std::ios::binary | std::ios::ate); // fail in some OS due to std::ios::ate
+	std::ifstream ifs;
+	int nTryTimes = 20;
+	do {
+		ifs = std::ifstream(strFile.c_str(), std::ios::binary);
+		if (ifs.good()) {
+			break;
+		}
+		Sleep(10);
+		LOG(INFO) << "fail to open file: " << ps8zFilename << ", try times: " << nTryTimes;
+	} while (nTryTimes--);
+	if (!ifs.good()) {
+		LOG(ERROR) << "fail to read file: " << ps8zFilename;
+		return false;
+	}
+
+	ifs.seekg(0, std::ios::end);
+	nFileBinLen = (unsigned long)ifs.tellg();
+	if (ppFileBins) {
+		ifs.seekg(0, std::ios::beg);
+		if (nFileBinLen > 0) {
+			*ppFileBins = new unsigned char[nFileBinLen + 1UL];
+			ifs.read((char*)*ppFileBins, nFileBinLen);
+		}
+	}
+
+	ifs.close();
+
+	LOG(INFO) << "byte size: " << nFileBinLen << " of file: " << ps8zFilename;
+	return true;
+}

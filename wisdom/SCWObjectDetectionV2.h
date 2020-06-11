@@ -1,23 +1,28 @@
-/// \file SCWObjectDetectionV2.h
-/// \brief sino cloud wisdom Object Detection header file.
+﻿/// \file SCWObjectDetectionV2.h
+/// \brief SINO CLOUD WISDOM Object Detection header file.
 /// 
-/// sino cloud wisdom Object Detection header file, for Object Detection purpose.
+/// Sinocloud Wisdom Object Detection header file, for Object Detection purpose.
 ///
 /// \author chenghuaiyu@yunkouan.com
-/// \version 2.0
-/// \date 2019-2-20
+/// \version 2.1
+/// \date 2020-06-02
 
 #ifndef __SCW_OBJECT_DETECTION_H__
 #define __SCW_OBJECT_DETECTION_H__
 
-/// \brief scw error code enumerator.
+const char cObjectSep = ';';
+const char cAliasSep = ':';
+const char cSynonymSep = '=';
+const char szObjKindSep[] = { cObjectSep, cObjectSep, '\0' };
+
+/// \brief SCW error code enumerator.
 /// 
-/// scw error code enumerator.
+/// SCW error code enumerator.
 enum SCWErroEnum {
 	SCWERR_NOERROR = 0, ///< no error
 	SCWERR_PARAMETER = 1, ///< function parameter error 
 	SCWERR_NOINIT = 2, ///< algorithm initialization function not invoked yet
-	SCWERR_INITIALED = 3, ///< algorithm initialization function invoked already
+	SCWERR_INITIALIZED = 3, ///< algorithm initialization function invoked already
 	SCWERR_CONFIG = 4, ///< configure error
 	SCWERR_FILENOTFOUND = 5, ///< file not found
 	SCWERR_IMGFILEBUF = 6, ///< SCWImgBufStruct format error, cannot be saved to file
@@ -34,7 +39,7 @@ enum SCWErroEnum {
 
 	SCWERR_NOGPU = 64,	///< GPU not found
 	SCWERR_NOGPUMEMORY = 65,	///< insufficient GPU memory
-	};
+};
 
 typedef void * HScwAlg; ///< algorithm handle
 
@@ -70,23 +75,29 @@ typedef void * HScwAlg; ///< algorithm handle
 /// \note \a ppszObjectTypeRes can be null pointer. if non null pointer 
 ///    specified and function return successfully, #SCWRelease(char **const) 
 ///    should be invoked to avoid the memory leakage.
+///    \a pszObjectTypes can be null pointer. if null pointer or empty string 
+///    specified, the algorithm supported objects are all used. so in the above 
+///    example, the algorithm support four objects: knife, scissors, knife_straight,
+///    knife_blade, then \a ppszObjectTypeRes should point to the following string 
+///    if it's not NULL: "knife;scissors;knife_straight;knife_blade;;;;" or 
+///    simply "knife;scissors;knife_straight;knife_blade"
 ///    <table>
 ///      <tr><th>\a nKind value of bits <th> Comments
 ///      <tr><td>|*|*|*|*|*|*|*|*|  <td> 0 means UTF-8 content; 1 means UTF-8 file name string, the file content encoding is not specified, although UTF-8 is recommended.
-///      <tr><td> * * * * * * * ^--><td> the lowest bit determine the first paramter's format.
-///      <tr><td> * * * ^----------><td> the forth bit determine the second paramter's format.
+///      <tr><td> * * * * * * * ^--><td> the lowest bit determines the first parameter's format.
+///      <tr><td> * * * ^----------><td> the fourth bit determines the second parameter's format.
 ///    </table>so that the following value of \a nKind means:
-///    +  0: the first and second paramter: use content directly;
-///    +  1: the first paramter: file, the second paramter: content;
-///    + 16: the first paramter: content, the second paramter: file;
-///    + 17: the first paramter: file, the second paramter: file;
+///    +  0: the first and second parameter: use content directly;
+///    +  1: the first parameter: file, the second parameter: content;
+///    + 16: the first parameter: content, the second parameter: file;
+///    + 17: the first parameter: file, the second parameter: file;
 int SCWInitObjectDetection(
 	HScwAlg* phAlg,
 	char** const ppszObjectTypeRes,
 	const char* pszObjectTypes,
 	const char* pszConfig,
 	const unsigned char nKind
-	);
+);
 
 /// \brief algorithm uninitialization function.
 /// 
@@ -96,7 +107,7 @@ int SCWInitObjectDetection(
 ///    
 int SCWUninitObjectDetection(
 	HScwAlg* phAlg
-	);
+);
 
 /// \brief image detection function.
 /// 
@@ -120,7 +131,7 @@ int SCWUninitObjectDetection(
 ///        300,"conf":99,"objs":[{"obj":"knife: 刀 ","conf":90,"locations":[{"rect"
 ///        :{"left":50,"top":50,"right":150,"bottom":300},"conf":90},{"points"
 ///        :"channels:2;250,50;500,50;500,320;250,320","conf":80}]},{"obj":
-///        "gun","locations":[{"rect":{"left":450,"top":20,"right":500,
+///        "gun:枪","locations":[{"rect":{"left":450,"top":20,"right":500,
 ///        "bottom":300},"conf":95}]}]},{"name":"201502022313.jpg","w":600
 ///        ,"h":300,"objs":[{"obj":"liquid:液体","conf":85,"locations":[{"rect":{
 ///        "left":50,"top":50,"right":150,"bottom":300},"conf":90},{"rect":
@@ -134,7 +145,7 @@ int SCWDetectObjectByFile(
 	HScwAlg hAlg,
 	const char*	pszImagePath,
 	const int	nConfidentialThreshold
-	);
+);
 
 
 /// \brief release the memory buffer.
@@ -144,7 +155,7 @@ int SCWDetectObjectByFile(
 /// \param[in] ppszBuf buffer to release.
 void SCWRelease(
 	char** const ppszBuf
-	);
+);
 
 /// \brief image file extension enumerator.
 /// 
@@ -156,20 +167,22 @@ enum SCWImgTypeEnum {
 	SCWImgType_BMP = 3, ///< bmp type 
 	SCWImgType_TIF = 4, ///< tif type 
 	SCWImgType_GIF = 5, ///< gif type 
-	SCWImgType_EXT1 = 6, ///< reserved
-	SCWImgType_EXT2 = 7, ///< reserved
-	SCWImgType_EXT3 = 8, ///< reserved
-	};
+	SCWIMGTYPE_WEBP = 6, ///< webp type
+	SCWImgType_EXT1 = 7, ///< reserved
+	SCWImgType_EXT2 = 8, ///< reserved
+	SCWImgType_EXT3 = 9, ///< reserved
+};
 
 /// \brief image file buffer struct.
 /// 
 /// image file buffer struct.
 struct SCWImgBufStruct {
-	unsigned char* pImageBuf; ///< image file buffer 
-	int nImageBufLen; ///< image file buffer size in bytes
+	unsigned char* pImageBuf; ///< image file buffer
+	unsigned long int nImageBufLen; ///< image file buffer size in bytes
 	int nImgType; ///< image file buffer's type, specified in SCWImgTypeEnum
-	int	nConfidentialThreshold; ///< confidential level used as a threshold, value range: [0, 100]. 
-	};
+	char*	pszImagePath; ///< image filename, UTF-8 encoding
+	int	nConfidentialThreshold; ///< confidential level used as a threshold, value range: [0, 100].
+};
 
 /// \brief image detection function.
 /// 
@@ -193,7 +206,7 @@ int SCWDetectObjectByFileBuf(
 	char** const ppszDetectionResult,
 	HScwAlg hAlg,
 	const struct SCWImgBufStruct * pScwImgStruct,
-	const int		nScwImgStructCount
-	);
+	const int nScwImgStructCount
+);
 
 #endif // !__SCW_OBJECT_DETECTION_H__

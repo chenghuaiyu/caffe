@@ -39,6 +39,9 @@
   <ImportGroup Label="PropertySheets" Condition="Exists('$(SolutionDir)\CommonSettings.props')">
     <Import Project="$(SolutionDir)\CommonSettings.props" />
   </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(ProjectName)D</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <AdditionalDependencies>libcaffe.lib;Winscard.lib;libhasp_windows_x64_24990.lib;$(CudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
@@ -186,10 +189,14 @@
     <ClInclude Include="..\..\wisdom\sentinel\vendor_code.h" />
     <ClInclude Include="..\..\wisdom\tools\encrypt.hpp" />
     <ClInclude Include="..\..\wisdom\util\util.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\wisdom\SCWObjectDetectionV2.def" />
     <None Include="..\..\wisdom\sentinel\DECXO.hvc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SCWObjectDetectionV2.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="$(SolutionDir)\CommonSettings.targets" />

@@ -326,11 +326,15 @@
     <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case3.hpp" />
     <ClInclude Include="..\..\wisdom\runcaffe\run_caffe_case4.hpp" />
     <ClInclude Include="..\..\wisdom\SCWObjectDetectionV2.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\wisdom\sentinel\DECXO.hvc">
       <Filter>dongle_sentinel</Filter>
     </None>
     <None Include="..\..\wisdom\SCWObjectDetectionV2.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SCWObjectDetectionV2.rc" />
   </ItemGroup>
 </Project>
