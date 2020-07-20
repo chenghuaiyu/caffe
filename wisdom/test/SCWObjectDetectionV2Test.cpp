@@ -279,10 +279,12 @@ int wmain(int argc, wchar_t *argv[], wchar_t *envp[]) {
 
 	wstring strDstDir = argv[3];
 	LOG(INFO) << "dstDir: " << Wide2MultiByte(argv[3], CP_UTF8) << endl;
-	nRet = _wmkdir(strDstDir.c_str());
-	if (0 != nRet) {
-		printf("fail to invoke _mkdir(): %s.", Wide2MultiByte(strDstDir.c_str(), CP_UTF8).c_str());
-		LOG(ERROR) << "return: " << nRet << " invoking _wmkdir() ";
+	if (!wDoesDirExist(strDstDir.c_str())) {
+		nRet = _wmkdir(strDstDir.c_str());
+		if (0 != nRet) {
+			printf("fail to invoke _mkdir(): %s.", Wide2MultiByte(strDstDir.c_str(), CP_UTF8).c_str());
+			LOG(ERROR) << "return: " << nRet << " invoking _wmkdir() ";
+		}
 	}
 
 	//char* pszRes = NULL;

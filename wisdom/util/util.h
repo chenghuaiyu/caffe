@@ -30,6 +30,7 @@ string GetAppPath();
 bool IsDirExist(string strDirName);
 bool IsFileExist(string strFileName);
 bool DoesFileExist(const char * pszFileName);
+bool wDoesDirExist(const wchar_t* pwszPath);
 bool wDoesFileExist(const wchar_t * pwszFileName);
 void GetFiles(string path, vector<string>& files);
 void GetFiles(string path, vector<string>& files, vector<string>& pathfiles);

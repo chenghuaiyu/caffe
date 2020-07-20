@@ -792,20 +792,33 @@ void SCWRelease(
 
 int Detect(cv::Mat& org_img, std::wstring wstrImgPath, vector<DETECT_FILE_S>& totalfiles, MODEL_INFO_S* pstMainInfo, MODEL_INFO_S* pstPostInfo) {
 #if	RSA == RSA_SENTINEL
-	hasp_u32_t FeatureID = 1123u;
-	ErrorPrinter errorPrinter;
-	haspStatus status;
+#if CALC_SENTINEL_TIME
+	union {
+		ULARGE_INTEGER uli; // QuadPart 100 ns
+		FILETIME       ft;
+	}u1, u2;
+	SYSTEMTIME st_start = {};
+	GetLocalTime(&st_start);
+	SystemTimeToFileTime(&st_start, &u1.ft);
+	SYSTEMTIME st_end = {};
+#endif
 
 	//Demonstrates the login to the default feature of a key
 	//Searches both locally and remotely for it
-	cout << "login to default feature: " << FeatureID;
-	Chasp hasp1(ChaspFeature::ChaspFeature(FeatureID));
-	status = hasp1.login(vendorCode);
-	errorPrinter.printError(status);
+	//cout << "login to default feature: " << 1123u;
+	Chasp hasp1(ChaspFeature::ChaspFeature(1123u));
+	haspStatus status = hasp1.login(vendorCode);
 	if (!HASP_SUCCEEDED(status)) {
+		ErrorPrinter errorPrinter;
+		errorPrinter.printError(status);
 		LOG(ERROR) << "login error: " << status;
 		return SCWERR_DONGLE;
 	}
+#if CALC_SENTINEL_TIME
+	GetLocalTime(&st_end);
+	SystemTimeToFileTime(&st_end, &u2.ft);
+	int uld = (u2.uli.QuadPart - u1.uli.QuadPart) * 1.E-4; // milliseconds
+	cout << "login time duration(ms): " << uld << endl;
 
 	SYSTEMTIME	curr_tm = {};
 	GetLocalTime(&curr_tm);
@@ -817,6 +830,11 @@ int Detect(cv::Mat& org_img, std::wstring wstrImgPath, vector<DETECT_FILE_S>& to
 		LOG(ERROR) << "hasp  encrypt: " << status;
 		return SCWERR_DONGLE;
 	}
+	GetLocalTime(&st_end);
+	SystemTimeToFileTime(&st_end, &u2.ft);
+	uld = (u2.uli.QuadPart - u1.uli.QuadPart) * 1.E-4; // milliseconds
+	cout << "encrypt time duration(ms): " << uld << endl;
+
 	status = hasp1.decrypt(str);
 	if (!HASP_SUCCEEDED(status)) {
 		LOG(ERROR) << "hasp decrypt: " << status;
@@ -826,9 +844,20 @@ int Detect(cv::Mat& org_img, std::wstring wstrImgPath, vector<DETECT_FILE_S>& to
 		LOG(ERROR) << "hasp : " << status;
 		return SCWERR_DONGLE;
 	}
+	GetLocalTime(&st_end);
+	SystemTimeToFileTime(&st_end, &u2.ft);
+	uld = (u2.uli.QuadPart - u1.uli.QuadPart) * 1.E-4; // milliseconds
+	cout << "decrypt time duration(ms): " << uld << endl;
+#endif
 
 	hasp1.logout();
 
+#if CALC_SENTINEL_TIME
+	GetLocalTime(&st_end);
+	SystemTimeToFileTime(&st_end, &u2.ft);
+	int ms = (u2.uli.QuadPart - u1.uli.QuadPart) * 1.E-4; // milliseconds
+	cout << "time duration(ms): " << ms << endl;
+#endif
 #elif	RSA == RSA_TENDYRON
 	SYSTEMTIME	curr_tm = {};
 	GetLocalTime(&curr_tm);

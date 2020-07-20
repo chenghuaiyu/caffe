@@ -14,6 +14,7 @@
 #else
 #include <io.h> //access
 #include <direct.h> //mkdir
+#include <sys/stat.h>
 #include <windows.h>
 #endif
 #define GLOG_NO_ABBREVIATED_SEVERITIES
@@ -57,6 +58,32 @@ bool DoesFileExist(const char * pszFileName) {
 		return true;
 	else
 		return false;
+}
+
+bool wDoesDirExist(const wchar_t* pwszPath) {
+	if (pwszPath == NULL)
+		return false;
+	size_t n = wcslen(pwszPath) - 1;
+	size_t ind = n;
+	while (ind > 0 && (pwszPath[ind] == L'/' || pwszPath[ind] == L'\\')) {
+		--ind;
+	}
+	wchar_t* pszPathNoSlash;
+	wchar_t szTemp[_MAX_PATH + 1] = {};
+	if (ind < n) {
+		wcsncpy_s(szTemp, _MAX_PATH, pwszPath, ind + 1);
+		pszPathNoSlash = szTemp;
+	} else {
+		pszPathNoSlash = (wchar_t*)pwszPath;
+	}
+	struct _stat st;
+	int nRet = _wstat(pszPathNoSlash, &st);
+	if (nRet == 0) {
+		if ((st.st_mode & _S_IFDIR) != 0) {
+			return true;
+		}
+	}
+	return false;
 }
 
 bool wDoesFileExist(const wchar_t * pwszFileName) {
